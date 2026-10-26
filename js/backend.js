@@ -31,6 +31,13 @@
       async delete(){const {error}=await sb.from('docs').delete().eq('collection',c).eq('id',id);if(error)throw fail(error);touch(c)},
       onSnapshot(ok,ko){const run=()=>fetchDoc(c,id).then(d=>ok(snapDoc(id,d)),e=>ko&&ko(e));run();watch(c,run);return()=>{}}
     }},
+    // Envoi groupé (import de membres)
+    async bulkSet(c,items){
+      for(let i=0;i<items.length;i+=200){
+        const rows=items.slice(i,i+200).map(x=>({collection:c,id:x.id,data:x.data,updated_at:new Date().toISOString()}));
+        const {error}=await sb.from('docs').upsert(rows);if(error)throw fail(error);
+      }
+      touch(c)},
     collection(c){return{
       async get(){return snapCol(await fetchCol(c))},
       onSnapshot(ok,ko){const run=()=>fetchCol(c).then(r=>ok(snapCol(r)),e=>ko&&ko(e));run();watch(c,run);return()=>{}}

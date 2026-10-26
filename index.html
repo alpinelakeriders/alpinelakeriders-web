@@ -238,6 +238,13 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 .tbl table{border-collapse:collapse;width:100%;font-size:14px}
 .tbl th,.tbl td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
 .tbl th{font:500 11px var(--mono);text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.tbl{max-height:70vh}
+.tbl thead th{position:sticky;top:0;background:var(--bg)}
+.tbl td.wr{white-space:normal;min-width:180px}
+.mb-tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.mb-tools input[type=search]{font:400 16px var(--sans);color:var(--fg);background:transparent;border:0;border-bottom:1px solid var(--line);padding:8px 0;min-width:220px;flex:1}
+.mb-tools input[type=search]:focus{outline:none;border-bottom-color:var(--fg)}
+.mb-count{font:500 12px var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
 
 .draft{position:fixed;right:max(14px,env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:20;font:500 11px var(--mono);letter-spacing:.04em;text-transform:uppercase;background:var(--fg);color:var(--bg);padding:8px 12px;border-radius:999px;opacity:.85}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -481,8 +488,18 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       </form>
     </div>
     <div>
-      <h3>Inscriptions reçues sur le site</h3>
-      <div id="insc"><p class="msg">Aucune inscription pour l'instant.</p></div>
+      <h3>Membres</h3>
+      <p class="msg" style="margin:6px 0 18px">Inscrits via le site et membres importés depuis votre tableur. Pour importer : dans Google Sheets, Fichier › Télécharger › CSV, puis « Importer un CSV ». Un membre déjà présent (même e-mail et même prénom) est mis à jour, pas dupliqué.</p>
+      <div class="mb-tools">
+        <input type="search" id="mb-q" placeholder="Rechercher un nom, une ville, un e-mail…" aria-label="Rechercher un membre">
+        <span class="mb-count" id="mb-count"></span>
+      </div>
+      <div class="mb-tools">
+        <label class="pill line small" style="cursor:pointer">Importer un CSV<input type="file" id="mb-file" accept=".csv,text/csv" hidden></label>
+        <button class="pill line small" type="button" id="mb-export">Exporter la liste (CSV)</button>
+        <span class="msg" id="mb-msg" role="status"></span>
+      </div>
+      <div id="insc"><p class="msg">Chargement…</p></div>
     </div>
   </div>
 </div></div>
@@ -919,22 +936,115 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   ['dragleave','drop'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.remove('over')}));
   drop.addEventListener('drop',e=>addPhotos(e.dataTransfer.files));
 
+  // ---------- Membres (admin) ----------
+  let membres=[];
+  const norm=t=>(t||'').toString().normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim();
+  const cap=t=>(t||'').toString().trim().replace(/\s+/g,' ').toLowerCase().replace(/(^|[\s\-'’])(\p{L})/gu,(m,a,b)=>a+b.toUpperCase());
+  const mkey=(email,prenom)=>(norm(email)||'sans-email')+'|'+norm(prenom);
   async function loadInscriptions(){
     const box=$('insc');
     try{
-      const q=await db.collection('inscriptions').get();
-      if(q.empty){box.innerHTML='<p class="msg">Aucune inscription pour l\'instant.</p>';return}
-      const wrap=document.createElement('div');wrap.className='tbl';const t=document.createElement('table');
-      t.innerHTML='<thead><tr><th>Date</th><th>Prénom</th><th>Nom</th><th>E-mail</th><th>Téléphone</th><th>Niveau</th></tr></thead>';
-      const tb=document.createElement('tbody');
-      q.docs.map(d=>d.data()).sort((a,b)=>(a.date||'')<(b.date||'')?1:-1).forEach(r=>{
-        const tr=document.createElement('tr');
-        [(r.date||'').slice(0,10),r.prenom,r.nom,r.email,r.tel,r.niveau].forEach(x=>{const td=document.createElement('td');td.textContent=x||'';tr.append(td)});
-        tb.append(tr);
-      });
-      t.append(tb);wrap.append(t);box.textContent='';box.append(wrap);
-    }catch(e){box.innerHTML='<p class="msg">Liste visible uniquement par le responsable du site.</p>'}
+      const [qi,qm]=await Promise.all([db.collection('inscriptions').get(),db.collection('membres').get()]);
+      const map=new Map();
+      qm.docs.forEach(d=>{const r=d.data();map.set(mkey(r.email,r.prenom),Object.assign({_col:'membres',_id:d.id,source:'Import'},r))});
+      qi.docs.forEach(d=>{const r=d.data();const k=mkey(r.email,r.prenom);
+        const row={_col:'inscriptions',_id:d.id,source:'Site',date:(r.date||'').slice(0,10).split('-').reverse().join('/'),nom:r.nom,prenom:r.prenom,email:r.email,tel:r.tel,niveau:r.niveau};
+        map.set(k,Object.assign({},map.get(k)||{},row))});
+      membres=[...map.values()].sort((a,b)=>norm(a.nom).localeCompare(norm(b.nom))||norm(a.prenom).localeCompare(norm(b.prenom)));
+      renderMembres();
+    }catch(e){box.innerHTML='<p class="msg err">Liste indisponible ('+(e&&e.code||'erreur')+').</p>'}
   }
+  const MB_COLS=[['nom','Nom'],['prenom','Prénom'],['email','E-mail'],['tel','Téléphone'],['ville','Ville'],['cp','Code postal'],['niveau','Niveau'],['disciplines','Disciplines'],['date','Date'],['source','Source']];
+  function filtered(){const q=norm($('mb-q').value);return q?membres.filter(m=>MB_COLS.some(([k])=>norm(m[k]).includes(q))||norm(m.adresse).includes(q)):membres}
+  function renderMembres(){
+    const box=$('insc'),list=filtered();
+    $('mb-count').textContent=list.length+' / '+membres.length+' membres';
+    if(!membres.length){box.innerHTML='<p class="msg">Aucun membre pour l\'instant. Importez votre tableur pour commencer.</p>';return}
+    const wrap=document.createElement('div');wrap.className='tbl';const t=document.createElement('table');
+    const hr=document.createElement('tr');MB_COLS.concat([['','']]).forEach(([,l])=>{const th=document.createElement('th');th.textContent=l;hr.append(th)});
+    const th=document.createElement('thead');th.append(hr);t.append(th);
+    const tb=document.createElement('tbody');
+    list.forEach(m=>{
+      const tr=document.createElement('tr');
+      MB_COLS.forEach(([k])=>{const td=document.createElement('td');
+        if(k==='email'&&m.email){const a=document.createElement('a');a.href='mailto:'+m.email;a.textContent=m.email;td.append(a)}
+        else if(k==='tel'&&m.tel){const a=document.createElement('a');a.href='tel:'+m.tel.replace(/[^\d+]/g,'');a.textContent=m.tel;td.append(a)}
+        else td.textContent=m[k]||'';
+        if(k==='disciplines')td.className='wr';tr.append(td)});
+      const td=document.createElement('td');const del=document.createElement('button');del.type='button';del.className='pill line small';del.textContent='Supprimer';let armed=false;
+      del.addEventListener('click',async()=>{
+        if(!armed){armed=true;del.textContent='Confirmer';setTimeout(()=>{armed=false;del.textContent='Supprimer'},4000);return}
+        try{await db.doc(m._col+'/'+m._id).delete();loadInscriptions()}catch(e){say($('mb-msg'),'Suppression refusée.','err')}
+      });
+      td.append(del);tr.append(td);tb.append(tr);
+    });
+    t.append(tb);wrap.append(t);box.textContent='';box.append(wrap);
+  }
+  $('mb-q').addEventListener('input',renderMembres);
+  // Export CSV (séparateur ; pour Excel en français)
+  $('mb-export').addEventListener('click',()=>{
+    const list=filtered();if(!list.length)return;
+    const esc=v=>{v=(v==null?'':String(v));return /[";\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+    const cols=MB_COLS.concat([['adresse','Adresse'],['pays','Pays']]);
+    const csv='﻿'+[cols.map(c=>c[1]).join(';')].concat(list.map(m=>cols.map(([k])=>esc(m[k])).join(';'))).join('\r\n');
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+    a.download='membres-alpine-lake-riders-'+new Date().toISOString().slice(0,10)+'.csv';document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);
+  });
+  // Import CSV
+  function parseCSV(text){
+    text=text.replace(/^﻿/,'');
+    const first=text.split(/\r?\n/)[0]||'';const sep=(first.split(';').length>first.split(',').length)?';':(first.includes('\t')?'\t':',');
+    const rows=[];let row=[],f='',q=false;
+    for(let i=0;i<text.length;i++){const c=text[i];
+      if(q){if(c==='"'){if(text[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
+      else if(c==='"')q=true;
+      else if(c===sep){row.push(f);f=''}
+      else if(c==='\n'||c==='\r'){if(c==='\r'&&text[i+1]==='\n')i++;row.push(f);rows.push(row);row=[];f=''}
+      else f+=c}
+    if(f||row.length){row.push(f);rows.push(row)}
+    return rows.filter(r=>r.some(x=>x.trim()));
+  }
+  function mapHeaders(h){
+    const H=h.map(norm),find=test=>H.findIndex(test);
+    const idx={
+      date:find(x=>/horodateur|^date/.test(x)),
+      nom:find(x=>x==='nom'||x==='nom de famille'),
+      prenom:find(x=>x.startsWith('prenom')),
+      email:find(x=>/mail/.test(x)),
+      adresse:find(x=>/^adresse/.test(x)&&!/mail/.test(x)),
+      cp:find(x=>/code postal|^cp$/.test(x)),
+      ville:find(x=>/ville|commune/.test(x)),
+      pays:find(x=>/pays/.test(x)),
+      tel:find(x=>/telephone|portable|^tel/.test(x)),
+      disciplines:find(x=>/discipline/.test(x)),
+      niveau:find(x=>/niveau/.test(x))};
+    const mails=H.map((x,i)=>/mail/.test(x)?i:-1).filter(i=>i>=0);
+    return {idx,mails};
+  }
+  $('mb-file').addEventListener('change',async e=>{
+    const file=e.target.files[0];const m=$('mb-msg');if(!file)return;
+    try{
+      const rows=parseCSV(await file.text());if(rows.length<2)throw new Error('vide');
+      const {idx,mails}=mapHeaders(rows[0]);
+      if(idx.nom<0&&idx.prenom<0&&!mails.length){say(m,'Colonnes non reconnues (il faut au moins Nom, Prénom ou E-mail).','err');return}
+      const get=(r,k)=>idx[k]>=0?(r[idx[k]]||'').trim():'';
+      const byKey=new Map();
+      rows.slice(1).forEach(r=>{
+        const email=(mails.map(i=>(r[i]||'').trim()).find(x=>/@/.test(x))||'').toLowerCase();
+        const d={nom:get(r,'nom').replace(/\s+/g,' '),prenom:cap(get(r,'prenom')),email,
+          tel:get(r,'tel'),adresse:get(r,'adresse'),cp:get(r,'cp'),ville:cap(get(r,'ville')),pays:cap(get(r,'pays')),
+          disciplines:get(r,'disciplines'),niveau:get(r,'niveau'),date:get(r,'date').split(' ')[0]};
+        if(!d.nom&&!d.prenom&&!d.email)return;
+        const k=mkey(d.email,d.prenom);byKey.set(k,d); // la dernière ligne l'emporte
+      });
+      const items=[...byKey.entries()].map(([k,d])=>({id:'m-'+k.replace(/[^a-z0-9@._+-]/g,'-').slice(0,180),data:d}));
+      say(m,'Import de '+items.length+' membres…');
+      await db.bulkSet('membres',items);
+      say(m,items.length+' membres importés ('+(rows.length-1-items.length)+' doublons fusionnés).','ok');
+      loadInscriptions();
+    }catch(err){say(m,'Import impossible ('+(err&&err.code||err&&err.message||'erreur')+').','err')}
+    e.target.value='';
+  });
 })();
 </script>
 
