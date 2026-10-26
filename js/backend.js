@@ -18,12 +18,14 @@
   }
   // Recharge au retour sur l'onglet (le temps réel peut s'interrompre en veille)
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)Object.values(watchers).flat().forEach(f=>f())});
+  // Après une écriture, on rafraîchit aussi localement (le temps réel ne signale pas toujours les suppressions)
+  const touch=c=>setTimeout(()=>(watchers[c]||[]).forEach(f=>f()),50);
   const db={
     doc(path){const [c,id]=split(path);return{
       async get(){return snapDoc(id,await fetchDoc(c,id))},
-      async set(data){const {error}=await sb.from('docs').upsert({collection:c,id,data,updated_at:new Date().toISOString()});if(error)throw fail(error)},
+      async set(data){const {error}=await sb.from('docs').upsert({collection:c,id,data,updated_at:new Date().toISOString()});if(error)throw fail(error);touch(c)},
       async update(patch){const cur=await fetchDoc(c,id)||{};await this.set(Object.assign({},cur,patch))},
-      async delete(){const {error}=await sb.from('docs').delete().eq('collection',c).eq('id',id);if(error)throw fail(error)},
+      async delete(){const {error}=await sb.from('docs').delete().eq('collection',c).eq('id',id);if(error)throw fail(error);touch(c)},
       onSnapshot(ok,ko){const run=()=>fetchDoc(c,id).then(d=>ok(snapDoc(id,d)),e=>ko&&ko(e));run();watch(c,run);return()=>{}}
     }},
     collection(c){return{
