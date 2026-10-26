@@ -11,7 +11,9 @@ Site statique (HTML, CSS, JS) hébergé sur Cloudflare Pages. Les données modif
 4. **Authentication > Users > Add user** : créer le compte administrateur (e-mail + mot de passe, cocher « Auto confirm »).
 5. **SQL Editor** : donner les droits admin à ce compte :
    `insert into admins (user_id) select id from auth.users where email = 'ton@email.fr';`
-6. **Project Settings > API** : copier l'URL du projet et la clé `anon public` dans `js/config.js`.
+6. **SQL Editor** : lancer aussi `supabase/002_admins.sql` (gestion des administrateurs depuis le site).
+7. **Authentication > URL Configuration** : mettre l'adresse du site dans *Site URL* (sert aux e-mails de confirmation et de mot de passe oublié).
+8. **Project Settings > API** : copier l'URL du projet et la clé `anon public` dans `js/config.js`.
 
 ### 2. Cloudflare Pages (hébergement)
 1. Créer un compte sur https://dash.cloudflare.com.
@@ -21,5 +23,5 @@ Site statique (HTML, CSS, JS) hébergé sur Cloudflare Pages. Les données modif
 5. **Custom domains** : ajouter le nom de domaine acheté et suivre les instructions DNS.
 
 ## Mises à jour
-- Textes, horaires, agenda, messages, photos : depuis le site, lien « Administration » en bas de page.
+- Textes, horaires, agenda, messages, photos, administrateurs : depuis le site, lien « Administration » en bas de page.
 - Design ou nouvelles sections : demander à Claude, qui modifie ce dépôt. Cloudflare republie automatiquement en une minute.

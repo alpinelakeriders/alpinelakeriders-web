@@ -392,7 +392,12 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     <form id="login" class="grid2" novalidate hidden>
       <label class="f full"><span class="label">E-mail</span><input id="l-email" type="email" autocomplete="username"></label>
       <label class="f full"><span class="label">Mot de passe</span><input id="l-pass" type="password" autocomplete="current-password"></label>
-      <div class="full" style="display:flex;gap:16px;align-items:center;flex-wrap:wrap"><button class="pill ink" type="submit">Se connecter</button><span class="msg" id="l-msg" role="status"></span></div>
+      <div class="full" style="display:flex;gap:16px;align-items:center;flex-wrap:wrap"><button class="pill ink" type="submit">Se connecter</button><button class="pill line small" type="button" id="l-forgot">Mot de passe oublié</button><span class="msg" id="l-msg" role="status"></span></div>
+    </form>
+    <form id="newpass" class="grid2" novalidate hidden>
+      <p class="full">Choisissez votre nouveau mot de passe.</p>
+      <label class="f full"><span class="label">Nouveau mot de passe (8 caractères minimum)</span><input id="np-pass" type="password" autocomplete="new-password"></label>
+      <div class="full" style="display:flex;gap:16px;align-items:center;flex-wrap:wrap"><button class="pill ink" type="submit">Enregistrer</button><span class="msg" id="np-msg" role="status"></span></div>
     </form>
   </div>
   <div id="admin-body" hidden style="display:grid;gap:56px">
@@ -455,6 +460,24 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
           <label class="f full"><span class="label">Sondage de présence (choix séparés par des virgules, laisser vide pour aucun)</span><input id="n-options" value="Apéro, Initiation débutant, Ride libre, Aide"></label>
         </div>
         <div class="bar"><button class="pill ink small" type="submit">Ajouter</button><span class="msg" id="n-msg" role="status"></span></div>
+      </form>
+    </div>
+    <div>
+      <h3>Administrateurs</h3>
+      <p class="msg" style="margin:6px 0 18px">Les administrateurs peuvent modifier tout le site. Un nouvel administrateur reçoit un e-mail de confirmation à valider avant sa première connexion.</p>
+      <div id="adm-list"></div>
+      <form id="adm-new" class="ed" novalidate>
+        <p class="label">Ajouter un administrateur</p>
+        <div class="grid2">
+          <label class="f"><span class="label">E-mail</span><input id="adm-email" type="email" autocomplete="off"></label>
+          <label class="f"><span class="label">Mot de passe provisoire (8 caractères min.)</span><input id="adm-pass" type="text" autocomplete="off"></label>
+        </div>
+        <div class="bar"><button class="pill ink small" type="submit">Ajouter</button><span class="msg" id="adm-msg" role="status"></span></div>
+      </form>
+      <form id="me-pass" class="ed" novalidate>
+        <p class="label">Mon mot de passe</p>
+        <div class="grid2"><label class="f"><span class="label">Nouveau mot de passe</span><input id="me-new" type="password" autocomplete="new-password"></label></div>
+        <div class="bar"><button class="pill line small" type="submit">Changer mon mot de passe</button><span class="msg" id="me-msg" role="status"></span></div>
       </form>
     </div>
     <div>
@@ -612,6 +635,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     try{db=window.claude&&await window.claude.use('db');user=window.claude&&await window.claude.use('user')}catch(e){}
     if(!db){sorties=[];renderAgenda();return}
     try{myId=user&&await user.currentId()}catch(e){}
+    if(user&&user.onRecovery)user.onRecovery(showNewPass);
     db.doc('contenu/site').onSnapshot(s=>{contenu=s.exists?(s.data()||{}):{};applyTexts();fillTextForm()},()=>{});
     db.collection('sorties').onSnapshot(q=>{sorties=q.docs.map(d=>Object.assign({id:d.id},d.data()));renderAgenda();renderEditor()},()=>{renderAgenda()});
     db.collection('annonces').onSnapshot(q=>{annonces=q.docs.map(d=>Object.assign({id:d.id},d.data()));renderAnnonces();renderAnEditor()},()=>{});
@@ -649,7 +673,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       $('gate').hidden=false;$('login').hidden=false;$('admin-body').hidden=true;$('logout').hidden=true;return;
     }
     $('gate').hidden=true;$('admin-body').hidden=false;$('logout').hidden=false;
-    fillTextForm();renderEditor();renderAnEditor();loadInscriptions();
+    fillTextForm();renderEditor();renderAnEditor();loadInscriptions();loadAdmins();
     try{assets=window.claude&&await window.claude.use('assets')}catch(e){}
     renderPhEditor();
   });
@@ -659,6 +683,57 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       if(!(await user.canEdit())){say(m,'Ce compte n\'a pas les droits d\'administration.','err');return}
       $('open-admin').click();
     }catch(err){say(m,'E-mail ou mot de passe incorrect.','err')}
+  });
+  // Mot de passe oublié et nouveau mot de passe
+  $('l-forgot').addEventListener('click',async()=>{
+    const m=$('l-msg'),em=$('l-email').value.trim();
+    if(!/^\S+@\S+\.\S+$/.test(em)){say(m,'Saisissez votre e-mail ci-dessus, puis recliquez.','err');$('l-email').focus();return}
+    try{await user.resetPassword(em);say(m,'Si ce compte existe, un e-mail de réinitialisation vient d\'être envoyé.','ok')}catch(err){say(m,'Envoi impossible pour le moment, réessayez plus tard.','err')}
+  });
+  function showNewPass(){admin.hidden=false;document.body.style.overflow='hidden';$('gate').hidden=false;$('login').hidden=true;$('admin-body').hidden=true;$('newpass').hidden=false;say($('gate-msg'),'')}
+  $('newpass').addEventListener('submit',async e=>{
+    e.preventDefault();const m=$('np-msg'),pw=$('np-pass').value;
+    if(pw.length<8){say(m,'8 caractères minimum.','err');return}
+    try{await user.changePassword(pw);$('np-pass').value='';$('newpass').hidden=true;$('open-admin').click()}catch(err){say(m,'Changement refusé ('+(err&&err.code||'erreur')+').','err')}
+  });
+  $('me-pass').addEventListener('submit',async e=>{
+    e.preventDefault();const m=$('me-msg'),pw=$('me-new').value;
+    if(pw.length<8){say(m,'8 caractères minimum.','err');return}
+    try{await user.changePassword(pw);$('me-new').value='';say(m,'Mot de passe changé.','ok')}catch(err){say(m,'Changement refusé ('+(err&&err.code||'erreur')+').','err')}
+  });
+  // Administrateurs
+  async function loadAdmins(){
+    const box=$('adm-list');let list=[],me='';
+    try{list=await user.listAdmins();me=await user.email()}catch(e){box.innerHTML='<p class="msg err">Liste indisponible : lancez le fichier supabase/002_admins.sql dans Supabase.</p>';return}
+    box.textContent='';
+    list.forEach(em=>{
+      const row=document.createElement('div');row.className='ed';row.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap';
+      const t=document.createElement('span');t.textContent=em+(em.toLowerCase()===(me||'').toLowerCase()?' (vous)':'');
+      const bar=document.createElement('span');bar.style.cssText='display:flex;gap:10px;align-items:center';
+      const m=document.createElement('span');m.className='msg';
+      bar.append(m);
+      if(em.toLowerCase()!==(me||'').toLowerCase()){
+        const del=document.createElement('button');del.type='button';del.className='pill line small';del.textContent='Retirer';let armed=false;
+        del.addEventListener('click',async()=>{
+          if(!armed){armed=true;del.textContent='Confirmer';setTimeout(()=>{armed=false;del.textContent='Retirer'},4000);return}
+          try{const r=await user.removeAdmin(em);if(r==='ok')loadAdmins();else say(m,r==='dernier'?'Il faut garder au moins un administrateur.':'Impossible ('+r+').','err')}catch(err){say(m,'Refusé.','err')}
+        });
+        bar.append(del);
+      }
+      row.append(t,bar);box.append(row);
+    });
+  }
+  $('adm-new').addEventListener('submit',async e=>{
+    e.preventDefault();const m=$('adm-msg'),em=$('adm-email').value.trim(),pw=$('adm-pass').value;
+    if(!/^\S+@\S+\.\S+$/.test(em)){say(m,'E-mail invalide.','err');return}
+    if(pw&&pw.length<8){say(m,'Mot de passe : 8 caractères minimum.','err');return}
+    say(m,'Ajout…');
+    try{
+      const ok=await user.addAdmin(em,pw);
+      if(!ok){say(m,'Aucun compte à cet e-mail : indiquez un mot de passe provisoire pour le créer.','err');return}
+      say(m,em+' est maintenant administrateur.'+(pw?' Transmettez-lui son mot de passe provisoire ; il devra d\'abord valider l\'e-mail de confirmation.':''),'ok');
+      e.target.reset();loadAdmins();
+    }catch(err){say(m,/rate|limit/i.test(err&&err.message||'')?'Trop d\'envois d\'e-mails, réessayez dans une heure.':'Ajout refusé ('+(err&&err.code||'erreur')+').','err')}
   });
   $('logout').addEventListener('click',async()=>{await user.logout();isAdmin=false;$('close-admin').click()});
   $('close-admin').addEventListener('click',()=>{admin.hidden=true;document.body.style.overflow=''});

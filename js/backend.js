@@ -4,6 +4,9 @@
   const cfg=window.ALR_CONFIG||{};
   if(!cfg.url||!cfg.anonKey||!window.supabase)return; // sans base : le site s'affiche avec ses textes par défaut
   const sb=window.supabase.createClient(cfg.url,cfg.anonKey);
+  // Lien « mot de passe oublié » : l'événement peut arriver avant que la page écoute
+  let recovering=false,recoveryCb=null;
+  sb.auth.onAuthStateChange(ev=>{if(ev==='PASSWORD_RECOVERY'){recovering=true;if(recoveryCb)setTimeout(recoveryCb,0)}});
   const fail=(e)=>{const err=new Error(e&&e.message||'erreur');err.code=(e&&(e.code||e.status))||'erreur';return err};
   const split=p=>{const i=p.indexOf('/');return [p.slice(0,i),p.slice(i+1)]};
   const snapDoc=(id,data)=>({id,exists:!!data,data:()=>data||undefined});
@@ -43,7 +46,20 @@
       const {data}=await sb.rpc('is_admin');adminCache=!!data;return adminCache},
     async login(email,password){adminCache=null;const {error}=await sb.auth.signInWithPassword({email,password});if(error)throw fail(error)},
     async logout(){adminCache=null;await sb.auth.signOut()},
-    async email(){const s=await session();return s&&!s.user.is_anonymous?s.user.email:''}
+    async email(){const s=await session();return s&&!s.user.is_anonymous?s.user.email:''},
+    // Gestion des administrateurs
+    async listAdmins(){const {data,error}=await sb.rpc('list_admins');if(error)throw fail(error);return (data||[]).map(r=>r.email)},
+    async addAdmin(email,password){
+      if(password){ // crée le compte s'il n'existe pas (client séparé pour ne pas déconnecter l'admin actuel)
+        const tmp=window.supabase.createClient(cfg.url,cfg.anonKey,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false,storageKey:'alr-tmp'}});
+        const {error}=await tmp.auth.signUp({email,password,options:{emailRedirectTo:location.origin+location.pathname}});
+        if(error&&!/registered|exists/i.test(error.message||''))throw fail(error);
+      }
+      const {data,error}=await sb.rpc('add_admin',{p_email:email});if(error)throw fail(error);return !!data},
+    async removeAdmin(email){const {data,error}=await sb.rpc('remove_admin',{p_email:email});if(error)throw fail(error);return data},
+    async changePassword(password){const {error}=await sb.auth.updateUser({password});if(error)throw fail(error)},
+    async resetPassword(email){const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});if(error)throw fail(error)},
+    onRecovery(cb){recoveryCb=cb;if(recovering)setTimeout(cb,0)}
   };
   const assets={
     async upload(blob,opt){const ext=(opt&&opt.type||blob.type)==='image/webp'?'webp':'jpg';
