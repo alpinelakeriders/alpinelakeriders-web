@@ -1,0 +1,4 @@
+/media/*
+  Cache-Control: public, max-age=2592000
+/js/*
+  Cache-Control: public, max-age=300
