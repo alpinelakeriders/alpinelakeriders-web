@@ -339,6 +339,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   .adm-sec{scroll-margin-top:12px}
 }
 
+.share-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.ag-row.hl{background:color-mix(in srgb,var(--lake) 9%,transparent);box-shadow:-20px 0 0 color-mix(in srgb,var(--lake) 9%,transparent),20px 0 0 color-mix(in srgb,var(--lake) 9%,transparent)}
 /* Bandeau cookies */
 .cookie{position:fixed;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:40;max-width:560px;margin:0 auto;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.14);padding:16px 18px;display:grid;gap:12px}
 .cookie p{font-size:14px;color:var(--muted);line-height:1.5}
@@ -347,8 +349,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=12"></script>
-<script src="js/backend.js?v=12"></script>
+<script src="js/config.js?v=13"></script>
+<script src="js/backend.js?v=13"></script>
 </head>
 <body>
 
@@ -739,7 +741,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   // ---------- Agenda ----------
   const today=()=>new Date().toISOString().slice(0,10);
   function row(s,isNext,upcoming){
-    const r=document.createElement('div');r.className='ag-row';
+    const r=document.createElement('div');r.className='ag-row'+(s.id===focusId?' hl':'');r.id='s-'+s.id;
     const d=new Date((s.date||'')+'T12:00:00');
     const ok=!isNaN(d);
     const dt=document.createElement('div');dt.className='ag-date';
@@ -792,6 +794,15 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
           g.append(h4,ul);det.append(g)});
         mid.append(det);
       }
+    }
+    if(upcoming){
+      const sh=document.createElement('div');sh.className='share-bar';
+      const b=document.createElement('button');b.type='button';b.className='pill line small';b.textContent='Partager';
+      const cp=document.createElement('button');cp.type='button';cp.className='pill line small';cp.textContent='Copier le lien';
+      const sm2=document.createElement('span');sm2.className='poll-msg';sm2.style.marginTop='0';
+      b.addEventListener('click',()=>shareSortie(s));
+      cp.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(sortieUrl(s));sm2.textContent='Lien copié.'}catch(e){sm2.textContent=sortieUrl(s)}});
+      sh.append(b,cp,sm2);mid.append(sh);
     }
     const where=document.createElement('div');where.className='ag-where';where.textContent=[s.heure,s.lieu].filter(Boolean).join(' · ');
     const tag=document.createElement('span');tag.className='ag-tag'+(isNext?' next':'');tag.textContent=isNext?'Prochaine':(upcoming?'À venir':'Passée');
@@ -847,6 +858,20 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       n.append(tag,body);box.append(n);
     });
   }
+  // ---------- Partage d'une sortie ----------
+  const focusId=(()=>{try{return new URLSearchParams(location.search).get('sortie')||''}catch(e){return ''}})();
+  let focusDone=false;
+  function sortieUrl(s){return location.origin+'/?sortie='+encodeURIComponent(s.id)}
+  function sortieText(s){
+    const d=new Date((s.date||'')+'T12:00:00');
+    const quand=isNaN(d)?'':JOURS[d.getDay()].replace('.','')+' '+d.getDate()+' '+MOIS[d.getMonth()];
+    return [(s.titre||'Sortie')+(quand?' · '+quand:''),[s.heure,s.lieu].filter(Boolean).join(' · '),'Inscris-toi ici :'].filter(Boolean).join('\n');
+  }
+  async function shareSortie(s){
+    const url=sortieUrl(s),text=sortieText(s);
+    if(navigator.share){try{await navigator.share({title:s.titre||'Sortie Alpine Lake Riders',text,url});return}catch(e){if(e&&e.name==='AbortError')return}}
+    window.open('https://wa.me/?text='+encodeURIComponent(text+' '+url),'_blank','noopener');
+  }
   function renderAgenda(){
     const t=today();
     const next=sorties.filter(s=>(s.date||'')>=t).sort((a,b)=>a.date<b.date?-1:1);
@@ -856,6 +881,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     next.forEach((s,i)=>n.append(row(s,i===0,true)));
     const p=$('ag-past');p.textContent='';past.slice(0,6).forEach(s=>p.append(row(s,false,false)));
     $('ag-past-wrap').hidden=!past.length;
+    if(focusId&&!focusDone&&sorties.length){const el=document.getElementById('s-'+focusId);if(el){focusDone=true;setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'center'}),300)}}
   }
 
   // ---------- Connexion aux données ----------
