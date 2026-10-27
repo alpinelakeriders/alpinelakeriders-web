@@ -204,6 +204,12 @@ form{display:grid;gap:26px;align-content:start}
 .chip em{font-style:normal;font-variant-numeric:tabular-nums;color:var(--muted)}
 .chip[aria-pressed="true"] em{color:inherit;opacity:.7}
 .poll-msg{font-size:13px;color:var(--muted);margin-top:8px;min-height:1em}
+.poll-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.pres{margin-top:12px;font-size:14px;color:var(--muted)}
+.pres b{color:var(--fg);font-weight:500}
+.pres-detail{margin-top:12px;display:grid;gap:12px;padding:16px;border:1px solid var(--line);border-radius:6px}
+.pres-detail h4{font:500 11px var(--mono);text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:4px}
+.pres-detail ul{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:4px 14px;font-size:14px}
 .who{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 .who input{font:400 16px var(--sans);color:var(--fg);background:transparent;border:0;border-bottom:1px solid var(--line);padding:6px 0;width:170px;border-radius:0}
 .who input:focus{outline:none;border-bottom-color:var(--fg)}
@@ -274,8 +280,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=6"></script>
-<script src="js/backend.js?v=6"></script>
+<script src="js/config.js?v=7"></script>
+<script src="js/backend.js?v=7"></script>
 </head>
 <body>
 
@@ -333,7 +339,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 </div></section>
 
 <section id="agenda" style="padding-top:0"><div class="wrap">
-  <div class="head"><h2>Agenda des sorties</h2><label class="who"><span class="label">Votre prénom pour répondre</span><input id="who" autocomplete="given-name" placeholder="Prénom"></label></div>
+  <div class="head"><h2>Agenda des sorties</h2><div class="who"><span class="label">Pour répondre</span><input id="who" autocomplete="given-name" placeholder="Prénom" aria-label="Prénom"><input id="who-nom" autocomplete="family-name" placeholder="Nom" aria-label="Nom"></div></div>
   <div class="ag" id="ag-next"><div class="ag-empty">Chargement de l'agenda…</div></div>
   <details class="past" id="ag-past-wrap" hidden><summary class="label">Sorties passées</summary><div class="ag" id="ag-past" style="margin-top:16px"></div></details>
 </div></section>
@@ -636,20 +642,45 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     const opts=parseOpts(s.options);
     if(upcoming&&opts.length){
       const mine=myAnswers(s.id);
+      const sel=drafts[s.id]||mine;
       const pl=document.createElement('div');pl.className='poll';pl.setAttribute('aria-label','Sondage de présence');
       opts.forEach(o=>{
         const c=document.createElement('button');c.type='button';c.className='chip';
-        const on=mine.includes(o);c.setAttribute('aria-pressed',on?'true':'false');
-        const n=countFor(s.id,o);
+        c.setAttribute('aria-pressed',sel.includes(o)?'true':'false');
         c.append(document.createTextNode(o));
-        const em=document.createElement('em');em.textContent=String(n);c.append(em);
-        c.title=namesFor(s.id,o).join(', ')||'Personne pour l\'instant';
-        c.addEventListener('click',()=>toggle(s.id,o,pm));
+        const em=document.createElement('em');em.textContent=String(countFor(s.id,o));c.append(em);
+        c.addEventListener('click',()=>{const cur=drafts[s.id]||myAnswers(s.id).slice();
+          drafts[s.id]=cur.includes(o)?cur.filter(x=>x!==o):cur.concat(o);renderAgenda()});
         pl.append(c);
       });
-      const pm=document.createElement('p');pm.className='poll-msg';pm.setAttribute('role','status');
-      pm.textContent=mine.length?'Vous venez : '+mine.join(', '):'Je viens ? Cliquez sur vos choix.';
-      mid.append(pl,pm);
+      const bar=document.createElement('div');bar.className='poll-bar';
+      const changed=!!drafts[s.id]&&drafts[s.id].slice().sort().join('|')!==mine.slice().sort().join('|');
+      const val=document.createElement('button');val.type='button';val.className='pill ink small';
+      val.textContent=mine.length?'Mettre à jour ma présence':'Valider ma présence';val.disabled=!changed;
+      const pm=document.createElement('span');pm.className='poll-msg';pm.style.marginTop='0';pm.setAttribute('role','status');
+      pm.textContent=pollMsg[s.id]||(changed?'Cliquez sur « Valider » pour enregistrer.':(mine.length?'Vous êtes inscrit : '+mine.map(short).join(', ')+'.':'Choisissez puis validez.'));
+      val.addEventListener('click',()=>savePresence(s.id,drafts[s.id]||[]));
+      bar.append(val,pm);
+      const people=presentsFor(s.id);
+      const pres=document.createElement('div');pres.className='pres';
+      if(people.length){
+        const b=document.createElement('b');b.textContent=people.length+(people.length>1?' personnes présentes : ':' personne présente : ');
+        pres.append(b,document.createTextNode(people.map(x=>x.nom).join(', ')));
+        const more=document.createElement('button');more.type='button';more.className='pill line small';more.style.marginTop='10px';
+        more.textContent=openDetail[s.id]?'Masquer le détail':'Voir les personnes présentes';
+        more.addEventListener('click',()=>{openDetail[s.id]=!openDetail[s.id];renderAgenda()});
+        pres.append(document.createElement('br'),more);
+      }else pres.textContent='Personne n\'est encore inscrit.';
+      mid.append(pl,bar,pres);
+      if(people.length&&openDetail[s.id]){
+        const det=document.createElement('div');det.className='pres-detail';
+        opts.forEach(o=>{const list=people.filter(x=>x.choix.includes(o));
+          const g=document.createElement('div');const h4=document.createElement('h4');h4.textContent=o+' · '+list.length;
+          const ul=document.createElement('ul');list.forEach(x=>{const li=document.createElement('li');li.textContent=x.nom;ul.append(li)});
+          if(!list.length){const li=document.createElement('li');li.textContent='—';ul.append(li)}
+          g.append(h4,ul);det.append(g)});
+        mid.append(det);
+      }
     }
     const where=document.createElement('div');where.className='ag-where';where.textContent=[s.heure,s.lieu].filter(Boolean).join(' · ');
     const tag=document.createElement('span');tag.className='ag-tag'+(isNext?' next':'');tag.textContent=isNext?'Prochaine':(upcoming?'À venir':'Passée');
@@ -661,25 +692,31 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   function myAnswers(sid){const me=presences.find(p=>p.id===myId);return (me&&me.rep&&Array.isArray(me.rep[sid]))?me.rep[sid]:[]}
   function countFor(sid,o){return presences.filter(p=>p.rep&&Array.isArray(p.rep[sid])&&p.rep[sid].includes(o)).length}
   function namesFor(sid,o){return presences.filter(p=>p.rep&&Array.isArray(p.rep[sid])&&p.rep[sid].includes(o)).map(p=>p.nom||'Rider')}
-  let voting=false;
-  const who=$('who');
-  try{who.value=localStorage.getItem('alr-prenom')||''}catch(e){}
+  let voting=false;const drafts={},pollMsg={},openDetail={};
+  const short=o=>o.replace(/^présente?s?\s+(à l'|à la |au |à |pour )?/i,'');
+  function presentsFor(sid){return presences.filter(p=>p.rep&&Array.isArray(p.rep[sid])&&p.rep[sid].length)
+    .map(p=>({nom:p.nom||'Rider',choix:p.rep[sid]})).sort((a,b)=>a.nom.localeCompare(b.nom,'fr'))}
+  const who=$('who'),whoNom=$('who-nom');
+  try{who.value=localStorage.getItem('alr-prenom')||'';whoNom.value=localStorage.getItem('alr-nom')||''}catch(e){}
   who.addEventListener('change',()=>{try{localStorage.setItem('alr-prenom',who.value.trim())}catch(e){}});
-  async function toggle(sid,o,pm){
+  whoNom.addEventListener('change',()=>{try{localStorage.setItem('alr-nom',whoNom.value.trim())}catch(e){}});
+  async function savePresence(sid,choix){
     if(voting)return;
-    if(!db){pm.textContent='Sondage indisponible pour le moment.';return}
-    const nom=who.value.trim();
-    if(!nom){pm.textContent='Indiquez votre prénom en haut de l\'agenda pour répondre.';who.focus();return}
+    const say2=t=>{pollMsg[sid]=t;renderAgenda()};
+    if(!db){say2('Sondage indisponible pour le moment.');return}
+    const prenom=who.value.trim(),nomF=whoNom.value.trim();
+    if(!prenom||!nomF){say2('Indiquez votre prénom et votre nom en haut de l\'agenda.');(prenom?whoNom:who).focus();return}
     const me=presences.find(p=>p.id===myId);
     const rep=JSON.parse(JSON.stringify((me&&me.rep)||{}));
-    const cur=Array.isArray(rep[sid])?rep[sid]:[];
-    rep[sid]=cur.includes(o)?cur.filter(x=>x!==o):cur.concat(o);
-    if(!rep[sid].length)delete rep[sid];
-    voting=true;pm.textContent='Enregistrement…';
-    if(!myId){try{myId=await user.id()}catch(e){pm.textContent='Réponse non enregistrée, réessayez.';voting=false;return}}
-    try{await db.doc('presences/'+myId).set({nom,rep,maj:new Date().toISOString()})}
-    catch(err){pm.textContent='Réponse non enregistrée ('+(err&&err.code||'erreur')+').'}
-    voting=false;
+    if(choix.length)rep[sid]=choix;else delete rep[sid];
+    voting=true;say2('Enregistrement…');
+    if(!myId){try{myId=await user.id()}catch(e){voting=false;say2('Réponse non enregistrée, réessayez.');return}}
+    try{
+      await db.doc('presences/'+myId).set({nom:prenom+' '+nomF,prenom,nomFamille:nomF,rep,maj:new Date().toISOString()});
+      delete drafts[sid];voting=false;
+      say2(choix.length?'C\'est noté, merci ! Vous êtes inscrit : '+choix.map(short).join(', ')+'.':'Votre présence a été retirée.');
+      setTimeout(()=>{delete pollMsg[sid];renderAgenda()},6000);
+    }catch(err){voting=false;say2('Réponse non enregistrée ('+(err&&err.code||'erreur')+').')}
   }
 
   // ---------- Messages et consignes ----------
@@ -880,13 +917,13 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   // ---- Création de sortie : modèles, jours rapides, choix du sondage ----
   const DEF_LIEU='Ponton du lac de la Terrasse';
   const EV_TPL=[
-    {nom:'Ride + initiation + apéro',titre:'Ride libre, initiation et apéro',heure:'15h – 18h30',description:"Ride libre de 15h à 18h30.\nInitiation pumpfoil à partir de 15h30, avec le matériel prêté par Alpinefoil.\nApéro partagé : chacun apporte quelque chose.",options:['Ride libre','Initiation pumpfoil','Apéro','Aide']},
-    {nom:'Apéro Pumpfoil',titre:'Apéro Pumpfoil',heure:'17h – 22h',description:"Pump de 17h à 20h, puis apéro de 20h à 22h au snack du lac.",options:['Ride','Apéro','Aide']},
-    {nom:'Ride libre',titre:'Ride libre',heure:'',description:'',options:['Ride libre']},
-    {nom:'Initiation débutants',titre:'Initiation pumpfoil',heure:'',description:"Initiation encadrée par les riders confirmés, matériel prêté par Alpinefoil.",options:['Initiation pumpfoil','Aide']}
+    {nom:'Ride + initiation + apéro',titre:'Ride libre, initiation et apéro',heure:'15h – 18h30',description:"Ride libre de 15h à 18h30.\nInitiation pumpfoil à partir de 15h30, avec le matériel prêté par Alpinefoil.\nApéro partagé : chacun apporte quelque chose.",options:['Présent pour rider','Présent à l\'initiation','Présent à l\'apéro','Présent pour aider']},
+    {nom:'Apéro Pumpfoil',titre:'Apéro Pumpfoil',heure:'17h – 22h',description:"Pump de 17h à 20h, puis apéro de 20h à 22h au snack du lac.",options:['Présent pour rider','Présent à l\'apéro','Présent pour aider']},
+    {nom:'Ride libre',titre:'Ride libre',heure:'',description:'',options:['Présent pour rider']},
+    {nom:'Initiation débutants',titre:'Initiation pumpfoil',heure:'',description:"Initiation encadrée par les riders confirmés, matériel prêté par Alpinefoil.",options:['Présent à l\'initiation','Présent pour aider']}
   ];
-  const EV_OPTS=['Ride libre','Initiation pumpfoil','Apéro','Aide','Prêt de matériel'];
-  let evOpts=['Ride libre','Initiation pumpfoil','Apéro','Aide'];
+  const EV_OPTS=['Présent pour rider','Présent à l\'initiation','Présent à l\'apéro','Présent pour aider','Besoin de matériel'];
+  let evOpts=['Présent pour rider','Présent à l\'initiation','Présent à l\'apéro','Présent pour aider'];
   function renderEvOpts(){
     const box=$('ev-opts');box.textContent='';
     [...new Set(EV_OPTS.concat(evOpts))].forEach(o=>{const b=document.createElement('button');b.type='button';b.className='chip';b.textContent=o;
@@ -908,7 +945,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     b.addEventListener('click',()=>{$('n-date').value=iso(d)});$('ev-days').append(b)});
   $('ev-opt-add').addEventListener('click',()=>{const v=$('ev-opt-new').value.trim().replace(/,/g,' ');if(v&&!evOpts.includes(v)){evOpts.push(v);if(!EV_OPTS.includes(v))EV_OPTS.push(v)}$('ev-opt-new').value='';renderEvOpts()});
   $('ev-opt-new').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('ev-opt-add').click()}});
-  $('ed-new').addEventListener('reset',()=>setTimeout(()=>{fillNew({options:['Ride libre','Initiation pumpfoil','Apéro','Aide']});say($('n-msg'),'')},0));
+  $('ed-new').addEventListener('reset',()=>setTimeout(()=>{fillNew({options:['Présent pour rider','Présent à l\'initiation','Présent à l\'apéro','Présent pour aider']});say($('n-msg'),'')},0));
   fillNew({options:evOpts});
   $('ed-new').addEventListener('submit',async e=>{
     e.preventDefault();const m=$('n-msg');
