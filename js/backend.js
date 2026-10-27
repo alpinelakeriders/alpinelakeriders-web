@@ -38,6 +38,7 @@
         const {error}=await sb.from('docs').upsert(rows);if(error)throw fail(error);
       }
       touch(c)},
+    async clearCollection(c){const {error}=await sb.from('docs').delete().eq('collection',c);if(error)throw fail(error);touch(c)},
     collection(c){return{
       async get(){return snapCol(await fetchCol(c))},
       onSnapshot(ok,ko){const run=()=>fetchCol(c).then(r=>ok(snapCol(r)),e=>ko&&ko(e));run();watch(c,run);return()=>{}}

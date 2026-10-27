@@ -498,7 +498,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     </div>
     <div>
       <h3>Membres</h3>
-      <p class="msg" style="margin:6px 0 18px">Inscrits via le site et membres importés depuis votre tableur. Pour importer : dans Google Sheets, Fichier › Télécharger › CSV, puis « Importer un CSV ». Un membre déjà présent (même e-mail et même prénom) est mis à jour, pas dupliqué.</p>
+      <p class="msg" style="margin:6px 0 18px">Inscrits via le site et membres importés depuis votre tableur. Pour importer : dans Google Sheets, Fichier › Télécharger › CSV, puis « Importer un CSV ». Un membre déjà présent (même nom et même prénom) est mis à jour, pas dupliqué ; plusieurs membres d'une même famille peuvent partager un e-mail.</p>
       <div class="mb-tools">
         <input type="search" id="mb-q" placeholder="Rechercher un nom, une ville, un e-mail…" aria-label="Rechercher un membre">
         <span class="mb-count" id="mb-count"></span>
@@ -506,6 +506,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       <div class="mb-tools">
         <label class="pill line small" style="cursor:pointer">Importer un CSV<input type="file" id="mb-file" accept=".csv,text/csv" hidden></label>
         <button class="pill line small" type="button" id="mb-export">Exporter la liste (CSV)</button>
+        <button class="pill line small" type="button" id="mb-clear">Vider les membres importés</button>
         <span class="msg" id="mb-msg" role="status"></span>
       </div>
       <div id="insc"><p class="msg">Chargement…</p></div>
@@ -949,14 +950,15 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   let membres=[];
   const norm=t=>(t||'').toString().normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim();
   const cap=t=>(t||'').toString().trim().replace(/\s+/g,' ').toLowerCase().replace(/(^|[\s\-'’])(\p{L})/gu,(m,a,b)=>a+b.toUpperCase());
-  const mkey=(email,prenom)=>(norm(email)||'sans-email')+'|'+norm(prenom);
+  // Un membre = un nom + un prénom (une famille peut partager le même e-mail)
+  const mkey=(nom,prenom,email)=>(norm(nom)||norm(prenom))?norm(nom).replace(/\s+/g,' ')+'|'+norm(prenom).replace(/\s+/g,' '):'email|'+norm(email);
   async function loadInscriptions(){
     const box=$('insc');
     try{
       const [qi,qm]=await Promise.all([db.collection('inscriptions').get(),db.collection('membres').get()]);
       const map=new Map();
-      qm.docs.forEach(d=>{const r=d.data();map.set(mkey(r.email,r.prenom),Object.assign({_col:'membres',_id:d.id,source:'Import'},r))});
-      qi.docs.forEach(d=>{const r=d.data();const k=mkey(r.email,r.prenom);
+      qm.docs.forEach(d=>{const r=d.data();map.set(mkey(r.nom,r.prenom,r.email),Object.assign({_col:'membres',_id:d.id,source:'Import'},r))});
+      qi.docs.forEach(d=>{const r=d.data();const k=mkey(r.nom,r.prenom,r.email);
         const row={_col:'inscriptions',_id:d.id,source:'Site',date:(r.date||'').slice(0,10).split('-').reverse().join('/'),nom:r.nom,prenom:r.prenom,email:r.email,tel:r.tel,niveau:r.niveau};
         map.set(k,Object.assign({},map.get(k)||{},row))});
       membres=[...map.values()].sort((a,b)=>norm(a.nom).localeCompare(norm(b.nom))||norm(a.prenom).localeCompare(norm(b.prenom)));
@@ -990,6 +992,14 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     t.append(tb);wrap.append(t);box.textContent='';box.append(wrap);
   }
   $('mb-q').addEventListener('input',renderMembres);
+  let clearArmed=false;
+  $('mb-clear').addEventListener('click',async()=>{
+    const b=$('mb-clear'),m=$('mb-msg');
+    if(!clearArmed){clearArmed=true;b.textContent='Confirmer : tout vider';say(m,'Les membres importés seront supprimés (les inscrits du site sont conservés). Recliquez pour confirmer.','err');
+      setTimeout(()=>{clearArmed=false;b.textContent='Vider les membres importés'},6000);return}
+    clearArmed=false;b.textContent='Vider les membres importés';
+    try{await db.clearCollection('membres');say(m,'Membres importés supprimés. Vous pouvez réimporter votre fichier.','ok');loadInscriptions()}catch(e){say(m,'Suppression refusée.','err')}
+  });
   // Export CSV (séparateur ; pour Excel en français)
   $('mb-export').addEventListener('click',()=>{
     const list=filtered();if(!list.length)return;
@@ -1044,7 +1054,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
           tel:get(r,'tel'),adresse:get(r,'adresse'),cp:get(r,'cp'),ville:cap(get(r,'ville')),pays:cap(get(r,'pays')),
           disciplines:get(r,'disciplines'),niveau:get(r,'niveau'),date:get(r,'date').split(' ')[0]};
         if(!d.nom&&!d.prenom&&!d.email)return;
-        const k=mkey(d.email,d.prenom);byKey.set(k,d); // la dernière ligne l'emporte
+        const k=mkey(d.nom,d.prenom,d.email);byKey.set(k,d); // la dernière ligne l'emporte
       });
       const items=[...byKey.entries()].map(([k,d])=>({id:'m-'+k.replace(/[^a-z0-9@._+-]/g,'-').slice(0,180),data:d}));
       say(m,'Import de '+items.length+' membres…');
