@@ -208,6 +208,13 @@ form{display:grid;gap:26px;align-content:start}
 .who input{font:400 16px var(--sans);color:var(--fg);background:transparent;border:0;border-bottom:1px solid var(--line);padding:6px 0;width:170px;border-radius:0}
 .who input:focus{outline:none;border-bottom-color:var(--fg)}
 .poll-sum{display:grid;gap:4px;font-size:14px;color:var(--muted)}
+.ev-new{border:1px solid var(--line);border-radius:6px;padding:22px;margin-top:14px}
+.ev-row{display:grid;gap:8px 16px;align-items:center}
+@media (min-width:760px){.ev-row{grid-template-columns:170px 1fr}}
+.ev-k{font:500 11px var(--mono);text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.ev-chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ev-add{font:400 14px var(--sans);color:var(--fg);background:transparent;border:0;border-bottom:1px solid var(--line);padding:6px 0;width:180px}
+.ev-add:focus{outline:none;border-bottom-color:var(--fg)}
 .poll-sum b{color:var(--fg);font-weight:500}
 .check{display:flex;align-items:center;gap:10px;font-size:16px}
 .af p{color:var(--muted);font-size:14px;max-width:30ch}
@@ -259,8 +266,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=4"></script>
-<script src="js/backend.js?v=4"></script>
+<script src="js/config.js?v=5"></script>
+<script src="js/backend.js?v=5"></script>
 </head>
 <body>
 
@@ -464,19 +471,25 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     </div>
     <div>
       <h3>Agenda des sorties</h3>
-      <div id="ed-list"></div>
-      <form id="ed-new" class="ed" novalidate>
-        <p class="label">Ajouter une sortie</p>
+      <form id="ed-new" class="ed ev-new" novalidate>
+        <p class="label">Nouvelle sortie</p>
+        <div class="ev-row"><span class="ev-k">Partir d'un modèle</span><div class="ev-chips" id="ev-tpl"></div></div>
+        <div class="ev-row"><span class="ev-k">Jour</span><div class="ev-chips" id="ev-days"></div></div>
         <div class="grid2">
           <label class="f"><span class="label">Date</span><input id="n-date" type="date"></label>
-          <label class="f"><span class="label">Horaires</span><input id="n-heure" placeholder="17h – 20h"></label>
-          <label class="f"><span class="label">Titre</span><input id="n-titre" placeholder="Apéro Pumpfoil #6"></label>
-          <label class="f"><span class="label">Lieu</span><input id="n-lieu" placeholder="Ponton du lac"></label>
-          <label class="f full"><span class="label">Description</span><textarea id="n-desc"></textarea></label>
-          <label class="f full"><span class="label">Sondage de présence (choix séparés par des virgules, laisser vide pour aucun)</span><input id="n-options" value="Apéro, Initiation débutant, Ride libre, Aide"></label>
+          <label class="f"><span class="label">Horaires</span><input id="n-heure" placeholder="15h – 18h30"></label>
+          <label class="f"><span class="label">Titre</span><input id="n-titre" placeholder="Ride libre et initiation"></label>
+          <label class="f"><span class="label">Lieu</span><input id="n-lieu" value="Ponton du lac de la Terrasse"></label>
+          <label class="f full"><span class="label">Description (une info par ligne)</span><textarea id="n-desc" rows="4"></textarea></label>
         </div>
-        <div class="bar"><button class="pill ink small" type="submit">Ajouter</button><span class="msg" id="n-msg" role="status"></span></div>
+        <div class="ev-row"><span class="ev-k">Sondage de présence</span><div class="ev-chips" id="ev-opts"></div></div>
+        <div class="ev-row"><span class="ev-k"></span><div class="ev-chips"><input id="ev-opt-new" class="ev-add" placeholder="Autre choix…"><button type="button" class="chip" id="ev-opt-add">Ajouter</button></div></div>
+        <input type="hidden" id="n-options">
+        <div class="bar"><button class="pill ink" type="submit">Publier la sortie</button><button class="pill line small" type="reset" id="ev-reset">Effacer</button><span class="msg" id="n-msg" role="status"></span></div>
       </form>
+      <p class="label" style="margin:34px 0 0">Sorties à venir</p>
+      <div id="ed-list"></div>
+      <details id="ed-past-wrap" style="margin-top:18px"><summary class="label" style="cursor:pointer">Sorties passées</summary><div id="ed-past"></div></details>
     </div>
     <div>
       <h3>Administrateurs</h3>
@@ -579,7 +592,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     const mid=document.createElement('div');
     const h=document.createElement('h3');h.textContent=s.titre||'Sortie';
     mid.append(h);
-    if(s.description){const p=document.createElement('p');p.textContent=s.description;mid.append(p)}
+    if(s.description){const p=document.createElement('p');p.textContent=s.description;p.style.whiteSpace='pre-line';mid.append(p)}
     const opts=parseOpts(s.options);
     if(upcoming&&opts.length){
       const mine=myAnswers(s.id);
@@ -780,12 +793,16 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 
   function renderEditor(){
     if(admin.hidden||!isAdmin)return;
-    const list=$('ed-list');
-    if(list.contains(document.activeElement))return; // ne pas effacer une saisie en cours
-    list.textContent='';
-    const all=sorties.slice().sort((a,b)=>(a.date||'')<(b.date||'')?1:-1);
-    if(!all.length){const p=document.createElement('p');p.className='msg';p.textContent='Aucune sortie. Ajoutez la première ci-dessous.';list.append(p)}
-    all.forEach(s=>{
+    const list=$('ed-list'),past=$('ed-past');
+    if(list.contains(document.activeElement)||past.contains(document.activeElement))return; // ne pas effacer une saisie en cours
+    list.textContent='';past.textContent='';
+    const t0=today();
+    const up=sorties.filter(s=>(s.date||'')>=t0).sort((a,b)=>(a.date||'')<(b.date||'')?-1:1);
+    const old=sorties.filter(s=>(s.date||'')<t0).sort((a,b)=>(a.date||'')<(b.date||'')?1:-1);
+    if(!up.length){const p=document.createElement('p');p.className='msg';p.textContent='Aucune sortie à venir.';list.append(p)}
+    $('ed-past-wrap').hidden=!old.length;
+    up.concat(old).forEach(s=>{
+      const host=(s.date||'')>=t0?list:past;
       const fm=document.createElement('form');fm.className='ed';fm.noValidate=true;
       const fields=[['date','Date','date'],['heure','Horaires','text'],['titre','Titre','text'],['lieu','Lieu','text'],['description','Description','textarea'],['options','Sondage de présence (choix séparés par des virgules)','textfull']];
       const g=document.createElement('div');g.className='grid2';
@@ -799,14 +816,16 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       const save=document.createElement('button');save.className='pill ink small';save.type='submit';save.textContent='Enregistrer';
       const del=document.createElement('button');del.className='pill line small';del.type='button';del.textContent='Supprimer';
       const m=document.createElement('span');m.className='msg';m.setAttribute('role','status');
-      bar.append(save,del,m);
+      const dup=document.createElement('button');dup.className='pill line small';dup.type='button';dup.textContent='Dupliquer';
+      dup.addEventListener('click',()=>{fillNew(Object.assign({},s,{date:''}));$('ed-new').scrollIntoView({behavior:'smooth',block:'start'});say($('n-msg'),'Copie prête : choisissez la date puis publiez.','ok')});
+      bar.append(save,dup,del,m);
       const sum=document.createElement('div');sum.className='poll-sum';
       const opts=parseOpts(s.options);
       if(opts.length){
         opts.forEach(o=>{const line=document.createElement('p');const n=namesFor(s.id,o);
           const b=document.createElement('b');b.textContent=o+' · '+n.length;line.append(b,document.createTextNode(n.length?'  '+n.join(', '):''));sum.append(line)});
       }
-      fm.append(g,sum,bar);list.append(fm);
+      fm.append(g,sum,bar);host.append(fm);
       fm.addEventListener('submit',async e=>{e.preventDefault();const d={};fields.forEach(([k])=>{d[k]=fm.elements[k].value.trim()});
         if(!d.date||!d.titre){say(m,'Date et titre requis.','err');return}
         try{await db.doc('sorties/'+s.id).set(d);say(m,'Enregistré.','ok')}catch(err){say(m,'Refusé ('+(err&&err.code||'erreur')+').','err')}});
@@ -817,12 +836,45 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       });
     });
   }
+  // ---- Création de sortie : modèles, jours rapides, choix du sondage ----
+  const DEF_LIEU='Ponton du lac de la Terrasse';
+  const EV_TPL=[
+    {nom:'Ride + initiation + apéro',titre:'Ride libre, initiation et apéro',heure:'15h – 18h30',description:"Ride libre de 15h à 18h30.\nInitiation pumpfoil à partir de 15h30, avec le matériel prêté par Alpinefoil.\nApéro partagé : chacun apporte quelque chose.",options:['Ride libre','Initiation pumpfoil','Apéro','Aide']},
+    {nom:'Apéro Pumpfoil',titre:'Apéro Pumpfoil',heure:'17h – 22h',description:"Pump de 17h à 20h, puis apéro de 20h à 22h au snack du lac.",options:['Ride','Apéro','Aide']},
+    {nom:'Ride libre',titre:'Ride libre',heure:'',description:'',options:['Ride libre']},
+    {nom:'Initiation débutants',titre:'Initiation pumpfoil',heure:'',description:"Initiation encadrée par les riders confirmés, matériel prêté par Alpinefoil.",options:['Initiation pumpfoil','Aide']}
+  ];
+  const EV_OPTS=['Ride libre','Initiation pumpfoil','Apéro','Aide','Prêt de matériel'];
+  let evOpts=['Ride libre','Initiation pumpfoil','Apéro','Aide'];
+  function renderEvOpts(){
+    const box=$('ev-opts');box.textContent='';
+    [...new Set(EV_OPTS.concat(evOpts))].forEach(o=>{const b=document.createElement('button');b.type='button';b.className='chip';b.textContent=o;
+      b.setAttribute('aria-pressed',evOpts.includes(o)?'true':'false');
+      b.addEventListener('click',()=>{evOpts=evOpts.includes(o)?evOpts.filter(x=>x!==o):evOpts.concat(o);renderEvOpts()});box.append(b)});
+    $('n-options').value=evOpts.join(', ');
+  }
+  function fillNew(d){
+    $('n-date').value=d.date||'';$('n-heure').value=d.heure||'';$('n-titre').value=d.titre||'';
+    $('n-lieu').value=d.lieu||DEF_LIEU;$('n-desc').value=d.description||'';
+    evOpts=Array.isArray(d.options)?d.options.slice():parseOpts(d.options);renderEvOpts();
+  }
+  EV_TPL.forEach(t=>{const b=document.createElement('button');b.type='button';b.className='chip';b.textContent=t.nom;
+    b.addEventListener('click',()=>{fillNew(Object.assign({date:$('n-date').value,lieu:$('n-lieu').value},t));say($('n-msg'),'')});$('ev-tpl').append(b)});
+  const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  [['Mercredi',3],['Samedi',6],['Dimanche',0]].forEach(([lab,wd])=>{
+    const d=new Date();d.setHours(12);d.setDate(d.getDate()+((wd-d.getDay()+7)%7));
+    const b=document.createElement('button');b.type='button';b.className='chip';b.textContent=lab+' '+d.getDate()+' '+MOIS[d.getMonth()];
+    b.addEventListener('click',()=>{$('n-date').value=iso(d)});$('ev-days').append(b)});
+  $('ev-opt-add').addEventListener('click',()=>{const v=$('ev-opt-new').value.trim().replace(/,/g,' ');if(v&&!evOpts.includes(v)){evOpts.push(v);if(!EV_OPTS.includes(v))EV_OPTS.push(v)}$('ev-opt-new').value='';renderEvOpts()});
+  $('ev-opt-new').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('ev-opt-add').click()}});
+  $('ed-new').addEventListener('reset',()=>setTimeout(()=>{fillNew({options:['Ride libre','Initiation pumpfoil','Apéro','Aide']});say($('n-msg'),'')},0));
+  fillNew({options:evOpts});
   $('ed-new').addEventListener('submit',async e=>{
     e.preventDefault();const m=$('n-msg');
     const d={date:$('n-date').value,heure:$('n-heure').value.trim(),titre:$('n-titre').value.trim(),lieu:$('n-lieu').value.trim(),description:$('n-desc').value.trim(),options:$('n-options').value.trim()};
     if(!d.date||!d.titre){say(m,'Date et titre requis.','err');return}
     const id=d.date+'-'+Math.random().toString(36).slice(2,7);
-    try{await db.doc('sorties/'+id).set(d);say(m,'Sortie ajoutée.','ok');e.target.reset()}catch(err){say(m,'Ajout refusé ('+(err&&err.code||'erreur')+').','err')}
+    try{await db.doc('sorties/'+id).set(d);e.target.reset();setTimeout(()=>say(m,'Sortie publiée : elle apparaît dans l\'agenda avec son sondage.','ok'),10)}catch(err){say(m,'Ajout refusé ('+(err&&err.code||'erreur')+').','err')}
   });
 
   // Messages et consignes (admin)
