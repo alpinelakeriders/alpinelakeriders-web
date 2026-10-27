@@ -140,9 +140,19 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .past .ag-row{opacity:.6}
 
 /* Apéro */
-.apero{display:grid;gap:48px;align-items:center}
-@media (min-width:960px){.apero{grid-template-columns:1fr 1fr;gap:96px}}
-.apero img{width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;object-position:50% 50%;border-radius:2px}
+.apero{display:grid;gap:40px;align-items:center}
+@media (min-width:960px){.apero{grid-template-columns:1.35fr 1fr;gap:72px}}
+.ap-car{position:relative;width:100%;aspect-ratio:4/3;border-radius:4px;overflow:hidden;background:var(--tint)}
+.ap-car img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.2s ease}
+.ap-car img.on{opacity:1}
+.ap-nav{position:absolute;left:0;right:0;bottom:12px;display:flex;justify-content:center;align-items:center;gap:8px;z-index:2}
+.ap-nav button.dot{width:8px;height:8px;padding:0;border:0;border-radius:50%;background:rgba(255,255,255,.55);cursor:pointer}
+.ap-nav button.dot[aria-current="true"]{background:#fff;width:22px;border-radius:4px}
+.ap-arr{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:40px;height:40px;border-radius:50%;border:0;background:rgba(0,0,0,.28);color:#fff;font-size:18px;cursor:pointer;opacity:0;transition:opacity .2s;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.ap-car:hover .ap-arr,.ap-arr:focus-visible{opacity:1}
+@media (hover:none){.ap-arr{opacity:.85}}
+.ap-arr.prev{left:12px}.ap-arr.next{right:12px}
+.ph.off img{opacity:.35;filter:grayscale(1)}
 .apero h2{font-size:clamp(44px,6.4vw,96px);line-height:.95}
 .dl{display:grid;margin:40px 0 36px;border-top:1px solid var(--line)}
 .dl div{display:grid;grid-template-columns:120px 1fr;gap:16px;padding-block:16px;border-bottom:1px solid var(--line)}
@@ -364,8 +374,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=15"></script>
-<script src="js/backend.js?v=15"></script>
+<script src="js/config.js?v=16"></script>
+<script src="js/backend.js?v=16"></script>
 </head>
 <body>
 
@@ -447,7 +457,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 
 <section id="apero" style="padding-top:0"><div class="wrap">
   <div class="apero">
-    <img src="media/briefing.jpg" alt="Riders réunis sur le ponton avant la session">
+    <div class="ap-car" id="ap-car" aria-roledescription="carrousel" aria-label="Photos des Apéros Pumpfoil"><img class="on" src="media/briefing.jpg" alt="Riders réunis sur le ponton avant la session"></div>
     <div>
       <p class="label" style="margin-bottom:24px">Le rendez-vous</p>
       <h2>Apéro Pumpfoil</h2>
@@ -530,7 +540,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 
 <div class="admin" id="admin" hidden role="dialog" aria-modal="true" aria-labelledby="admin-title"><div class="wrap">
   <div class="admin-head"><h2 id="admin-title">Administration</h2><div style="display:flex;gap:8px"><button class="pill line small" id="logout" type="button" hidden>Se déconnecter</button><button class="pill line small" id="close-admin" type="button">Fermer</button></div>
-    <nav class="adm-nav" id="adm-nav" aria-label="Rubriques de l'administration"><button type="button" data-go="sec-agenda">Agenda</button><button type="button" data-go="sec-msg">Messages</button><button type="button" data-go="sec-membres">Membres</button><button type="button" data-go="sec-visites">Visites</button><button type="button" data-go="sec-textes">Textes</button><button type="button" data-go="sec-photos">Photos</button><button type="button" data-go="sec-admins">Administrateurs</button></nav></div>
+    <nav class="adm-nav" id="adm-nav" aria-label="Rubriques de l'administration"><button type="button" data-go="sec-agenda">Agenda</button><button type="button" data-go="sec-msg">Messages</button><button type="button" data-go="sec-membres">Membres</button><button type="button" data-go="sec-visites">Visites</button><button type="button" data-go="sec-textes">Textes</button><button type="button" data-go="sec-photos">Photos</button><button type="button" data-go="sec-apero-ph">Photos apéro</button><button type="button" data-go="sec-admins">Administrateurs</button></nav></div>
   <button class="pill ink small adm-top" id="adm-top" type="button">↑ Menu</button>
   <div class="gate" id="gate">
     <p class="msg" id="gate-msg">Vérification de l'accès…</p>
@@ -650,11 +660,20 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     </section>
     <section class="adm-sec" id="sec-photos">
       <h3>Photos du bandeau</h3>
-      <p class="adm-intro">Glissez les photos pour les ajouter. Elles sont redimensionnées (2000 px max), recompressées et retouchées automatiquement (niveaux, contraste, vibrance) avant l'envoi.</p>
+      <p class="adm-intro">Glissez les photos pour les ajouter. Décochez « Affichée » pour masquer une photo sans la supprimer. Elles sont redimensionnées (2000 px max), recompressées et retouchées automatiquement (niveaux, contraste, vibrance) avant l'envoi.</p>
       <div class="ph-grid" id="ph-list"></div>
       <div class="drop" id="ph-drop">
         <label class="check"><input type="checkbox" id="ph-auto" checked> Retouche automatique</label>
         <div class="bar" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><label class="pill ink small" style="cursor:pointer">Ajouter des photos<input type="file" id="ph-file" accept="image/*" multiple hidden></label><span class="msg" id="ph-msg" role="status">ou glissez-les ici</span></div>
+      </div>
+    </section>
+    <section class="adm-sec" id="sec-apero-ph">
+      <h3>Photos de l'Apéro Pumpfoil</h3>
+      <p class="adm-intro">Carrousel affiché à côté du bloc « Apéro Pumpfoil ». Les photos défilent en fondu toutes les 5 secondes. Décochez « Affichée » pour masquer une photo sans la supprimer. Même traitement automatique que le bandeau (2000 px, compression, contraste et saturation).</p>
+      <div class="ph-grid" id="ap-list"></div>
+      <div class="drop" id="ap-drop">
+        <label class="check"><input type="checkbox" id="ap-auto" checked> Retouche automatique</label>
+        <div class="bar" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><label class="pill ink small" style="cursor:pointer">Ajouter des photos<input type="file" id="ap-file" accept="image/*" multiple hidden></label><span class="msg" id="ap-msg" role="status">ou glissez-les ici</span></div>
       </div>
     </section>
     <section class="adm-sec" id="sec-admins">
@@ -744,9 +763,33 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 
   // ---------- Bande photos : contenu depuis la base ----------
   const phSrc=p=>p.url||p.src||'';
-  const phSorted=()=>(photos||[]).slice().sort((a,b)=>(a.ordre||0)-(b.ordre||0));
+  const zoneOf=p=>p.zone==='apero'?'apero':'bandeau';
+  const phSorted=(z='bandeau',tout=false)=>(photos||[]).filter(p=>zoneOf(p)===z&&(tout||p.actif!==false)).sort((a,b)=>(a.ordre||0)-(b.ordre||0));
+  // Carrousel de l'Apéro Pumpfoil : fondu toutes les 5 s, pause au survol
+  const apCar=$('ap-car');let apI=0,apHover=false,apTimer=null,apSig='';
+  function apShow(i){const ims=apCar.querySelectorAll('img');if(!ims.length)return;apI=(i+ims.length)%ims.length;
+    ims.forEach((im,k)=>im.classList.toggle('on',k===apI));apCar.querySelectorAll('.dot').forEach((d,k)=>d.setAttribute('aria-current',k===apI?'true':'false'))}
+  function renderApero(){
+    const list=phSorted('apero');if(!list.length)return; // sinon on garde la photo par défaut
+    const sig=list.map(p=>p.id+phSrc(p)+(p.alt||'')).join('|');if(sig===apSig)return;apSig=sig;
+    apCar.textContent='';
+    list.forEach((p,k)=>{const im=document.createElement('img');im.src=phSrc(p);im.alt=p.alt||'Apéro Pumpfoil au lac de la Terrasse';im.decoding='async';if(k>0)im.loading='lazy';apCar.append(im)});
+    if(list.length>1){
+      const nav=document.createElement('div');nav.className='ap-nav';
+      list.forEach((p,k)=>{const d=document.createElement('button');d.type='button';d.className='dot';d.setAttribute('aria-label','Photo '+(k+1));d.addEventListener('click',()=>{apShow(k);apRestart()});nav.append(d)});
+      const mk=(c,t,l,f)=>{const b=document.createElement('button');b.type='button';b.className='ap-arr '+c;b.textContent=t;b.setAttribute('aria-label',l);b.addEventListener('click',()=>{apShow(apI+f);apRestart()});return b};
+      apCar.append(nav,mk('prev','←','Photo précédente',-1),mk('next','→','Photo suivante',1));
+    }
+    apShow(0);apRestart();
+  }
+  function apRestart(){clearInterval(apTimer);if(apCar.querySelectorAll('img').length<2||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+    apTimer=setInterval(()=>{if(!apHover&&!document.hidden)apShow(apI+1)},5000)}
+  apCar.addEventListener('mouseenter',()=>{apHover=true});apCar.addEventListener('mouseleave',()=>{apHover=false});
+  let apX=null;apCar.addEventListener('touchstart',e=>{apX=e.touches[0].clientX},{passive:true});
+  apCar.addEventListener('touchend',e=>{if(apX===null)return;const d=e.changedTouches[0].clientX-apX;apX=null;if(Math.abs(d)>40){apShow(apI+(d<0?1:-1));apRestart()}},{passive:true});
   function renderStrip(){
-    if(!photos||!photos.length)return; // sinon on garde les photos par défaut
+    renderApero();
+    if(!phSorted().length)return; // sinon on garde les photos par défaut
     st.textContent='';
     phSorted().forEach(p=>{const im=document.createElement('img');im.src=phSrc(p);im.alt=p.alt||'Session de pumpfoil au lac';im.decoding='async';if(p.tall)im.className='tall';
       im.addEventListener('error',()=>im.remove());st.append(im)});
@@ -1235,20 +1278,26 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   });
 
   // Photos du bandeau (admin)
-  function renderPhEditor(){
+  const PH_Z={bandeau:{list:'ph-list',drop:'ph-drop',msg:'ph-msg',auto:'ph-auto',file:'ph-file',vide:'Les photos par défaut sont affichées. Ajoutez des photos pour composer le bandeau.'},
+              apero:{list:'ap-list',drop:'ap-drop',msg:'ap-msg',auto:'ap-auto',file:'ap-file',vide:'La photo par défaut est affichée. Ajoutez des photos pour créer le carrousel.'}};
+  function renderPhEditor(){Object.keys(PH_Z).forEach(renderPhZone)}
+  function renderPhZone(z){
     if(admin.hidden||!isAdmin)return;
-    const list=$('ph-list');
+    const Z=PH_Z[z],list=$(Z.list);
     if(list.contains(document.activeElement)&&document.activeElement.type==='text')return;
     list.textContent='';
-    const all=phSorted();
-    if(!all.length){const p=document.createElement('p');p.className='msg';p.textContent='Les photos par défaut sont affichées. Ajoutez des photos pour composer le bandeau.';list.append(p)}
+    const all=phSorted(z,true);
+    if(!all.length){const p=document.createElement('p');p.className='msg';p.textContent=Z.vide;list.append(p)}
     all.forEach((p,i)=>{
-      const c=document.createElement('div');c.className='ph'+(p.tall?' tall':'');
+      const c=document.createElement('div');c.className='ph'+(p.tall&&z==='bandeau'?' tall':'')+(p.actif===false?' off':'');
       const im=document.createElement('img');im.src=phSrc(p);im.alt='';
       const alt=document.createElement('input');alt.type='text';alt.value=p.alt||'';alt.placeholder='Description (accessibilité)';
       alt.addEventListener('change',()=>db.doc('photos/'+p.id).update({alt:alt.value.trim()}).catch(()=>{}));
-      const ck=document.createElement('label');ck.className='check';const cb=document.createElement('input');cb.type='checkbox';cb.checked=!!p.tall;ck.append(cb,' Portrait');
-      cb.addEventListener('change',()=>db.doc('photos/'+p.id).update({tall:cb.checked}).catch(()=>{}));
+      const on=document.createElement('label');on.className='check';const ob=document.createElement('input');ob.type='checkbox';ob.checked=p.actif!==false;on.append(ob,' Affichée');
+      ob.addEventListener('change',()=>db.doc('photos/'+p.id).update({actif:ob.checked}).catch(()=>{}));
+      c.append(im,alt,on);
+      if(z==='bandeau'){const ck=document.createElement('label');ck.className='check';const cb=document.createElement('input');cb.type='checkbox';cb.checked=!!p.tall;ck.append(cb,' Portrait');
+        cb.addEventListener('change',()=>db.doc('photos/'+p.id).update({tall:cb.checked}).catch(()=>{}));c.append(ck)}
       const bar=document.createElement('div');bar.className='bar';
       const btn=(t,lab)=>{const b=document.createElement('button');b.type='button';b.className='pill line small';b.textContent=t;b.setAttribute('aria-label',lab);return b};
       const up=btn('←','Avancer'),dn=btn('→','Reculer'),del=btn('Supprimer','Supprimer la photo');
@@ -1258,12 +1307,12 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       let armed=false;
       del.addEventListener('click',async()=>{
         if(!armed){armed=true;del.textContent='Confirmer';setTimeout(()=>{armed=false;del.textContent='Supprimer'},4000);return}
-        try{await db.doc('photos/'+p.id).delete();if(p.asset&&assets)await assets.delete(p.asset).catch(()=>{})}catch(e){say($('ph-msg'),'Suppression refusée.','err')}
+        try{await db.doc('photos/'+p.id).delete();if(p.asset&&assets)await assets.delete(p.asset).catch(()=>{})}catch(e){say($(Z.msg),'Suppression refusée.','err')}
       });
-      bar.append(up,dn,del);c.append(im,alt,ck,bar);list.append(c);
+      bar.append(up,dn,del);c.append(bar);list.append(c);
     });
-    $('ph-drop').hidden=!assets;
-    if(!assets)say($('ph-msg'),'Ajout de photos indisponible dans cette vue.','err');
+    $(Z.drop).hidden=!assets;
+    if(!assets)say($(Z.msg),'Ajout de photos indisponible dans cette vue.','err');
   }
   // Redimensionne, retouche (niveaux auto + contraste + vibrance) et recompresse
   async function prepare(file,enhance){
@@ -1294,28 +1343,30 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     if(!out||out.type!=='image/webp')out=await toBlob('image/jpeg',.82);
     return {blob:out,tall:h>w*1.05};
   }
-  async function addPhotos(files){
-    const m=$('ph-msg');files=[...files].filter(f=>/^image\//.test(f.type)||/\.(jpe?g|png|webp|heic)$/i.test(f.name));
+  async function addPhotos(files,z='bandeau'){
+    const Z=PH_Z[z];const m=$(Z.msg);files=[...files].filter(f=>/^image\//.test(f.type)||/\.(jpe?g|png|webp|heic)$/i.test(f.name));
     if(!files.length||!assets)return;
-    let base=Math.max(0,...(photos||[]).map(p=>p.ordre||0));let ok=0;
+    let base=Math.max(0,...phSorted(z,true).map(p=>p.ordre||0));let ok=0;
     for(const [i,f] of files.entries()){
       say(m,'Traitement '+(i+1)+'/'+files.length+'…');
       try{
-        const {blob,tall}=await prepare(f,$('ph-auto').checked);
+        const {blob,tall}=await prepare(f,$(Z.auto).checked);
         const res=await assets.upload(blob,{type:blob.type});
         const id='ph-'+Date.now().toString(36)+i;
-        await db.doc('photos/'+id).set({asset:res.id,url:res.url,alt:'',tall,ordre:++base,cree:new Date().toISOString()});
+        await db.doc('photos/'+id).set(Object.assign({asset:res.id,url:res.url,alt:'',tall,ordre:++base,actif:true,cree:new Date().toISOString()},z==='apero'?{zone:'apero'}:{}));
         ok++;say(m,f.name+' : '+Math.round(f.size/1024)+' Ko → '+Math.round(res.sizeBytes/1024)+' Ko','ok');
       }catch(e){const c=e&&typeof e.code==='string'?e.code:'';say(m,f.name+' : '+(c==='too_large'?'fichier trop lourd':!c?'format non lu (HEIC ? exportez en JPEG)':'envoi refusé ('+c+')'),'err');}
     }
     if(ok>1)say(m,ok+' photos ajoutées.','ok');
-    $('ph-file').value='';
+    $(Z.file).value='';
   }
-  $('ph-file').addEventListener('change',e=>addPhotos(e.target.files));
-  const drop=$('ph-drop');
-  ['dragenter','dragover'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.add('over')}));
-  ['dragleave','drop'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.remove('over')}));
-  drop.addEventListener('drop',e=>addPhotos(e.dataTransfer.files));
+  Object.entries(PH_Z).forEach(([z,Z])=>{
+    $(Z.file).addEventListener('change',e=>addPhotos(e.target.files,z));
+    const drop=$(Z.drop);
+    ['dragenter','dragover'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.add('over')}));
+    ['dragleave','drop'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.remove('over')}));
+    drop.addEventListener('drop',e=>addPhotos(e.dataTransfer.files,z));
+  });
 
   // ---------- Membres (admin) ----------
   let membres=[];
