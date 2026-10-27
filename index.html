@@ -16,9 +16,12 @@
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Un rider en pumpfoil sur le lac de la Terrasse, logo Alpine Lake Riders">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Alpine Lake Riders">
+<meta name="twitter:description" content="Pump, vole, recommence. L'association de pumpfoil des lacs alpins.">
 <meta name="twitter:image" content="https://alpinelakeriders.com/media/partage-v2.jpg">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#ffffff">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"SportsOrganization","name":"Alpine Lake Riders","alternateName":"Alpine Lake Riders Association","url":"https://alpinelakeriders.com/","logo":"https://alpinelakeriders.com/media/logo-alr-noir.svg","image":"https://alpinelakeriders.com/media/partage-v2.jpg","description":"Association de pumpfoil des lacs alpins (Isère, Savoie, Haute-Savoie) : sessions, initiations au dockstart et Apéros Pumpfoil au lac de la Terrasse.","sport":"Pumpfoil","address":{"@type":"PostalAddress","addressLocality":"La Terrasse","postalCode":"38660","addressRegion":"Isère","addressCountry":"FR"},"sameAs":["https://chat.whatsapp.com/D0wUPuh0QP87qtSMwNR3xT"]}</script>
 <link rel="icon" href="media/logo-alr-noir.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -344,8 +347,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=11"></script>
-<script src="js/backend.js?v=11"></script>
+<script src="js/config.js?v=12"></script>
+<script src="js/backend.js?v=12"></script>
 </head>
 <body>
 
@@ -586,6 +589,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
         <p class="full adm-sub">Accueil</p>
         <label class="f full"><span class="label">Slogan</span><input id="t-slogan"></label>
         <label class="f full"><span class="label">Sous-titre</span><textarea id="t-accroche"></textarea></label>
+        <label class="f full"><span class="label">Texte d'aperçu (WhatsApp, Facebook, Google). Vide = slogan + sous-titre.</span><textarea id="t-partage" placeholder="Une ou deux phrases, 160 caractères maximum."></textarea></label>
         <p class="full adm-sub">L'association</p>
         <label class="f full"><span class="label">Présentation</span><textarea id="t-mission"></textarea></label>
         <label class="f full"><span class="label">Encadrer</span><textarea id="t-p1"></textarea></label>
@@ -657,7 +661,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   const $=id=>document.getElementById(id);
   const MOIS=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
   const JOURS=['dim.','lun.','mar.','mer.','jeu.','ven.','sam.'];
-  const TEXT_KEYS=['slogan','accroche','mission','p1','p2','p3','prog1','prog2','prog3','debIntro','deb1','deb2','deb3','deb4','deb5','deb6','debLien','inscrits','nbAperos','ride','apero','dernier','prochain','spot','prixRider','prixFamille','prixDecouverte','gaId'];
+  const TEXT_KEYS=['slogan','accroche','partage','mission','p1','p2','p3','prog1','prog2','prog3','debIntro','deb1','deb2','deb3','deb4','deb5','deb6','debLien','inscrits','nbAperos','ride','apero','dernier','prochain','spot','prixRider','prixFamille','prixDecouverte','gaId'];
   let db=null,user=null,assets=null,myId=null,sorties=[],contenu={},annonces=[],presences=[],photos=null;
 
   // ---------- Vidéo ----------
