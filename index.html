@@ -93,8 +93,9 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .stats span{display:block;margin-top:10px;color:var(--muted);font-size:14px}
 
 /* Bande photos */
-.strip{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px));scrollbar-width:none}
+.strip{display:flex;gap:12px;overflow-x:auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px));scrollbar-width:none}
 .strip::-webkit-scrollbar{display:none}
+.strip.auto{scroll-snap-type:none}
 @media (min-width:800px){.strip{padding-left:max(48px,env(safe-area-inset-left,0px))}}
 .strip img{flex:none;height:clamp(300px,42vw,560px);width:auto;aspect-ratio:3/2;object-fit:cover;scroll-snap-align:start;border-radius:2px;background:var(--tint)}
 .strip img.tall{aspect-ratio:4/5}
@@ -363,8 +364,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=14"></script>
-<script src="js/backend.js?v=14"></script>
+<script src="js/config.js?v=15"></script>
+<script src="js/backend.js?v=15"></script>
 </head>
 <body>
 
@@ -697,15 +698,49 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   // ---------- Bande photos : flèches + glisser à la souris ----------
   const st=$('strip'),pv=$('s-prev'),nx=$('s-next');
   const step=()=>Math.max(300,st.clientWidth*0.7);
-  pv.addEventListener('click',()=>st.scrollBy({left:-step(),behavior:'smooth'}));
-  nx.addEventListener('click',()=>st.scrollBy({left:step(),behavior:'smooth'}));
-  const edges=()=>{pv.disabled=st.scrollLeft<4;nx.disabled=st.scrollLeft+st.clientWidth>=st.scrollWidth-4};
-  st.addEventListener('scroll',edges,{passive:true});addEventListener('resize',edges);setTimeout(edges,300);
+  // Boucle : on ajoute une copie des photos à la suite pour un défilement sans fin
+  let loopW=0;
+  function loopify(){
+    st.querySelectorAll('.clone').forEach(e=>e.remove());loopW=0;
+    const orig=[...st.children];if(!orig.length)return;
+    orig.forEach(e=>{const c=e.cloneNode(true);c.classList.add('clone');c.setAttribute('aria-hidden','true');c.alt='';st.append(c)});
+    requestAnimationFrame(()=>{const c=st.querySelector('.clone');loopW=c?c.offsetLeft-orig[0].offsetLeft:0;if(loopW<=st.clientWidth){st.querySelectorAll('.clone').forEach(e=>e.remove());loopW=0}});
+  }
+  const wrap=()=>{if(loopW&&st.scrollLeft>=loopW){st.scrollLeft-=loopW;pos=st.scrollLeft}};
+  pv.addEventListener('click',()=>{hold(6000);if(loopW&&st.scrollLeft<step())st.scrollLeft+=loopW;st.scrollBy({left:-step(),behavior:'smooth'})});
+  nx.addEventListener('click',()=>{hold(6000);st.scrollBy({left:step(),behavior:'smooth'})});
+  const edges=()=>{if(loopW){pv.disabled=nx.disabled=false;return}pv.disabled=st.scrollLeft<4;nx.disabled=st.scrollLeft+st.clientWidth>=st.scrollWidth-4};
+  st.addEventListener('scroll',()=>{wrap();edges()},{passive:true});addEventListener('resize',()=>{loopify();edges()});setTimeout(edges,300);
   let dx=null,sl=0;
-  st.addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse')return;dx=e.clientX;sl=st.scrollLeft;st.classList.add('drag');st.setPointerCapture(e.pointerId)});
+  st.addEventListener('pointerdown',e=>{hold(5000);if(e.pointerType!=='mouse')return;dx=e.clientX;sl=st.scrollLeft;st.classList.add('drag');st.setPointerCapture(e.pointerId)});
   st.addEventListener('pointermove',e=>{if(dx===null)return;st.scrollLeft=sl-(e.clientX-dx)});
   const end=()=>{if(dx===null)return;dx=null;st.classList.remove('drag')};
   st.addEventListener('pointerup',end);st.addEventListener('pointercancel',end);
+  // Défilement automatique, tout doux ; la souris ou le doigt reprennent la main
+  const SPEED=28; // pixels par seconde
+  let pos=0,last=0,hover=false,holdUntil=0,inView=true;
+  const still=matchMedia('(prefers-reduced-motion: reduce)');
+  function hold(ms){holdUntil=Math.max(holdUntil,performance.now()+ms)}
+  st.addEventListener('mouseenter',()=>{hover=true});
+  st.addEventListener('mouseleave',()=>{hover=false;hold(800)});
+  st.addEventListener('touchstart',()=>hold(5000),{passive:true});
+  st.addEventListener('wheel',()=>hold(3000),{passive:true});
+  st.addEventListener('focusin',()=>hold(8000));
+  try{new IntersectionObserver(es=>{inView=es[0].isIntersecting}).observe(st)}catch(e){}
+  function tick(t){
+    const dt=last?Math.min(100,t-last):0;last=t;
+    const run=!still.matches&&!hover&&dx===null&&t>holdUntil&&inView&&!document.hidden&&st.scrollWidth>st.clientWidth+4;
+    st.classList.toggle('auto',run);
+    if(run){
+      if(Math.abs(st.scrollLeft-pos)>2)pos=st.scrollLeft; // l'utilisateur a bougé : on repart de là
+      pos+=SPEED*dt/1000;
+      if(loopW&&pos>=loopW)pos-=loopW;
+      else if(!loopW&&pos>=st.scrollWidth-st.clientWidth){pos=0}
+      st.scrollLeft=pos;
+    }
+    requestAnimationFrame(tick);
+  }
+  setTimeout(()=>{loopify();requestAnimationFrame(tick)},1200);
 
   // ---------- Bande photos : contenu depuis la base ----------
   const phSrc=p=>p.url||p.src||'';
@@ -715,7 +750,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     st.textContent='';
     phSorted().forEach(p=>{const im=document.createElement('img');im.src=phSrc(p);im.alt=p.alt||'Session de pumpfoil au lac';im.decoding='async';if(p.tall)im.className='tall';
       im.addEventListener('error',()=>im.remove());st.append(im)});
-    st.scrollLeft=0;setTimeout(edges,300);
+    st.scrollLeft=0;pos=0;loopify();setTimeout(edges,300);
   }
 
   // ---------- Textes modifiables ----------
