@@ -336,12 +336,16 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   .adm-sec{scroll-margin-top:12px}
 }
 
+/* Bandeau cookies */
+.cookie{position:fixed;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:40;max-width:560px;margin:0 auto;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.14);padding:16px 18px;display:grid;gap:12px}
+.cookie p{font-size:14px;color:var(--muted);line-height:1.5}
+.cookie div{display:flex;gap:8px;flex-wrap:wrap}
 .draft{position:fixed;right:max(14px,env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:20;font:500 11px var(--mono);letter-spacing:.04em;text-transform:uppercase;background:var(--fg);color:var(--bg);padding:8px 12px;border-radius:999px;opacity:.85}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=9"></script>
-<script src="js/backend.js?v=9"></script>
+<script src="js/config.js?v=10"></script>
+<script src="js/backend.js?v=10"></script>
 </head>
 <body>
 
@@ -496,8 +500,13 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     <a href="#top" aria-label="Alpine Lake Riders, retour en haut"><img class="logo-light" src="media/logo-alr-noir.svg" alt="Alpine Lake Riders" width="2869" height="1699"><img class="logo-dark" src="media/logo-alr-blanc.svg" alt="Alpine Lake Riders" width="2869" height="1699"></a>
     <ul><li><a href="#asso">L'asso</a></li><li><a href="#agenda">Agenda</a></li><li><a href="#debuter">Débuter</a></li><li><a href="#apero">Apéros Pumpfoil</a></li><li><a href="https://chat.whatsapp.com/D0wUPuh0QP87qtSMwNR3xT" target="_blank" rel="noopener">WhatsApp</a></li><li><a href="#rejoindre">Adhérer</a></li></ul>
   </div>
-  <div class="legal"><span>© 2027 Alpine Lake Riders · Association loi 1901 · La Terrasse, Isère</span><span>Mentions légales · Statuts · <button class="link" id="open-admin" type="button">Administration</button></span></div>
+  <div class="legal"><span>© 2027 Alpine Lake Riders · Association loi 1901 · La Terrasse, Isère</span><span>Mentions légales · Statuts · <button class="link" id="cookie-open" type="button" hidden>Cookies</button> · <button class="link" id="open-admin" type="button">Administration</button></span></div>
 </div></footer>
+
+<div class="cookie" id="cookie" hidden role="dialog" aria-label="Cookies">
+  <p>Nous aimerions mesurer la fréquentation du site avec Google Analytics. Elles servent uniquement à améliorer le site. Vous acceptez ?</p>
+  <div><button class="pill ink small" type="button" id="cookie-ok">Accepter</button><button class="pill line small" type="button" id="cookie-no">Refuser</button></div>
+</div>
 
 <div class="admin" id="admin" hidden role="dialog" aria-modal="true" aria-labelledby="admin-title"><div class="wrap">
   <div class="admin-head"><h2 id="admin-title">Administration</h2><div style="display:flex;gap:8px"><button class="pill line small" id="logout" type="button" hidden>Se déconnecter</button><button class="pill line small" id="close-admin" type="button">Fermer</button></div>
@@ -607,6 +616,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
         <label class="f"><span class="label">Tarif Rider</span><input id="t-prixRider"></label>
         <label class="f"><span class="label">Tarif Famille</span><input id="t-prixFamille"></label>
         <label class="f"><span class="label">Tarif Découverte</span><input id="t-prixDecouverte"></label>
+        <p class="full adm-sub">Statistiques</p>
+        <label class="f full"><span class="label">Identifiant Google Analytics (G-XXXXXXXXXX). Laisser vide pour désactiver.</span><input id="t-gaId" placeholder="G-XXXXXXXXXX" autocomplete="off" spellcheck="false"></label>
         <div class="full adm-save"><button class="pill ink" type="submit" id="t-save">Enregistrer les textes</button><span class="msg" id="t-msg" role="status"></span></div>
       </form>
     </section>
@@ -646,7 +657,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   const $=id=>document.getElementById(id);
   const MOIS=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
   const JOURS=['dim.','lun.','mar.','mer.','jeu.','ven.','sam.'];
-  const TEXT_KEYS=['slogan','accroche','mission','p1','p2','p3','prog1','prog2','prog3','debIntro','deb1','deb2','deb3','deb4','deb5','deb6','debLien','inscrits','nbAperos','ride','apero','dernier','prochain','spot','prixRider','prixFamille','prixDecouverte'];
+  const TEXT_KEYS=['slogan','accroche','mission','p1','p2','p3','prog1','prog2','prog3','debIntro','deb1','deb2','deb3','deb4','deb5','deb6','debLien','inscrits','nbAperos','ride','apero','dernier','prochain','spot','prixRider','prixFamille','prixDecouverte','gaId'];
   let db=null,user=null,assets=null,myId=null,sorties=[],contenu={},annonces=[],presences=[],photos=null;
 
   // ---------- Vidéo ----------
@@ -685,6 +696,27 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   const defaults={};
   document.querySelectorAll('[data-k]').forEach(el=>{defaults[el.dataset.k]=el.textContent});
   let autoCount=null;
+  // ---------- Google Analytics, chargé seulement après accord (RGPD) ----------
+  let gaId='',gaLoaded=false;
+  const ckGet=()=>{try{return localStorage.getItem('alr-cookies')}catch(e){return null}};
+  const ckSet=v=>{try{localStorage.setItem('alr-cookies',v)}catch(e){}};
+  function loadGA(){
+    if(gaLoaded||!gaId)return;gaLoaded=true;
+    window.dataLayer=window.dataLayer||[];window.gtag=function(){dataLayer.push(arguments)};
+    gtag('js',new Date());gtag('config',gaId,{anonymize_ip:true});
+    const sc=document.createElement('script');sc.async=true;sc.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(gaId);document.head.append(sc);
+  }
+  function initGA(id){
+    id=String(id||'').trim().toUpperCase();
+    if(!/^G-[A-Z0-9]{4,}$/.test(id)){gaId='';$('cookie').hidden=true;$('cookie-open').hidden=true;return}
+    gaId=id;$('cookie-open').hidden=false;
+    const c=ckGet();
+    if(c==='oui')loadGA();else if(c!=='non')$('cookie').hidden=false;
+  }
+  $('cookie-ok').addEventListener('click',()=>{ckSet('oui');$('cookie').hidden=true;loadGA()});
+  $('cookie-no').addEventListener('click',()=>{const was=ckGet()==='oui';ckSet('non');$('cookie').hidden=true;
+    if(was){document.cookie.split(';').forEach(c=>{const n=c.split('=')[0].trim();if(/^_ga/.test(n)){[location.hostname,'.'+location.hostname.replace(/^www\./,'')].forEach(d=>{document.cookie=n+'=;Max-Age=0;path=/;domain='+d});document.cookie=n+'=;Max-Age=0;path=/'}});location.reload()}});
+  $('cookie-open').addEventListener('click',()=>{$('cookie').hidden=false});
   function applyTexts(){
     document.querySelectorAll('[data-k]').forEach(el=>{
       const val=contenu[el.dataset.k];
@@ -826,7 +858,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     if(!db){sorties=[];renderAgenda();return}
     try{myId=user&&await user.currentId()}catch(e){}
     if(user&&user.onRecovery)user.onRecovery(showNewPass);
-    db.doc('contenu/site').onSnapshot(s=>{contenu=s.exists?(s.data()||{}):{};applyTexts();fillTextForm()},()=>{});
+    db.doc('contenu/site').onSnapshot(s=>{contenu=s.exists?(s.data()||{}):{};applyTexts();fillTextForm();initGA(contenu.gaId)},()=>{});
     db.collection('sorties').onSnapshot(q=>{sorties=q.docs.map(d=>Object.assign({id:d.id},d.data()));renderAgenda();renderEditor()},()=>{renderAgenda()});
     db.collection('annonces').onSnapshot(q=>{annonces=q.docs.map(d=>Object.assign({id:d.id},d.data()));renderAnnonces();renderAnEditor()},()=>{});
     refreshCount();
