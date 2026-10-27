@@ -276,12 +276,71 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 .mb-tools input[type=search]:focus{outline:none;border-bottom-color:var(--fg)}
 .mb-count{font:500 12px var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
 
+/* Back-office : vrais champs cadrés, pas de défilement horizontal */
+[hidden]{display:none!important}
+.admin{overflow-x:hidden;background:var(--tint);padding-top:0;--field:color-mix(in srgb,var(--fg) 24%,transparent)}
+.admin .wrap{max-width:900px;grid-template-columns:minmax(0,1fr);gap:22px}
+#admin-body{grid-template-columns:minmax(0,1fr);gap:22px!important}
+.admin-head{position:sticky;top:0;z-index:3;background:var(--tint);padding-top:calc(14px + env(safe-area-inset-top,0px));padding-bottom:12px;flex-wrap:wrap;row-gap:12px}
+.admin-head h2{font-size:24px}
+.adm-nav{display:flex;flex-wrap:wrap;gap:6px;width:100%}
+.admin:has(#admin-body[hidden]) .adm-nav{display:none}
+.adm-nav button{font:500 13px var(--sans);padding:7px 12px;border-radius:999px;border:0;background:var(--bg);box-shadow:inset 0 0 0 1px var(--line);color:var(--fg);cursor:pointer}
+.adm-nav button:hover{box-shadow:inset 0 0 0 1px var(--fg)}
+.adm-sec,.admin .gate{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:clamp(18px,3vw,28px);scroll-margin-top:130px;min-width:0;max-width:none}
+.admin h3{font-size:22px;margin-bottom:6px}
+.adm-intro{font-size:14px;color:var(--muted);margin:0 0 18px;max-width:70ch}
+.adm-sub{font:600 12px/1 var(--mono);text-transform:uppercase;letter-spacing:.05em;color:var(--lake);padding-top:14px;border-top:1px solid var(--line);margin-top:6px}
+.adm-sub:first-child{border-top:0;padding-top:0;margin-top:0}
+.admin .label{font:600 14px/1.3 var(--sans);text-transform:none;letter-spacing:0;color:var(--fg)}
+.admin .f{gap:7px}
+.admin .f input,.admin .f textarea,.admin .ev-add,.admin .mb-tools input[type=search],.admin .ph input[type=text]{font:400 16px/1.45 var(--sans);color:var(--fg);background:var(--bg);border:1px solid var(--field);border-radius:8px;padding:10px 12px;width:100%;min-width:0;text-align:left;-webkit-appearance:none;appearance:none;box-shadow:none}
+.admin .f input,.admin .ev-add,.admin .mb-tools input[type=search]{min-height:46px}
+.admin .f textarea{min-height:104px;field-sizing:content;max-height:60vh;resize:vertical}
+.admin .f input:focus,.admin .f textarea:focus,.admin .ev-add:focus,.admin .mb-tools input[type=search]:focus,.admin .ph input[type=text]:focus{outline:none;border-color:var(--lake);box-shadow:0 0 0 3px color-mix(in srgb,var(--lake) 22%,transparent)}
+.admin input[type=date]{display:block}
+.admin input::-webkit-date-and-time-value{text-align:left}
+.admin .f input::placeholder,.admin .f textarea::placeholder{color:var(--muted);opacity:.8}
+.admin .grid2{gap:16px 18px}
+.admin .ed{display:grid;gap:16px;padding:18px;border:1px solid var(--line);border-radius:10px;margin-top:14px;background:var(--bg)}
+.admin .ev-new{margin-top:6px}
+.admin .ev-add{width:auto;flex:1;min-width:150px}
+.admin .ev-row{grid-template-columns:minmax(0,1fr)}
+.admin .ev-k{font:600 14px var(--sans);text-transform:none;letter-spacing:0;color:var(--fg)}
+.adm-save{position:sticky;bottom:calc(-49px - env(safe-area-inset-bottom,0px));box-shadow:0 -10px 16px -12px rgba(0,0,0,.18);padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))!important;z-index:2;background:var(--bg);padding:12px 0 4px;border-top:1px solid var(--line);display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.adm-item{border:1px solid var(--line);border-radius:10px;margin-top:10px;background:var(--bg);min-width:0}
+.adm-item>summary{padding:14px 16px;cursor:pointer;display:flex;gap:6px 12px;align-items:center;flex-wrap:wrap;list-style:none}
+.adm-item>summary::-webkit-details-marker{display:none}
+.adm-item>summary::after{content:'Modifier';margin-left:auto;font:500 13px var(--sans);color:var(--muted)}
+.adm-item[open]>summary::after{content:'Fermer'}
+.adm-item>summary b{font-weight:600}
+.adm-item>summary small{font-size:13px;color:var(--muted)}
+.adm-item>.ed{margin:0;border:0;border-top:1px solid var(--line);border-radius:0 0 10px 10px}
+.adm-row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 0;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
+.mb-list{display:grid;gap:10px}
+@media (min-width:760px){.mb-list{grid-template-columns:1fr 1fr}}
+.mb-card{border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:grid;gap:6px;min-width:0;align-content:start}
+.mb-card .top{display:flex;justify-content:space-between;gap:10px;align-items:start}
+.mb-card b{font-size:16px;font-weight:600}
+.mb-card .meta{display:flex;flex-wrap:wrap;gap:2px 14px;font-size:14px;color:var(--muted);overflow-wrap:anywhere;min-width:0}
+.mb-card .meta a{color:var(--fg)}
+.mb-more{margin-top:12px}
+.admin .grid2>.check{align-self:end;min-height:46px}
+.adm-top{display:none}
+@media (max-width:700px){
+  .admin-head{position:static}
+  .admin-head h2{font-size:21px}
+  .adm-top{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:4;display:inline-flex;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+  .admin:has(#admin-body[hidden]) .adm-top{display:none}
+  .adm-sec{scroll-margin-top:12px}
+}
+
 .draft{position:fixed;right:max(14px,env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:20;font:500 11px var(--mono);letter-spacing:.04em;text-transform:uppercase;background:var(--fg);color:var(--bg);padding:8px 12px;border-radius:999px;opacity:.85}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=7"></script>
-<script src="js/backend.js?v=7"></script>
+<script src="js/config.js?v=8"></script>
+<script src="js/backend.js?v=8"></script>
 </head>
 <body>
 
@@ -440,7 +499,9 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 </div></footer>
 
 <div class="admin" id="admin" hidden role="dialog" aria-modal="true" aria-labelledby="admin-title"><div class="wrap">
-  <div class="admin-head"><h2 id="admin-title">Administration</h2><div style="display:flex;gap:8px"><button class="pill line small" id="logout" type="button" hidden>Se déconnecter</button><button class="pill line small" id="close-admin" type="button">Fermer</button></div></div>
+  <div class="admin-head"><h2 id="admin-title">Administration</h2><div style="display:flex;gap:8px"><button class="pill line small" id="logout" type="button" hidden>Se déconnecter</button><button class="pill line small" id="close-admin" type="button">Fermer</button></div>
+    <nav class="adm-nav" id="adm-nav" aria-label="Rubriques de l'administration"><button type="button" data-go="sec-agenda">Agenda</button><button type="button" data-go="sec-msg">Messages</button><button type="button" data-go="sec-membres">Membres</button><button type="button" data-go="sec-textes">Textes</button><button type="button" data-go="sec-photos">Photos</button><button type="button" data-go="sec-admins">Administrateurs</button></nav></div>
+  <button class="pill ink small adm-top" id="adm-top" type="button">↑ Menu</button>
   <div class="gate" id="gate">
     <p class="msg" id="gate-msg">Vérification de l'accès…</p>
     <form id="login" class="grid2" novalidate hidden>
@@ -454,62 +515,10 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       <div class="full" style="display:flex;gap:16px;align-items:center;flex-wrap:wrap"><button class="pill ink" type="submit">Enregistrer</button><span class="msg" id="np-msg" role="status"></span></div>
     </form>
   </div>
-  <div id="admin-body" hidden style="display:grid;gap:56px">
-    <div>
-      <h3>Textes et horaires</h3>
-      <form id="txt" class="grid2" novalidate>
-        <label class="f full"><span class="label">Slogan</span><input id="t-slogan"></label>
-        <label class="f full"><span class="label">Sous-titre</span><textarea id="t-accroche"></textarea></label>
-        <label class="f full"><span class="label">L'association : présentation</span><textarea id="t-mission"></textarea></label>
-        <label class="f full"><span class="label">Encadrer</span><textarea id="t-p1"></textarea></label>
-        <label class="f full"><span class="label">Conventionner</span><textarea id="t-p2"></textarea></label>
-        <label class="f full"><span class="label">Partager</span><textarea id="t-p3"></textarea></label>
-        <label class="f full"><span class="label">Débuter : lien de l'article du blog Alpinefoil</span><input id="t-debLien" type="url" placeholder="https://www.alpinefoil.com/blog-…"></label>
-        <label class="f full"><span class="label">Débuter : introduction</span><textarea id="t-debIntro"></textarea></label>
-        <label class="f full"><span class="label">Conseil 1 : le bon matériel</span><textarea id="t-deb1"></textarea></label>
-        <label class="f full"><span class="label">Conseil 2 : protégez-vous</span><textarea id="t-deb2"></textarea></label>
-        <label class="f full"><span class="label">Conseil 3 : la bonne position</span><textarea id="t-deb3"></textarea></label>
-        <label class="f full"><span class="label">Conseil 4 : le geste du pump</span><textarea id="t-deb4"></textarea></label>
-        <label class="f full"><span class="label">Conseil 5 : le départ</span><textarea id="t-deb5"></textarea></label>
-        <label class="f full"><span class="label">Conseil 6 : dosez l'effort</span><textarea id="t-deb6"></textarea></label>
-        <label class="f"><span class="label">Nombre d'inscrits (secours : le site compte automatiquement les membres)</span><input id="t-inscrits"></label>
-        <label class="f"><span class="label">Apéros organisés</span><input id="t-nbAperos"></label>
-        <label class="f"><span class="label">Apéro : horaires ride</span><input id="t-ride"></label>
-        <label class="f"><span class="label">Apéro : horaires apéro</span><input id="t-apero"></label>
-        <label class="f"><span class="label">Dernier apéro</span><input id="t-dernier"></label>
-        <label class="f"><span class="label">Prochain apéro</span><input id="t-prochain"></label>
-        <label class="f full"><span class="label">Texte du spot</span><textarea id="t-spot"></textarea></label>
-        <label class="f"><span class="label">Tarif Rider</span><input id="t-prixRider"></label>
-        <label class="f"><span class="label">Tarif Famille</span><input id="t-prixFamille"></label>
-        <label class="f"><span class="label">Tarif Découverte</span><input id="t-prixDecouverte"></label>
-        <div class="full" style="display:flex;gap:16px;align-items:center;flex-wrap:wrap"><button class="pill ink" type="submit" id="t-save">Enregistrer les textes</button><span class="msg" id="t-msg" role="status"></span></div>
-      </form>
-    </div>
-    <div>
-      <h3>Photos du bandeau</h3>
-      <p class="msg" style="margin:6px 0 18px">Glissez les photos pour les ajouter. Elles sont redimensionnées (2000 px max), recompressées et retouchées automatiquement (niveaux, contraste, vibrance) avant l'envoi.</p>
-      <div class="ph-grid" id="ph-list"></div>
-      <div class="drop" id="ph-drop">
-        <label class="check"><input type="checkbox" id="ph-auto" checked> Retouche automatique</label>
-        <div class="bar" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><label class="pill ink small" style="cursor:pointer">Ajouter des photos<input type="file" id="ph-file" accept="image/*" multiple hidden></label><span class="msg" id="ph-msg" role="status">ou glissez-les ici</span></div>
-      </div>
-    </div>
-    <div>
-      <h3>Messages et consignes</h3>
-      <div id="an-list"></div>
-      <form id="an-new" class="ed" novalidate>
-        <p class="label">Nouveau message</p>
-        <div class="grid2">
-          <label class="f full"><span class="label">Titre</span><input id="a-titre" placeholder="Ponton fermé jusqu'au 18 décembre"></label>
-          <label class="f full"><span class="label">Message</span><textarea id="a-texte"></textarea></label>
-          <label class="f"><span class="label">Afficher jusqu'au (optionnel)</span><input id="a-fin" type="date"></label>
-          <label class="check"><input type="checkbox" id="a-imp"> Message important</label>
-        </div>
-        <div class="bar"><button class="pill ink small" type="submit">Publier le message</button><span class="msg" id="a-msg" role="status"></span></div>
-      </form>
-    </div>
-    <div>
+  <div id="admin-body" hidden style="display:grid">
+    <section class="adm-sec" id="sec-agenda">
       <h3>Agenda des sorties</h3>
+      <p class="adm-intro">Créez une sortie à partir d'un modèle, puis ouvrez une sortie existante pour la modifier et voir qui vient.</p>
       <form id="ed-new" class="ed ev-new" novalidate>
         <p class="label">Nouvelle sortie</p>
         <div class="ev-row"><span class="ev-k">Partir d'un modèle</span><div class="ev-chips" id="ev-tpl"></div></div>
@@ -529,10 +538,85 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       <p class="label" style="margin:34px 0 0">Sorties à venir</p>
       <div id="ed-list"></div>
       <details id="ed-past-wrap" style="margin-top:18px"><summary class="label" style="cursor:pointer">Sorties passées</summary><div id="ed-past"></div></details>
-    </div>
-    <div>
+    </section>
+    <section class="adm-sec" id="sec-msg">
+      <h3>Messages et consignes</h3>
+      <p class="adm-intro">Ces messages s'affichent sous la vidéo d'accueil.</p>
+      <div id="an-list"></div>
+      <form id="an-new" class="ed" novalidate>
+        <p class="label">Nouveau message</p>
+        <div class="grid2">
+          <label class="f full"><span class="label">Titre</span><input id="a-titre" placeholder="Ponton fermé jusqu'au 18 décembre"></label>
+          <label class="f full"><span class="label">Message</span><textarea id="a-texte"></textarea></label>
+          <label class="f"><span class="label">Afficher jusqu'au (optionnel)</span><input id="a-fin" type="date"></label>
+          <label class="check"><input type="checkbox" id="a-imp"> Message important</label>
+        </div>
+        <div class="bar"><button class="pill ink small" type="submit">Publier le message</button><span class="msg" id="a-msg" role="status"></span></div>
+      </form>
+    </section>
+    <section class="adm-sec" id="sec-membres">
+      <h3>Membres</h3>
+      <p class="adm-intro">Inscrits via le site et membres importés depuis votre tableur. Pour importer : dans Google Sheets, Fichier › Télécharger › CSV, puis « Importer un CSV ». Un membre déjà présent (même nom et même prénom) est mis à jour, pas dupliqué ; plusieurs membres d'une même famille peuvent partager un e-mail.</p>
+      <div class="mb-tools">
+        <input type="search" id="mb-q" placeholder="Rechercher un nom, une ville, un e-mail…" aria-label="Rechercher un membre">
+        <span class="mb-count" id="mb-count"></span>
+      </div>
+      <div class="mb-tools">
+        <label class="pill line small" style="cursor:pointer">Importer un CSV<input type="file" id="mb-file" accept=".csv,text/csv" hidden></label>
+        <button class="pill line small" type="button" id="mb-export">Exporter la liste (CSV)</button>
+        <button class="pill line small" type="button" id="mb-clear">Vider les membres importés</button>
+        <span class="msg" id="mb-msg" role="status"></span>
+      </div>
+      <div id="insc"><p class="msg">Chargement…</p></div>
+    </section>
+    <section class="adm-sec" id="sec-textes">
+      <h3>Textes et horaires</h3>
+      <p class="adm-intro">Modifiez les textes du site, puis cliquez sur « Enregistrer les textes » en bas.</p>
+      <form id="txt" class="grid2" novalidate>
+        <p class="full adm-sub">Accueil</p>
+        <label class="f full"><span class="label">Slogan</span><input id="t-slogan"></label>
+        <label class="f full"><span class="label">Sous-titre</span><textarea id="t-accroche"></textarea></label>
+        <p class="full adm-sub">L'association</p>
+        <label class="f full"><span class="label">Présentation</span><textarea id="t-mission"></textarea></label>
+        <label class="f full"><span class="label">Encadrer</span><textarea id="t-p1"></textarea></label>
+        <label class="f full"><span class="label">Conventionner</span><textarea id="t-p2"></textarea></label>
+        <label class="f full"><span class="label">Partager</span><textarea id="t-p3"></textarea></label>
+        <p class="full adm-sub">Débuter en pumpfoil</p>
+        <label class="f full"><span class="label">Lien de l'article du blog Alpinefoil</span><input id="t-debLien" type="url" placeholder="https://www.alpinefoil.com/blog-…"></label>
+        <label class="f full"><span class="label">Introduction</span><textarea id="t-debIntro"></textarea></label>
+        <label class="f full"><span class="label">Conseil 1 : le bon matériel</span><textarea id="t-deb1"></textarea></label>
+        <label class="f full"><span class="label">Conseil 2 : protégez-vous</span><textarea id="t-deb2"></textarea></label>
+        <label class="f full"><span class="label">Conseil 3 : la bonne position</span><textarea id="t-deb3"></textarea></label>
+        <label class="f full"><span class="label">Conseil 4 : le geste du pump</span><textarea id="t-deb4"></textarea></label>
+        <label class="f full"><span class="label">Conseil 5 : le départ</span><textarea id="t-deb5"></textarea></label>
+        <label class="f full"><span class="label">Conseil 6 : dosez l'effort</span><textarea id="t-deb6"></textarea></label>
+        <p class="full adm-sub">Chiffres et apéros</p>
+        <label class="f"><span class="label">Nombre d'inscrits (secours, le site compte tout seul)</span><input id="t-inscrits"></label>
+        <label class="f"><span class="label">Apéros organisés</span><input id="t-nbAperos"></label>
+        <label class="f"><span class="label">Apéro : horaires ride</span><input id="t-ride"></label>
+        <label class="f"><span class="label">Apéro : horaires apéro</span><input id="t-apero"></label>
+        <label class="f"><span class="label">Dernier apéro</span><input id="t-dernier"></label>
+        <label class="f"><span class="label">Prochain apéro</span><input id="t-prochain"></label>
+        <p class="full adm-sub">Le spot et les tarifs</p>
+        <label class="f full"><span class="label">Texte du spot</span><textarea id="t-spot"></textarea></label>
+        <label class="f"><span class="label">Tarif Rider</span><input id="t-prixRider"></label>
+        <label class="f"><span class="label">Tarif Famille</span><input id="t-prixFamille"></label>
+        <label class="f"><span class="label">Tarif Découverte</span><input id="t-prixDecouverte"></label>
+        <div class="full adm-save"><button class="pill ink" type="submit" id="t-save">Enregistrer les textes</button><span class="msg" id="t-msg" role="status"></span></div>
+      </form>
+    </section>
+    <section class="adm-sec" id="sec-photos">
+      <h3>Photos du bandeau</h3>
+      <p class="adm-intro">Glissez les photos pour les ajouter. Elles sont redimensionnées (2000 px max), recompressées et retouchées automatiquement (niveaux, contraste, vibrance) avant l'envoi.</p>
+      <div class="ph-grid" id="ph-list"></div>
+      <div class="drop" id="ph-drop">
+        <label class="check"><input type="checkbox" id="ph-auto" checked> Retouche automatique</label>
+        <div class="bar" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><label class="pill ink small" style="cursor:pointer">Ajouter des photos<input type="file" id="ph-file" accept="image/*" multiple hidden></label><span class="msg" id="ph-msg" role="status">ou glissez-les ici</span></div>
+      </div>
+    </section>
+    <section class="adm-sec" id="sec-admins">
       <h3>Administrateurs</h3>
-      <p class="msg" style="margin:6px 0 18px">Les administrateurs peuvent modifier tout le site. Un nouvel administrateur reçoit un e-mail de confirmation à valider avant sa première connexion.</p>
+      <p class="adm-intro">Les administrateurs peuvent modifier tout le site. Un nouvel administrateur reçoit un e-mail de confirmation à valider avant sa première connexion.</p>
       <div id="adm-list"></div>
       <form id="adm-new" class="ed" novalidate>
         <p class="label">Ajouter un administrateur</p>
@@ -547,24 +631,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
         <div class="grid2"><label class="f"><span class="label">Nouveau mot de passe</span><input id="me-new" type="password" autocomplete="new-password"></label></div>
         <div class="bar"><button class="pill line small" type="submit">Changer mon mot de passe</button><span class="msg" id="me-msg" role="status"></span></div>
       </form>
-    </div>
-    <div>
-      <h3>Membres</h3>
-      <p class="msg" style="margin:6px 0 18px">Inscrits via le site et membres importés depuis votre tableur. Pour importer : dans Google Sheets, Fichier › Télécharger › CSV, puis « Importer un CSV ». Un membre déjà présent (même nom et même prénom) est mis à jour, pas dupliqué ; plusieurs membres d'une même famille peuvent partager un e-mail.</p>
-      <div class="mb-tools">
-        <input type="search" id="mb-q" placeholder="Rechercher un nom, une ville, un e-mail…" aria-label="Rechercher un membre">
-        <span class="mb-count" id="mb-count"></span>
-      </div>
-      <div class="mb-tools">
-        <label class="pill line small" style="cursor:pointer">Importer un CSV<input type="file" id="mb-file" accept=".csv,text/csv" hidden></label>
-        <button class="pill line small" type="button" id="mb-export">Exporter la liste (CSV)</button>
-        <button class="pill line small" type="button" id="mb-clear">Vider les membres importés</button>
-        <span class="msg" id="mb-msg" role="status"></span>
-      </div>
-      <div id="insc"><p class="msg">Chargement…</p></div>
-    </div>
-  </div>
-</div></div>
+    </section>
+  </div></div>
 
 
 
@@ -825,7 +893,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     try{list=await user.listAdmins();me=await user.email()}catch(e){box.innerHTML='<p class="msg err">Liste indisponible : lancez le fichier supabase/002_admins.sql dans Supabase.</p>';return}
     box.textContent='';
     list.forEach(em=>{
-      const row=document.createElement('div');row.className='ed';row.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap';
+      const row=document.createElement('div');row.className='adm-row';
       const t=document.createElement('span');t.textContent=em+(em.toLowerCase()===(me||'').toLowerCase()?' (vous)':'');
       const bar=document.createElement('span');bar.style.cssText='display:flex;gap:10px;align-items:center';
       const m=document.createElement('span');m.className='msg';
@@ -854,6 +922,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     }catch(err){say(m,/rate|limit/i.test(err&&err.message||'')?'Trop d\'envois d\'e-mails, réessayez dans une heure.':'Ajout refusé ('+(err&&err.code||'erreur')+').','err')}
   });
   $('logout').addEventListener('click',async()=>{await user.logout();isAdmin=false;$('close-admin').click()});
+  document.querySelectorAll('#adm-nav [data-go]').forEach(b=>b.addEventListener('click',()=>{const t=$(b.dataset.go);if(t)t.scrollIntoView({behavior:'smooth',block:'start'})}));
+  $('adm-top').addEventListener('click',()=>{admin.scrollTo({top:0,behavior:'smooth'})});
   $('close-admin').addEventListener('click',()=>{admin.hidden=true;document.body.style.overflow=''});
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!admin.hidden)$('close-admin').click()});
 
@@ -869,6 +939,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     $('t-save').disabled=false;
   });
 
+  const openEd=new Set(),openAn=new Set();
   function renderEditor(){
     if(admin.hidden||!isAdmin)return;
     const list=$('ed-list'),past=$('ed-past');
@@ -881,8 +952,13 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     $('ed-past-wrap').hidden=!old.length;
     up.concat(old).forEach(s=>{
       const host=(s.date||'')>=t0?list:past;
+      const det=document.createElement('details');det.className='adm-item';det.open=openEd.has(s.id);
+      det.addEventListener('toggle',()=>{det.open?openEd.add(s.id):openEd.delete(s.id)});
+      const su=document.createElement('summary');const sb=document.createElement('b');sb.textContent=(fmtDate(s.date)||'Sans date')+' · '+(s.titre||'Sans titre');
+      const nb=presentsFor(s.id).length;const sm=document.createElement('small');sm.textContent=[s.heure,nb?nb+(nb>1?' présents':' présent'):''].filter(Boolean).join(' · ');
+      su.append(sb,sm);det.append(su);
       const fm=document.createElement('form');fm.className='ed';fm.noValidate=true;
-      const fields=[['date','Date','date'],['heure','Horaires','text'],['titre','Titre','text'],['lieu','Lieu','text'],['description','Description','textarea'],['options','Sondage de présence (choix séparés par des virgules)','textfull']];
+      const fields=[['titre','Titre','textfull'],['date','Date','date'],['heure','Horaires','text'],['lieu','Lieu','textfull'],['description','Description (une info par ligne)','textarea'],['options','Choix du sondage (séparés par des virgules)','textarea']];
       const g=document.createElement('div');g.className='grid2';
       fields.forEach(([k,lab,type])=>{
         const l=document.createElement('label');l.className='f'+(type==='textarea'||type==='textfull'?' full':'');
@@ -900,11 +976,12 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       const sum=document.createElement('div');sum.className='poll-sum';
       const opts=parseOpts(s.options);
       if(opts.length){
+        const st=document.createElement('p');st.className='label';st.textContent='Réponses au sondage';sum.append(st);
         opts.forEach(o=>{const line=document.createElement('p');const n=namesFor(s.id,o);
           const b=document.createElement('b');b.textContent=o+' · '+n.length;line.append(b,document.createTextNode(n.length?'  '+n.join(', '):''));sum.append(line)});
       }
-      fm.append(g,sum,bar);host.append(fm);
-      fm.addEventListener('submit',async e=>{e.preventDefault();const d={};fields.forEach(([k])=>{d[k]=fm.elements[k].value.trim()});
+      fm.append(sum,g,bar);det.append(fm);host.append(det);
+      fm.addEventListener('submit',async e=>{e.preventDefault();const d={};fields.forEach(([k])=>{d[k]=fm.elements[k].value.trim()});d.options=parseOpts(d.options.replace(/\n/g,',')).join(', ');
         if(!d.date||!d.titre){say(m,'Date et titre requis.','err');return}
         try{await db.doc('sorties/'+s.id).set(d);say(m,'Enregistré.','ok')}catch(err){say(m,'Refusé ('+(err&&err.code||'erreur')+').','err')}});
       let armed=false;
@@ -964,16 +1041,21 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     const all=annonces.slice().sort((a,b)=>(a.cree||'')<(b.cree||'')?1:-1);
     if(!all.length){const p=document.createElement('p');p.className='msg';p.textContent='Aucun message publié.';list.append(p)}
     all.forEach(a=>{
+      const det=document.createElement('details');det.className='adm-item';det.open=openAn.has(a.id);
+      det.addEventListener('toggle',()=>{det.open?openAn.add(a.id):openAn.delete(a.id)});
+      const su=document.createElement('summary');const sb=document.createElement('b');sb.textContent=a.titre||'Message';
+      const sm=document.createElement('small');sm.textContent=[a.important?'Important':'Info',a.fin?'jusqu\'au '+fmtDate(a.fin):''].filter(Boolean).join(' · ');
+      su.append(sb,sm);det.append(su);
       const fm=document.createElement('form');fm.className='ed';fm.noValidate=true;
       const g=document.createElement('div');g.className='grid2';
       const mk=(k,lab,tag,type,full)=>{const l=document.createElement('label');l.className='f'+(full?' full':'');const sp=document.createElement('span');sp.className='label';sp.textContent=lab;
         const i=document.createElement(tag);if(type)i.type=type;i.name=k;i.id='an-'+a.id+'-'+k;if(type==='checkbox')i.checked=!!a[k];else i.value=a[k]||'';l.append(sp,i);g.append(l);return i};
-      mk('titre','Titre','input','text',true);mk('texte','Message','textarea',null,true);mk('fin','Afficher jusqu\'au','input','date',false);mk('important','Important','input','checkbox',false);
+      mk('titre','Titre','input','text',true);mk('texte','Message','textarea',null,true);mk('fin','Afficher jusqu\'au','input','date',false);const ci=mk('important','Message important','input','checkbox',false);ci.parentElement.className='check';ci.parentElement.append(ci.previousSibling);
       const bar=document.createElement('div');bar.className='bar';
       const save=document.createElement('button');save.className='pill ink small';save.type='submit';save.textContent='Enregistrer';
       const del=document.createElement('button');del.className='pill line small';del.type='button';del.textContent='Supprimer';
       const m=document.createElement('span');m.className='msg';m.setAttribute('role','status');
-      bar.append(save,del,m);fm.append(g,bar);list.append(fm);
+      bar.append(save,del,m);fm.append(g,bar);det.append(fm);list.append(det);
       fm.addEventListener('submit',async e=>{e.preventDefault();
         const d={titre:fm.elements.titre.value.trim(),texte:fm.elements.texte.value.trim(),fin:fm.elements.fin.value,important:fm.elements.important.checked,cree:a.cree||new Date().toISOString()};
         if(!d.titre){say(m,'Titre requis.','err');return}
@@ -1097,31 +1179,39 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   }
   const MB_COLS=[['nom','Nom'],['prenom','Prénom'],['email','E-mail'],['tel','Téléphone'],['ville','Ville'],['cp','Code postal'],['niveau','Niveau'],['disciplines','Disciplines'],['date','Date'],['source','Source']];
   function filtered(){const q=norm($('mb-q').value);return q?membres.filter(m=>MB_COLS.some(([k])=>norm(m[k]).includes(q))||norm(m.adresse).includes(q)):membres}
+  let mbShow=40;
   function renderMembres(){
     const box=$('insc'),list=filtered();
     $('mb-count').textContent=list.length+' / '+membres.length+' membres';
     if(!membres.length){box.innerHTML='<p class="msg">Aucun membre pour l\'instant. Importez votre tableur pour commencer.</p>';return}
-    const wrap=document.createElement('div');wrap.className='tbl';const t=document.createElement('table');
-    const hr=document.createElement('tr');MB_COLS.concat([['','']]).forEach(([,l])=>{const th=document.createElement('th');th.textContent=l;hr.append(th)});
-    const th=document.createElement('thead');th.append(hr);t.append(th);
-    const tb=document.createElement('tbody');
-    list.forEach(m=>{
-      const tr=document.createElement('tr');
-      MB_COLS.forEach(([k])=>{const td=document.createElement('td');
-        if(k==='email'&&m.email){const a=document.createElement('a');a.href='mailto:'+m.email;a.textContent=m.email;td.append(a)}
-        else if(k==='tel'&&m.tel){const a=document.createElement('a');a.href='tel:'+m.tel.replace(/[^\d+]/g,'');a.textContent=m.tel;td.append(a)}
-        else td.textContent=m[k]||'';
-        if(k==='disciplines')td.className='wr';tr.append(td)});
-      const td=document.createElement('td');const del=document.createElement('button');del.type='button';del.className='pill line small';del.textContent='Supprimer';let armed=false;
+    const grid=document.createElement('div');grid.className='mb-list';
+    const lim=Math.min(list.length,mbShow);
+    list.slice(0,lim).forEach(m=>{
+      const c=document.createElement('div');c.className='mb-card';
+      const top=document.createElement('div');top.className='top';
+      const nm=document.createElement('b');nm.textContent=[m.prenom,m.nom].filter(Boolean).join(' ')||m.email||'Sans nom';
+      const del=document.createElement('button');del.type='button';del.className='pill line small';del.textContent='Supprimer';let armed=false;
       del.addEventListener('click',async()=>{
         if(!armed){armed=true;del.textContent='Confirmer';setTimeout(()=>{armed=false;del.textContent='Supprimer'},4000);return}
         try{await db.doc(m._col+'/'+m._id).delete();loadInscriptions()}catch(e){say($('mb-msg'),'Suppression refusée.','err')}
       });
-      td.append(del);tr.append(td);tb.append(tr);
+      top.append(nm,del);c.append(top);
+      const meta=document.createElement('div');meta.className='meta';
+      if(m.email){const x=document.createElement('a');x.href='mailto:'+m.email;x.textContent=m.email;meta.append(x)}
+      if(m.tel){const x=document.createElement('a');x.href='tel:'+String(m.tel).replace(/[^\d+]/g,'');x.textContent=m.tel;meta.append(x)}
+      const lieu=[m.cp,m.ville].filter(Boolean).join(' ');if(lieu){const x=document.createElement('span');x.textContent=lieu;meta.append(x)}
+      c.append(meta);
+      const extra=[m.niveau,m.disciplines].filter(Boolean).join(' · ');
+      if(extra){const x=document.createElement('div');x.className='meta';x.textContent=extra;c.append(x)}
+      const src=[m.date?('Inscrit le '+m.date):'',m.source||''].filter(Boolean).join(' · ');
+      if(src){const x=document.createElement('div');x.className='meta';x.style.fontSize='12px';x.textContent=src;c.append(x)}
+      grid.append(c);
     });
-    t.append(tb);wrap.append(t);box.textContent='';box.append(wrap);
+    box.textContent='';box.append(grid);
+    if(list.length>lim){const more=document.createElement('button');more.type='button';more.className='pill line small mb-more';more.textContent='Afficher les '+(list.length-lim)+' autres';
+      more.addEventListener('click',()=>{mbShow=Infinity;renderMembres()});box.append(more)}
   }
-  $('mb-q').addEventListener('input',renderMembres);
+  $('mb-q').addEventListener('input',()=>{mbShow=40;renderMembres()});
   let clearArmed=false;
   $('mb-clear').addEventListener('click',async()=>{
     const b=$('mb-clear'),m=$('mb-msg');
