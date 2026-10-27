@@ -344,8 +344,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=10"></script>
-<script src="js/backend.js?v=10"></script>
+<script src="js/config.js?v=11"></script>
+<script src="js/backend.js?v=11"></script>
 </head>
 <body>
 
@@ -617,7 +617,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
         <label class="f"><span class="label">Tarif Famille</span><input id="t-prixFamille"></label>
         <label class="f"><span class="label">Tarif Découverte</span><input id="t-prixDecouverte"></label>
         <p class="full adm-sub">Statistiques</p>
-        <label class="f full"><span class="label">Identifiant Google Analytics (G-XXXXXXXXXX). Laisser vide pour désactiver.</span><input id="t-gaId" placeholder="G-XXXXXXXXXX" autocomplete="off" spellcheck="false"></label>
+        <label class="f full"><span class="label">Identifiant Google Analytics (G-XXXXXXXXXX)</span><input id="t-gaId" placeholder="G-XXXXXXXXXX" autocomplete="off" spellcheck="false"></label>
         <div class="full adm-save"><button class="pill ink" type="submit" id="t-save">Enregistrer les textes</button><span class="msg" id="t-msg" role="status"></span></div>
       </form>
     </section>
@@ -697,6 +697,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   document.querySelectorAll('[data-k]').forEach(el=>{defaults[el.dataset.k]=el.textContent});
   let autoCount=null;
   // ---------- Google Analytics, chargé seulement après accord (RGPD) ----------
+  const GA_DEF='G-4P1WWQHMMD';
   let gaId='',gaLoaded=false;
   const ckGet=()=>{try{return localStorage.getItem('alr-cookies')}catch(e){return null}};
   const ckSet=v=>{try{localStorage.setItem('alr-cookies',v)}catch(e){}};
@@ -717,6 +718,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   $('cookie-no').addEventListener('click',()=>{const was=ckGet()==='oui';ckSet('non');$('cookie').hidden=true;
     if(was){document.cookie.split(';').forEach(c=>{const n=c.split('=')[0].trim();if(/^_ga/.test(n)){[location.hostname,'.'+location.hostname.replace(/^www\./,'')].forEach(d=>{document.cookie=n+'=;Max-Age=0;path=/;domain='+d});document.cookie=n+'=;Max-Age=0;path=/'}});location.reload()}});
   $('cookie-open').addEventListener('click',()=>{$('cookie').hidden=false});
+  defaults.gaId=GA_DEF;
   function applyTexts(){
     document.querySelectorAll('[data-k]').forEach(el=>{
       const val=contenu[el.dataset.k];
@@ -858,7 +860,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     if(!db){sorties=[];renderAgenda();return}
     try{myId=user&&await user.currentId()}catch(e){}
     if(user&&user.onRecovery)user.onRecovery(showNewPass);
-    db.doc('contenu/site').onSnapshot(s=>{contenu=s.exists?(s.data()||{}):{};applyTexts();fillTextForm();initGA(contenu.gaId)},()=>{});
+    db.doc('contenu/site').onSnapshot(s=>{contenu=s.exists?(s.data()||{}):{};applyTexts();fillTextForm();initGA(contenu.gaId!=null?contenu.gaId:GA_DEF)},()=>{initGA(GA_DEF)});
     db.collection('sorties').onSnapshot(q=>{sorties=q.docs.map(d=>Object.assign({id:d.id},d.data()));renderAgenda();renderEditor()},()=>{renderAgenda()});
     db.collection('annonces').onSnapshot(q=>{annonces=q.docs.map(d=>Object.assign({id:d.id},d.data()));renderAnnonces();renderAnEditor()},()=>{});
     refreshCount();
