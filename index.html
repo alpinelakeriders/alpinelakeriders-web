@@ -209,6 +209,14 @@ form{display:grid;gap:26px;align-content:start}
 .who input:focus{outline:none;border-bottom-color:var(--fg)}
 .poll-sum{display:grid;gap:4px;font-size:14px;color:var(--muted)}
 .ev-new{border:1px solid var(--line);border-radius:6px;padding:22px;margin-top:14px}
+.tips{display:grid;border-top:1px solid var(--line)}
+@media (min-width:760px){.tips{grid-template-columns:repeat(2,1fr)}}
+@media (min-width:1100px){.tips{grid-template-columns:repeat(3,1fr)}}
+.tips div{display:grid;gap:10px;align-content:start;padding:28px 28px 28px 0;border-bottom:1px solid var(--line)}
+.tips .label{color:var(--lake)}
+.tips h3{font-size:22px}
+.tips p{color:var(--muted);max-width:40ch}
+.deb-cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:36px}
 .ev-row{display:grid;gap:8px 16px;align-items:center}
 @media (min-width:760px){.ev-row{grid-template-columns:170px 1fr}}
 .ev-k{font:500 11px var(--mono);text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
@@ -266,15 +274,15 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=5"></script>
-<script src="js/backend.js?v=5"></script>
+<script src="js/config.js?v=6"></script>
+<script src="js/backend.js?v=6"></script>
 </head>
 <body>
 
 
 <nav class="topbar"><div class="wrap">
   <span class="label">Lac de la Terrasse · Isère</span>
-  <ul><li><a href="#asso">L'asso</a></li><li><a href="#agenda">Agenda</a></li><li><a href="#apero">Apéros Pumpfoil</a></li><li><a href="#spot">Le spot</a></li><li><a href="#rejoindre">Rejoindre</a></li></ul>
+  <ul><li><a href="#asso">L'asso</a></li><li><a href="#agenda">Agenda</a></li><li><a href="#debuter">Débuter</a></li><li><a href="#apero">Apéros Pumpfoil</a></li><li><a href="#spot">Le spot</a></li><li><a href="#rejoindre">Rejoindre</a></li></ul>
   <a class="pill ink" href="#rejoindre">Adhérer</a>
 </div></nav>
 <header class="hero" id="top">
@@ -328,6 +336,23 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   <div class="head"><h2>Agenda des sorties</h2><label class="who"><span class="label">Votre prénom pour répondre</span><input id="who" autocomplete="given-name" placeholder="Prénom"></label></div>
   <div class="ag" id="ag-next"><div class="ag-empty">Chargement de l'agenda…</div></div>
   <details class="past" id="ag-past-wrap" hidden><summary class="label">Sorties passées</summary><div class="ag" id="ag-past" style="margin-top:16px"></div></details>
+</div></section>
+
+<section id="debuter"><div class="wrap">
+  <div class="head"><h2>Débuter en pumpfoil</h2><span class="label">Les bons conseils</span></div>
+  <p class="lede" data-k="debIntro" style="margin-top:0">Le pumpfoil s'apprend vite quand on part du bon pied. Voici l'essentiel pour vos premières sessions, testé au ponton par les riders de l'asso.</p>
+  <div class="tips">
+    <div><span class="label">01</span><h3>Le bon matériel</h3><p data-k="deb1">Une grande aile avant (1 500 à 2 000 cm²) qui porte à basse vitesse, une planche de pump légère, une combinaison adaptée à la saison. Pas besoin d'acheter tout de suite : l'asso prête du matériel Alpinefoil aux initiations.</p></div>
+    <div><span class="label">02</span><h3>Protégez-vous</h3><p data-k="deb2">Casque obligatoire au début, gilet d'impact conseillé. Quand vous tombez, tombez à plat, loin de la planche et du foil, et protégez votre tête avec les bras.</p></div>
+    <div><span class="label">03</span><h3>La bonne position</h3><p data-k="deb3">Pieds centrés sur l'axe du mât, genoux souples, buste droit, regard loin devant. Le poids légèrement sur le pied avant pour garder le foil sous la surface.</p></div>
+    <div><span class="label">04</span><h3>Le geste du pump</h3><p data-k="deb4">Poussez vers le bas avec les jambes, puis relâchez. Petite amplitude, rythme régulier, environ un pompage par seconde. C'est le rythme qui fait voler, pas la force.</p></div>
+    <div><span class="label">05</span><h3>Le départ</h3><p data-k="deb5">Commencez par le départ depuis le ponton bas avec un rider qui vous guide. Une course d'élan, on pose la planche bien à plat, on monte, et on pump tout de suite.</p></div>
+    <div><span class="label">06</span><h3>Dosez l'effort</h3><p data-k="deb6">Le pump est très physique : quelques essais, puis une vraie pause. Mieux vaut dix départs bien faits qu'une heure d'épuisement. Ne ridez jamais seul et gardez vos distances avec le ponton et les autres riders.</p></div>
+  </div>
+  <div class="deb-cta">
+    <a class="pill ink" id="deb-blog" href="https://www.alpinefoil.com/blog-hydrofoil-kite-foil/tuto-foil/" target="_blank" rel="noopener"><span data-k="debBlogTxt">Lire le tuto complet sur le blog Alpinefoil</span> ↗</a>
+    <a class="pill line" href="#agenda">Venir à une initiation</a>
+  </div>
 </div></section>
 
 <section id="apero" style="padding-top:0"><div class="wrap">
@@ -403,7 +428,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 <footer><div class="wrap">
   <div class="top">
     <a href="#top" aria-label="Alpine Lake Riders, retour en haut"><img class="logo-light" src="media/logo-alr-noir.svg" alt="Alpine Lake Riders" width="2869" height="1699"><img class="logo-dark" src="media/logo-alr-blanc.svg" alt="Alpine Lake Riders" width="2869" height="1699"></a>
-    <ul><li><a href="#asso">L'asso</a></li><li><a href="#agenda">Agenda</a></li><li><a href="#apero">Apéros Pumpfoil</a></li><li><a href="https://chat.whatsapp.com/D0wUPuh0QP87qtSMwNR3xT" target="_blank" rel="noopener">WhatsApp</a></li><li><a href="#rejoindre">Adhérer</a></li></ul>
+    <ul><li><a href="#asso">L'asso</a></li><li><a href="#agenda">Agenda</a></li><li><a href="#debuter">Débuter</a></li><li><a href="#apero">Apéros Pumpfoil</a></li><li><a href="https://chat.whatsapp.com/D0wUPuh0QP87qtSMwNR3xT" target="_blank" rel="noopener">WhatsApp</a></li><li><a href="#rejoindre">Adhérer</a></li></ul>
   </div>
   <div class="legal"><span>© 2027 Alpine Lake Riders · Association loi 1901 · La Terrasse, Isère</span><span>Mentions légales · Statuts · <button class="link" id="open-admin" type="button">Administration</button></span></div>
 </div></footer>
@@ -433,7 +458,15 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
         <label class="f full"><span class="label">Encadrer</span><textarea id="t-p1"></textarea></label>
         <label class="f full"><span class="label">Conventionner</span><textarea id="t-p2"></textarea></label>
         <label class="f full"><span class="label">Partager</span><textarea id="t-p3"></textarea></label>
-        <label class="f"><span class="label">Nombre d'inscrits</span><input id="t-inscrits"></label>
+        <label class="f full"><span class="label">Débuter : lien de l'article du blog Alpinefoil</span><input id="t-debLien" type="url" placeholder="https://www.alpinefoil.com/blog-…"></label>
+        <label class="f full"><span class="label">Débuter : introduction</span><textarea id="t-debIntro"></textarea></label>
+        <label class="f full"><span class="label">Conseil 1 : le bon matériel</span><textarea id="t-deb1"></textarea></label>
+        <label class="f full"><span class="label">Conseil 2 : protégez-vous</span><textarea id="t-deb2"></textarea></label>
+        <label class="f full"><span class="label">Conseil 3 : la bonne position</span><textarea id="t-deb3"></textarea></label>
+        <label class="f full"><span class="label">Conseil 4 : le geste du pump</span><textarea id="t-deb4"></textarea></label>
+        <label class="f full"><span class="label">Conseil 5 : le départ</span><textarea id="t-deb5"></textarea></label>
+        <label class="f full"><span class="label">Conseil 6 : dosez l'effort</span><textarea id="t-deb6"></textarea></label>
+        <label class="f"><span class="label">Nombre d'inscrits (secours : le site compte automatiquement les membres)</span><input id="t-inscrits"></label>
         <label class="f"><span class="label">Apéros organisés</span><input id="t-nbAperos"></label>
         <label class="f"><span class="label">Apéro : horaires ride</span><input id="t-ride"></label>
         <label class="f"><span class="label">Apéro : horaires apéro</span><input id="t-apero"></label>
@@ -534,7 +567,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   const $=id=>document.getElementById(id);
   const MOIS=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
   const JOURS=['dim.','lun.','mar.','mer.','jeu.','ven.','sam.'];
-  const TEXT_KEYS=['slogan','accroche','mission','p1','p2','p3','inscrits','nbAperos','ride','apero','dernier','prochain','spot','prixRider','prixFamille','prixDecouverte'];
+  const TEXT_KEYS=['slogan','accroche','mission','p1','p2','p3','debIntro','deb1','deb2','deb3','deb4','deb5','deb6','debLien','inscrits','nbAperos','ride','apero','dernier','prochain','spot','prixRider','prixFamille','prixDecouverte'];
   let db=null,user=null,assets=null,myId=null,sorties=[],contenu={},annonces=[],presences=[],photos=null;
 
   // ---------- Vidéo ----------
@@ -572,11 +605,18 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   // ---------- Textes modifiables ----------
   const defaults={};
   document.querySelectorAll('[data-k]').forEach(el=>{defaults[el.dataset.k]=el.textContent});
+  let autoCount=null;
   function applyTexts(){
     document.querySelectorAll('[data-k]').forEach(el=>{
       const val=contenu[el.dataset.k];
       el.textContent=(typeof val==='string'&&val.trim())?val:defaults[el.dataset.k];
+      if(el.dataset.k==='inscrits'&&autoCount)el.textContent=autoCount;
     });
+    const lien=(contenu.debLien||'').trim();
+    if(/^https:\/\//.test(lien))$('deb-blog').href=lien;
+  }
+  async function refreshCount(){
+    try{const n=db&&db.countMembers&&await db.countMembers();if(n>0){autoCount=String(n);applyTexts()}}catch(e){}
   }
 
   // ---------- Agenda ----------
@@ -679,6 +719,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     db.doc('contenu/site').onSnapshot(s=>{contenu=s.exists?(s.data()||{}):{};applyTexts();fillTextForm()},()=>{});
     db.collection('sorties').onSnapshot(q=>{sorties=q.docs.map(d=>Object.assign({id:d.id},d.data()));renderAgenda();renderEditor()},()=>{renderAgenda()});
     db.collection('annonces').onSnapshot(q=>{annonces=q.docs.map(d=>Object.assign({id:d.id},d.data()));renderAnnonces();renderAnEditor()},()=>{});
+    refreshCount();
     db.collection('photos').onSnapshot(q=>{photos=q.docs.map(d=>Object.assign({id:d.id},d.data()));renderStrip();renderPhEditor()},()=>{});
     db.collection('presences').onSnapshot(q=>{presences=q.docs.map(d=>Object.assign({id:d.id},d.data()));renderAgenda();renderEditor()},()=>{});
   })();
@@ -1014,7 +1055,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
         const row={_col:'inscriptions',_id:d.id,source:'Site',date:(r.date||'').slice(0,10).split('-').reverse().join('/'),nom:r.nom,prenom:r.prenom,email:r.email,tel:r.tel,niveau:r.niveau};
         map.set(k,Object.assign({},map.get(k)||{},row))});
       membres=[...map.values()].sort((a,b)=>norm(a.nom).localeCompare(norm(b.nom))||norm(a.prenom).localeCompare(norm(b.prenom)));
-      renderMembres();
+      renderMembres();refreshCount();
     }catch(e){box.innerHTML='<p class="msg err">Liste indisponible ('+(e&&e.code||'erreur')+').</p>'}
   }
   const MB_COLS=[['nom','Nom'],['prenom','Prénom'],['email','E-mail'],['tel','Téléphone'],['ville','Ville'],['cp','Code postal'],['niveau','Niveau'],['disciplines','Disciplines'],['date','Date'],['source','Source']];

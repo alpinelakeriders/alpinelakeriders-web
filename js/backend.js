@@ -38,6 +38,7 @@
         const {error}=await sb.from('docs').upsert(rows);if(error)throw fail(error);
       }
       touch(c)},
+    async countMembers(){const {data,error}=await sb.rpc('nb_membres');if(error)throw fail(error);return data},
     async clearCollection(c){const {error}=await sb.from('docs').delete().eq('collection',c);if(error)throw fail(error);touch(c)},
     collection(c){return{
       async get(){return snapCol(await fetchCol(c))},
