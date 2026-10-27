@@ -341,6 +341,20 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 
 .share-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
 .ag-row.hl{background:color-mix(in srgb,var(--lake) 9%,transparent);box-shadow:-20px 0 0 color-mix(in srgb,var(--lake) 9%,transparent),20px 0 0 color-mix(in srgb,var(--lake) 9%,transparent)}
+.vs-kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.vs-kpi div{border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.vs-kpi b{display:block;font-size:28px;font-weight:500;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.vs-kpi span{font-size:13px;color:var(--muted)}
+.vs-chart{display:flex;align-items:flex-end;gap:2px;height:110px;margin:18px 0 4px;border-bottom:1px solid var(--line)}
+.vs-chart i{flex:1;min-width:0;background:var(--lake);border-radius:2px 2px 0 0;min-height:1px}
+.vs-axis{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+.vs-lists{display:grid;gap:18px;margin-top:20px}
+@media (min-width:700px){.vs-lists{grid-template-columns:1fr 1fr}}
+.vs-list h4{font:600 14px var(--sans);margin-bottom:8px}
+.vs-list p{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;font-size:14px;padding:5px 0;border-bottom:1px solid var(--line);position:relative}
+.vs-list p span{overflow-wrap:anywhere}
+.vs-list p em{font-style:normal;font-variant-numeric:tabular-nums;color:var(--muted)}
+.vs-list p::after{content:'';position:absolute;left:0;bottom:-1px;height:2px;width:var(--w,0);background:var(--lake);opacity:.5}
 /* Bandeau cookies */
 .cookie{position:fixed;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:40;max-width:560px;margin:0 auto;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.14);padding:16px 18px;display:grid;gap:12px}
 .cookie p{font-size:14px;color:var(--muted);line-height:1.5}
@@ -349,8 +363,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=13"></script>
-<script src="js/backend.js?v=13"></script>
+<script src="js/config.js?v=14"></script>
+<script src="js/backend.js?v=14"></script>
 </head>
 <body>
 
@@ -515,7 +529,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 
 <div class="admin" id="admin" hidden role="dialog" aria-modal="true" aria-labelledby="admin-title"><div class="wrap">
   <div class="admin-head"><h2 id="admin-title">Administration</h2><div style="display:flex;gap:8px"><button class="pill line small" id="logout" type="button" hidden>Se déconnecter</button><button class="pill line small" id="close-admin" type="button">Fermer</button></div>
-    <nav class="adm-nav" id="adm-nav" aria-label="Rubriques de l'administration"><button type="button" data-go="sec-agenda">Agenda</button><button type="button" data-go="sec-msg">Messages</button><button type="button" data-go="sec-membres">Membres</button><button type="button" data-go="sec-textes">Textes</button><button type="button" data-go="sec-photos">Photos</button><button type="button" data-go="sec-admins">Administrateurs</button></nav></div>
+    <nav class="adm-nav" id="adm-nav" aria-label="Rubriques de l'administration"><button type="button" data-go="sec-agenda">Agenda</button><button type="button" data-go="sec-msg">Messages</button><button type="button" data-go="sec-membres">Membres</button><button type="button" data-go="sec-visites">Visites</button><button type="button" data-go="sec-textes">Textes</button><button type="button" data-go="sec-photos">Photos</button><button type="button" data-go="sec-admins">Administrateurs</button></nav></div>
   <button class="pill ink small adm-top" id="adm-top" type="button">↑ Menu</button>
   <div class="gate" id="gate">
     <p class="msg" id="gate-msg">Vérification de l'accès…</p>
@@ -583,6 +597,12 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
         <span class="msg" id="mb-msg" role="status"></span>
       </div>
       <div id="insc"><p class="msg">Chargement…</p></div>
+    </section>
+    <section class="adm-sec" id="sec-visites">
+      <h3>Visites du site</h3>
+      <p class="adm-intro">Compteur anonyme, sans cookie et sans adresse IP : chaque ouverture du site est comptée (robots exclus), avec le pays, le type d'appareil et le site d'où vient le visiteur.</p>
+      <div class="ev-chips" id="vs-per"></div>
+      <div id="vs-box" style="margin-top:16px"><p class="msg">Chargement…</p></div>
     </section>
     <section class="adm-sec" id="sec-textes">
       <h3>Textes et horaires</h3>
@@ -928,7 +948,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       $('gate').hidden=false;$('login').hidden=false;$('admin-body').hidden=true;$('logout').hidden=true;return;
     }
     $('gate').hidden=true;$('admin-body').hidden=false;$('logout').hidden=false;
-    fillTextForm();renderEditor();renderAnEditor();loadInscriptions();loadAdmins();
+    fillTextForm();renderEditor();renderAnEditor();loadInscriptions();loadAdmins();loadStats();
     try{assets=window.claude&&await window.claude.use('assets')}catch(e){}
     renderPhEditor();
   });
@@ -956,6 +976,41 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     if(pw.length<8){say(m,'8 caractères minimum.','err');return}
     try{await user.changePassword(pw);$('me-new').value='';say(m,'Mot de passe changé.','ok')}catch(err){say(m,'Changement refusé ('+(err&&err.code||'erreur')+').','err')}
   });
+  // Visites (admin)
+  let vsDays=30;
+  const VS_PER=[[7,'7 jours'],[30,'30 jours'],[90,'3 mois'],[365,'1 an']];
+  function renderVsPer(){const b=$('vs-per');b.textContent='';VS_PER.forEach(([d,l])=>{const c=document.createElement('button');c.type='button';c.className='chip';c.textContent=l;c.setAttribute('aria-pressed',d===vsDays?'true':'false');c.addEventListener('click',()=>{vsDays=d;loadStats()});b.append(c)})}
+  const paysNom=(()=>{let dn=null;try{dn=new Intl.DisplayNames(['fr'],{type:'region'})}catch(e){}return k=>{if(!k||k==='??'||k==='XX'||k==='T1')return 'Inconnu';const f=String.fromCodePoint(...[...k].map(c=>127397+c.charCodeAt(0)));let n=k;try{n=dn?dn.of(k):k}catch(e){}return f+' '+n}})();
+  async function loadStats(){
+    renderVsPer();const box=$('vs-box');
+    if(!db||!db.stats){box.innerHTML='<p class="msg">Statistiques indisponibles.</p>';return}
+    let st;try{st=await db.stats(vsDays)}catch(e){box.innerHTML='<p class="msg err">Statistiques indisponibles : le fichier supabase/004_visites.sql doit être appliqué dans Supabase.</p>';return}
+    box.textContent='';
+    const kpi=document.createElement('div');kpi.className='vs-kpi';
+    const app=Object.fromEntries((st.appareils||[]).map(x=>[x.k,x.n]));const tot=st.total||0;
+    const pct=n=>tot?Math.round(100*(n||0)/tot)+' %':'0 %';
+    [[st.aujourdhui||0,'aujourd\'hui'],[tot,'visites sur '+VS_PER.find(p=>p[0]===vsDays)[1]],[pct(app.mobile),'sur mobile'],[pct(app.ordinateur),'sur ordinateur']].forEach(([v,l])=>{const d=document.createElement('div');const b=document.createElement('b');b.textContent=v;const sp=document.createElement('span');sp.textContent=l;d.append(b,sp);kpi.append(d)});
+    box.append(kpi);
+    // courbe par jour
+    const days=[];const map=Object.fromEntries((st.parJour||[]).map(x=>[x.jour,x.n]));
+    const span=Math.min(vsDays,90);for(let i=span-1;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push([iso(d),map[iso(d)]||0])}
+    const max=Math.max(1,...days.map(x=>x[1]));
+    const ch=document.createElement('div');ch.className='vs-chart';ch.setAttribute('role','img');ch.setAttribute('aria-label','Visites par jour');
+    days.forEach(([j,n])=>{const i=document.createElement('i');i.style.height=(100*n/max)+'%';i.title=fmtDate(j)+' : '+n+' visite'+(n>1?'s':'');ch.append(i)});
+    const ax=document.createElement('div');ax.className='vs-axis';const a1=document.createElement('span');a1.textContent=fmtDate(days[0][0]);const a2=document.createElement('span');a2.textContent='max '+max+' / jour';const a3=document.createElement('span');a3.textContent='aujourd\'hui';ax.append(a1,a2,a3);
+    box.append(ch,ax);
+    const lists=document.createElement('div');lists.className='vs-lists';
+    const titreSortie=id=>{const s=sorties.find(x=>x.id===id);return s?(fmtDate(s.date)+' · '+(s.titre||'Sortie')):id};
+    const APP={mobile:'📱 Mobile',ordinateur:'💻 Ordinateur',tablette:'Tablette',autre:'Autre'};
+    [['Pays',st.pays,paysNom],['Appareils',st.appareils,k=>APP[k]||k],['Venus de',st.sources,k=>k==='direct'?'Accès direct ou appli':k],['Sorties partagées les plus ouvertes',st.sorties,titreSortie]].forEach(([t,arr,lab])=>{
+      if(!arr||!arr.length)return;
+      const w=document.createElement('div');w.className='vs-list';const h=document.createElement('h4');h.textContent=t;w.append(h);
+      const m=Math.max(...arr.map(x=>x.n));
+      arr.forEach(x=>{const p=document.createElement('p');p.style.setProperty('--w',(100*x.n/m)+'%');const a=document.createElement('span');a.textContent=lab(x.k);const e=document.createElement('em');e.textContent=x.n;p.append(a,e);w.append(p)});
+      lists.append(w)});
+    if(!tot){const p=document.createElement('p');p.className='msg';p.style.marginTop='14px';p.textContent='Aucune visite enregistrée sur cette période pour l\'instant.';box.append(p)}
+    box.append(lists);
+  }
   // Administrateurs
   async function loadAdmins(){
     const box=$('adm-list');let list=[],me='';

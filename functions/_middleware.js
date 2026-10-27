@@ -5,7 +5,27 @@ const SB = 'https://lhnwxbgaemphzmceieht.supabase.co';
 const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxobnd4YmdhZW1waHptY2VpZWh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMwMzc1MDksImV4cCI6MjEwODYxMzUwOX0.uxcxlf3eJAKxi3z3NxVeY5P5ipqO3yvTk--WvkrrrYE'; // clé « anon » publique, déjà dans js/config.js
 const SKIP = new Set(['inscrits']); // calculé par le site lui-même
 
-export async function onRequest({ request, next }) {
+const BOTS = /bot|crawl|spider|slurp|facebookexternalhit|whatsapp|telegram|preview|headless|lighthouse|curl|wget|python|monitor|uptime/i;
+
+function logVisite(request, url) {
+  const ua = request.headers.get('user-agent') || '';
+  if (!ua || BOTS.test(ua)) return null;
+  if (url.hostname !== 'alpinelakeriders.com') return null;
+  const purpose = request.headers.get('sec-purpose') || request.headers.get('purpose') || '';
+  if (/prefetch|prerender/i.test(purpose)) return null;
+  const appareil = /iPad|Tablet|Android(?!.*Mobile)/i.test(ua) ? 'tablette' : /Mobi|iPhone|Android/i.test(ua) ? 'mobile' : 'ordinateur';
+  let source = '';
+  try { const r = new URL(request.headers.get('referer') || ''); if (!r.hostname.endsWith('alpinelakeriders.com')) source = r.hostname.replace(/^www\./, ''); } catch (e) {}
+  const body = { p_pays: request.headers.get('cf-ipcountry') || '', p_appareil: appareil, p_source: source, p_sortie: url.searchParams.get('sortie') || '' };
+  return fetch(SB + '/rest/v1/rpc/log_visite', {
+    method: 'POST',
+    headers: { apikey: KEY, Authorization: 'Bearer ' + KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  }).catch(() => {});
+}
+
+export async function onRequest(context) {
+  const { request, next } = context;
   const url = new URL(request.url);
   if (url.hostname.startsWith('www.')) {
     url.hostname = url.hostname.slice(4);
@@ -13,6 +33,7 @@ export async function onRequest({ request, next }) {
   }
   const res = await next();
   if (request.method !== 'GET' || !(res.headers.get('content-type') || '').includes('text/html')) return res;
+  try { const p = logVisite(request, url); if (p) context.waitUntil(p); } catch (e) {}
   const sid = (url.searchParams.get('sortie') || '').slice(0, 80);
   let c = null, so = null;
   if (/^[\w-]+$/.test(sid)) {
