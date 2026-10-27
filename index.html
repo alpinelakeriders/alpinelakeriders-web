@@ -108,7 +108,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 /* Pratiques */
 .trio{display:grid;border-top:1px solid var(--line)}
 @media (min-width:860px){.trio{grid-template-columns:repeat(3,1fr)}}
-.trio div{padding:28px 32px 28px 0;display:grid;gap:10px;border-bottom:1px solid var(--line)}
+.trio div{padding:28px 32px 28px 0;display:grid;gap:10px;align-content:start;border-bottom:1px solid var(--line)}
 @media (min-width:860px){.trio div{border-bottom:0}.trio div+div{padding-left:32px;border-left:1px solid var(--line)}}
 .trio h3{font-size:24px}
 .trio p{color:var(--muted);max-width:34ch}
@@ -339,8 +339,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=8"></script>
-<script src="js/backend.js?v=8"></script>
+<script src="js/config.js?v=9"></script>
+<script src="js/backend.js?v=9"></script>
 </head>
 <body>
 
@@ -388,19 +388,19 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   <div class="wrap strip-meta"><span class="label">Sessions · automne 2026</span><div class="arrows"><button class="arrow" id="s-prev" type="button" aria-label="Photos précédentes">←</button><button class="arrow" id="s-next" type="button" aria-label="Photos suivantes">→</button></div></div>
 </div>
 
-<section><div class="wrap">
-  <div class="head"><h2>Au programme</h2><span class="label">Sans vent, sans moteur</span></div>
-  <div class="trio">
-    <div><h3>Pumpfoil</h3><p>On pump pour voler. Le lac plat est le terrain idéal pour progresser.</p></div>
-    <div><h3>Dockstart</h3><p>Départ en courant depuis les blocs du ponton, puis on enchaîne les longueurs.</p></div>
-    <div><h3>Découverte</h3><p>Les riders confirmés accompagnent les premiers départs. Casque conseillé.</p></div>
-  </div>
-</div></section>
-
-<section id="agenda" style="padding-top:0"><div class="wrap">
+<section id="agenda"><div class="wrap">
   <div class="head"><h2>Agenda des sorties</h2><div class="who"><span class="label">Pour répondre</span><input id="who" autocomplete="given-name" placeholder="Prénom" aria-label="Prénom"><input id="who-nom" autocomplete="family-name" placeholder="Nom" aria-label="Nom"></div></div>
   <div class="ag" id="ag-next"><div class="ag-empty">Chargement de l'agenda…</div></div>
   <details class="past" id="ag-past-wrap" hidden><summary class="label">Sorties passées</summary><div class="ag" id="ag-past" style="margin-top:16px"></div></details>
+</div></section>
+
+<section id="programme" style="padding-top:0"><div class="wrap">
+  <div class="head"><h2>Au programme</h2><span class="label">Sans vent, sans moteur</span></div>
+  <div class="trio">
+    <div><h3>Pumpfoil</h3><p data-k="prog1">On partage une passion unique : voler et glisser au-dessus de l'eau. La sensation d'être au milieu d'un champ de poudreuse, de surfer sur une eau plate, sur un lac transparent.</p></div>
+    <div><h3>Initiation</h3><p data-k="prog2">Damien vous transmet sa passion et vous fait découvrir le dockstart, un sport ultra complet, unique et très addictif. Alpinefoil met le matériel à disposition pour découvrir l'activité.</p></div>
+    <div><h3>Partage</h3><p data-k="prog3">Le pumpfoil, c'est un peu comme un skatepark : on est tous là les uns pour les autres, pour s'entraider, se conseiller, se coacher. Et souvent, tout se termine autour d'un bon apéro, pour clôturer une belle journée de convivialité.</p></div>
+  </div>
 </div></section>
 
 <section id="debuter"><div class="wrap">
@@ -581,6 +581,10 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
         <label class="f full"><span class="label">Encadrer</span><textarea id="t-p1"></textarea></label>
         <label class="f full"><span class="label">Conventionner</span><textarea id="t-p2"></textarea></label>
         <label class="f full"><span class="label">Partager</span><textarea id="t-p3"></textarea></label>
+        <p class="full adm-sub">Au programme</p>
+        <label class="f full"><span class="label">Pumpfoil</span><textarea id="t-prog1"></textarea></label>
+        <label class="f full"><span class="label">Initiation</span><textarea id="t-prog2"></textarea></label>
+        <label class="f full"><span class="label">Partage</span><textarea id="t-prog3"></textarea></label>
         <p class="full adm-sub">Débuter en pumpfoil</p>
         <label class="f full"><span class="label">Lien de l'article du blog Alpinefoil</span><input id="t-debLien" type="url" placeholder="https://www.alpinefoil.com/blog-…"></label>
         <label class="f full"><span class="label">Introduction</span><textarea id="t-debIntro"></textarea></label>
@@ -641,7 +645,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   const $=id=>document.getElementById(id);
   const MOIS=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
   const JOURS=['dim.','lun.','mar.','mer.','jeu.','ven.','sam.'];
-  const TEXT_KEYS=['slogan','accroche','mission','p1','p2','p3','debIntro','deb1','deb2','deb3','deb4','deb5','deb6','debLien','inscrits','nbAperos','ride','apero','dernier','prochain','spot','prixRider','prixFamille','prixDecouverte'];
+  const TEXT_KEYS=['slogan','accroche','mission','p1','p2','p3','prog1','prog2','prog3','debIntro','deb1','deb2','deb3','deb4','deb5','deb6','debLien','inscrits','nbAperos','ride','apero','dernier','prochain','spot','prixRider','prixFamille','prixDecouverte'];
   let db=null,user=null,assets=null,myId=null,sorties=[],contenu={},annonces=[],presences=[],photos=null;
 
   // ---------- Vidéo ----------
