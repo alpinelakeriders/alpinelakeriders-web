@@ -524,8 +524,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=38"></script>
-<script src="js/backend.js?v=38"></script>
+<script src="js/config.js?v=39"></script>
+<script src="js/backend.js?v=39"></script>
 </head>
 <body>
 
@@ -966,7 +966,11 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   // ---------- Bande photos : contenu depuis la base ----------
   const phSrc=p=>p.url||p.src||'';
   const zoneOf=p=>['apero','lib','spot'].includes(p.zone)?p.zone:'bandeau';
-  const phSorted=(z='bandeau',tout=false)=>(photos||[]).filter(p=>zoneOf(p)===z&&(tout||p.actif!==false)).sort((a,b)=>(a.ordre||0)-(b.ordre||0));
+  const phSorted=(z='bandeau',tout=false)=>{const seen=new Set();return (photos||[]).filter(p=>zoneOf(p)===z).sort((a,b)=>(a.ordre||0)-(b.ordre||0)||String(a.id).localeCompare(String(b.id)))
+    .filter(p=>{const u=phSrc(p);if(z!=='lib'&&seen.has(u))return false;seen.add(u);return true}).filter(p=>tout||p.actif!==false)};
+  // Doublons dans un même module (même fichier deux fois) : on garde la première occurrence
+  const phDupes=()=>{const out=[];['bandeau','apero','spot'].forEach(z=>{const seen=new Set();(photos||[]).filter(p=>zoneOf(p)===z).sort((a,b)=>(a.ordre||0)-(b.ordre||0)||String(a.id).localeCompare(String(b.id)))
+    .forEach(p=>{const u=phSrc(p);if(seen.has(u))out.push(p);else seen.add(u)})});return out};
   // Carrousel de l'Apéro Pumpfoil : fondu toutes les 5 s, pause au survol
   const apCar=$('ap-car');let apI=0,apHover=false,apTimer=null,apSig='';
   function apShow(i){const ims=apCar.querySelectorAll('img');if(!ims.length)return;apI=(i+ims.length)%ims.length;
@@ -1028,7 +1032,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     st.textContent='';
     // Photos « place fixe » : gardent leur rang. Les autres places sont tirées au hasard à chaque visite,
     // parmi les photos du bandeau non fixes + 1 ou 2 photos de l'apéro (de temps en temps).
-    const base=phSorted(),ap=shuffled('apero'),extra=(mixN?ap.slice(-mixN):[]).map(p=>Object.assign({},p,{tall:false}));
+    const base=phSorted(),inB=new Set(base.map(phSrc)),ap=shuffled('apero').filter(p=>!inB.has(phSrc(p))),extra=(mixN?ap.slice(-mixN):[]).map(p=>Object.assign({},p,{tall:false}));
     const pool=base.filter(p=>!p.fixe).concat(extra).sort((a,b)=>rk(a.id+'s')-rk(b.id+'s')),out=[];
     for(let i=0;i<base.length+extra.length;i++)out.push(i<base.length&&base[i].fixe?base[i]:pool.shift());
     out.filter(Boolean).forEach(p=>{const im=document.createElement('img');im.src=phSrc(p);im.alt=p.alt||'Session de pumpfoil au lac';im.decoding='async';if(p.pos)im.style.objectPosition=p.pos;if(p.tall)im.className='tall';
@@ -1232,7 +1236,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     db.collection('sorties').onSnapshot(q=>{sorties=q.docs.map(d=>Object.assign({id:d.id},d.data()));renderAgenda();renderEditor()},()=>{renderAgenda()});
     db.collection('annonces').onSnapshot(q=>{annonces=q.docs.map(d=>Object.assign({id:d.id},d.data()));renderAnnonces();renderAnEditor()},()=>{});
     refreshCount();
-    db.collection('photos').onSnapshot(q=>{photos=q.docs.map(d=>Object.assign({id:d.id},d.data()));renderStrip();renderPhEditor()},()=>{});
+    db.collection('photos').onSnapshot(q=>{photos=q.docs.map(d=>Object.assign({id:d.id},d.data()));renderStrip();renderPhEditor();try{phCleanDupes()}catch(e){}},()=>{});
     db.collection('presences').onSnapshot(q=>{presences=q.docs.map(d=>Object.assign({id:d.id},d.data()));renderAgenda();renderEditor()},()=>{});
   })();
 
@@ -1268,7 +1272,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     $('gate').hidden=true;$('admin-body').hidden=false;$('logout').hidden=false;
     fillTextForm();renderEditor();renderAnEditor();loadInscriptions();loadAdmins();loadStats();
     try{assets=window.claude&&await window.claude.use('assets')}catch(e){}
-    renderPhEditor();
+    renderPhEditor();phCleanDupes();
   });
   $('login').addEventListener('submit',async e=>{
     e.preventDefault();const m=$('l-msg');say(m,'Connexion…');
@@ -1551,6 +1555,9 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
               apero:{list:'ap-list',drop:'ap-drop',msg:'ap-msg',auto:'ap-auto',file:'ap-file',vide:'La photo par défaut est affichée. Ajoutez des photos pour créer le carrousel.'},
               spot:{list:'sp-list',drop:'sp-drop',msg:'sp-msg',auto:'sp-auto',file:'sp-file',vide:'La photo par défaut du lac est affichée. Ajoutez des photos pour créer le carrousel.'}};
   const UP_Z=Object.assign({},PH_Z,{lib:{drop:'lib-drop',msg:'lib-msg',auto:'lib-auto',file:'lib-file'}});
+  let phCleaning=false;
+  async function phCleanDupes(){if(phCleaning||!isAdmin||!db)return;const d=phDupes();if(!d.length)return;phCleaning=true;
+    try{for(const p of d)await db.doc('photos/'+p.id).delete()}catch(e){}phCleaning=false}
   function renderPhEditor(){Object.keys(PH_Z).forEach(renderPhZone);renderLib();try{selPaint()}catch(e){}}
   // ---------- Photothèque : toutes les photos (une par fichier), grisées si utilisées dans un module ----------
   let libFilter='all';
@@ -1586,6 +1593,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   // Place une ou plusieurs photos de la photothèque dans un module, à la position voulue (fin par défaut)
   async function libAddMany(items,z,before){
     const list=phSorted(z,true).filter(p=>!items.some(it=>it.__src===p.id));let idx=list.length;
+    {const have=new Set(list.map(phSrc)),seen=new Set();items=items.filter(it=>{if(have.has(it.url)||seen.has(it.url))return false;seen.add(it.url);return true})}
+    if(!items.length){say($(PH_Z[z].msg),'Cette photo est déjà dans ce module.','ok');return}
     if(before){const k=list.findIndex(p=>p.id===before);if(k>=0)idx=k}
     const used=new Set(),news=[];
     items.forEach((it,n)=>{const free=it.docs.find(d=>zoneOf(d)==='lib'&&!used.has(d.id)),r=it.ref;if(free)used.add(free.id);
