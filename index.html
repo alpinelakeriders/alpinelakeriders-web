@@ -438,7 +438,9 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 .pv-mock.d .pv-fr{height:150px}.pv-mock.m .pv-fr{height:110px}
 .ph img.adj{cursor:grab;touch-action:pan-y;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none}
 .ph.framing img.adj{cursor:move;touch-action:none;outline:2px solid var(--lake,#2a8c89);outline-offset:2px}
-.ph-tools{display:flex;justify-content:flex-end;margin:-6px 0 12px}
+.ph-tools{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:-6px 0 12px}
+.ph-arr{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.ph-arr .msg{font-size:12px}
 .ph-sort[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 .ph-grid.compact{grid-template-columns:repeat(auto-fill,minmax(min(120px,28vw),1fr));gap:8px}
 .ph-grid.compact .ph>*:not(img):not(.ph-head){display:none}
@@ -498,8 +500,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=33"></script>
-<script src="js/backend.js?v=33"></script>
+<script src="js/config.js?v=34"></script>
+<script src="js/backend.js?v=34"></script>
 </head>
 <body>
 
@@ -810,7 +812,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
           <div class="ph-mod" id="mod-bandeau">
             <h4 class="ph-mod-t">Bandeau « Sessions »</h4>
             <p class="adm-intro">Attrapez une photo pour changer sa place (mobile : appui long). « Cadrer » choisit la partie visible. « Place fixe » garde la photo à son rang ; les photos « Aléatoire » (et, 7 visites sur 10, une ou deux photos de l'apéro) se partagent les autres places, tirées au hasard à chaque visite.</p>
-            <div class="ph-tools"><button type="button" class="pill line small ph-sort" data-grid="ph-list" aria-pressed="false">Réorganiser les photos</button></div>
+            <div class="ph-tools"><div class="ph-arr" data-grid="ph-list"><button type="button" class="pill line small" data-o="rnd">Mélanger</button><button type="button" class="pill line small" data-o="chrono">Chronologique</button><button type="button" class="pill line small" data-o="smart">✦ Ordre intelligent</button><button type="button" class="pill line small ph-undo" data-o="undo" hidden>Annuler</button><span class="msg" role="status"></span></div><button type="button" class="pill line small ph-sort" data-grid="ph-list" aria-pressed="false">Réorganiser les photos</button></div>
             <div class="ph-grid" id="ph-list"></div>
             <div class="drop" id="ph-drop">
         <label class="check"><input type="checkbox" id="ph-auto" checked> Retouche automatique</label>
@@ -820,7 +822,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
           <div class="ph-mod" id="sec-apero-ph">
             <h4 class="ph-mod-t">Carrousel « Apéro Pumpfoil »</h4>
             <p class="adm-intro">Défile en fondu toutes les 5 secondes, dans un ordre aléatoire à chaque visite.</p>
-            <div class="ph-tools"><button type="button" class="pill line small ph-sort" data-grid="ap-list" aria-pressed="false">Réorganiser les photos</button></div>
+            <div class="ph-tools"><div class="ph-arr" data-grid="ap-list"><button type="button" class="pill line small" data-o="rnd">Mélanger</button><button type="button" class="pill line small" data-o="chrono">Chronologique</button><button type="button" class="pill line small" data-o="smart">✦ Ordre intelligent</button><button type="button" class="pill line small ph-undo" data-o="undo" hidden>Annuler</button><span class="msg" role="status"></span></div><button type="button" class="pill line small ph-sort" data-grid="ap-list" aria-pressed="false">Réorganiser les photos</button></div>
             <div class="ph-grid" id="ap-list"></div>
             <div class="drop" id="ap-drop">
         <label class="check"><input type="checkbox" id="ap-auto" checked> Retouche automatique</label>
@@ -830,7 +832,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
           <div class="ph-mod" id="mod-spot">
             <h4 class="ph-mod-t">Carrousel « Lac de la Terrasse »</h4>
             <p class="adm-intro">Grande photo du spot, en bas de page. Défile en fondu toutes les 6 secondes, dans un ordre aléatoire à chaque visite.</p>
-            <div class="ph-tools"><button type="button" class="pill line small ph-sort" data-grid="sp-list" aria-pressed="false">Réorganiser les photos</button></div>
+            <div class="ph-tools"><div class="ph-arr" data-grid="sp-list"><button type="button" class="pill line small" data-o="rnd">Mélanger</button><button type="button" class="pill line small" data-o="chrono">Chronologique</button><button type="button" class="pill line small" data-o="smart">✦ Ordre intelligent</button><button type="button" class="pill line small ph-undo" data-o="undo" hidden>Annuler</button><span class="msg" role="status"></span></div><button type="button" class="pill line small ph-sort" data-grid="sp-list" aria-pressed="false">Réorganiser les photos</button></div>
             <div class="ph-grid" id="sp-list"></div>
             <div class="drop" id="sp-drop">
         <label class="check"><input type="checkbox" id="sp-auto" checked> Retouche automatique</label>
@@ -1558,7 +1560,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     const list=phSorted(z,true);let idx=list.length;
     if(before){const k=list.findIndex(p=>p.id===before);if(k>=0)idx=k}
     const free=it.docs.find(d=>zoneOf(d)==='lib'),r=it.ref,id=free?free.id:'ph-'+Date.now().toString(36)+Math.floor(Math.random()*1e4);
-    const data={asset:r.asset||null,url:r.url||r.src,alt:r.alt||'',tall:z==='bandeau'?!!r.tall:false,actif:true,zone:z,cree:r.cree||new Date().toISOString()};if(r.pos)data.pos=r.pos;
+    const data={asset:r.asset||null,url:r.url||r.src,alt:r.alt||'',prise:r.prise||null,tall:z==='bandeau'?!!r.tall:false,actif:true,zone:z,cree:r.cree||new Date().toISOString()};if(r.pos)data.pos=r.pos;
     const ids=list.map(p=>p.id);ids.splice(idx,0,id);
     try{
       if(free)await db.doc('photos/'+id).update(Object.assign(data,{ordre:idx+1,fixe:false}));else await db.doc('photos/'+id).set(Object.assign(data,{ordre:idx+1}));
@@ -1588,6 +1590,46 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   }
   // Glisser-déposer pour réordonner (souris et doigt) : la carte suit, les autres se décalent, l'ordre est enregistré au lâcher
   let phDragging=false;
+  // ---------- Aides au rangement : mélanger, chronologique, ordre intelligent (+ annuler) ----------
+  const phUndo={};
+  const phDate=p=>p.prise||p.cree||'';
+  async function phWriteOrder(z,ids){const all=phSorted(z,true),by=Object.fromEntries(all.map(p=>[p.id,p]));
+    await Promise.all(ids.map((id,k)=>by[id]&&by[id].ordre!==k+1?db.doc('photos/'+id).update({ordre:k+1}):null))}
+  // Garde les photos « place fixe » du bandeau à leur rang, range les autres dans les places libres
+  const withFixed=(all,sorted)=>{const out=all.map(p=>p.fixe?p:null),rest=sorted.filter(p=>!p.fixe);return out.map(p=>p||rest.shift())};
+  // Analyse légère de chaque image dans le navigateur : couleur moyenne, luminosité, saturation, contraste, orientation
+  const featCache=new Map();
+  function phFeat(p){const u=phSrc(p);if(featCache.has(u))return featCache.get(u);
+    const pr=new Promise(res=>{const im=new Image();im.crossOrigin='anonymous';im.onload=()=>{try{const c=document.createElement('canvas');c.width=c.height=24;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(im,0,0,24,24);
+      const d=x.getImageData(0,0,24,24).data;let r=0,g=0,b=0,L=0,L2=0,S=0;const n=d.length/4;
+      for(let i=0;i<d.length;i+=4){const R=d[i]/255,G=d[i+1]/255,B=d[i+2]/255,mx=Math.max(R,G,B),mn=Math.min(R,G,B),l=.2126*R+.7152*G+.0722*B;r+=R;g+=G;b+=B;L+=l;L2+=l*l;S+=mx?(mx-mn)/mx:0}
+      r/=n;g/=n;b/=n;L/=n;const con=Math.sqrt(Math.max(0,L2/n-L*L));const hue=Math.atan2(Math.sqrt(3)*(g-b),2*r-g-b);
+      res({r,g,b,L,S:S/n,con,hue,tall:im.naturalHeight>im.naturalWidth*1.05||!!p.tall})}catch(e){res(null)}};im.onerror=()=>res(null);im.src=u});
+    featCache.set(u,pr);return pr}
+  async function smartOrder(list){
+    const F=await Promise.all(list.map(phFeat));if(F.some(f=>!f))return null;
+    const dist=(a,b)=>{const dh=Math.abs(Math.atan2(Math.sin(a.hue-b.hue),Math.cos(a.hue-b.hue)))/Math.PI;
+      return 1.4*Math.hypot(a.r-b.r,a.g-b.g,a.b-b.b)+1.2*Math.abs(a.L-b.L)+.8*Math.abs(a.S-b.S)*(1+dh)+.6*Math.abs(a.con-b.con)+(a.tall!==b.tall?.35:0)};
+    const idx=list.map((_,i)=>i);
+    // On ouvre avec la photo la plus « forte » (contraste + couleurs vives), puis on enchaîne en cherchant le contraste avec les deux précédentes
+    let cur=idx.reduce((m,i)=>F[i].con*1.5+F[i].S>F[m].con*1.5+F[m].S?i:m,0);const out=[cur],left=new Set(idx.filter(i=>i!==cur));
+    while(left.size){let best=null,bs=-1;for(const i of left){const a=dist(F[i],F[out[out.length-1]]),b2=out.length>1?dist(F[i],F[out[out.length-2]]):a;
+        const tallRun=F[i].tall&&F[out[out.length-1]].tall?.5:0;const sc=a+.5*b2-tallRun+Math.random()*.08;if(sc>bs){bs=sc;best=i}}
+      out.push(best);left.delete(best)}
+    return out.map(i=>list[i])}
+  document.querySelectorAll('.ph-arr').forEach(bar=>bar.addEventListener('click',async e=>{const b=e.target.closest('button[data-o]');if(!b)return;
+    const g=bar.dataset.grid,z={'ph-list':'bandeau','ap-list':'apero','sp-list':'spot'}[g],all=phSorted(z,true),m=bar.querySelector('.msg'),undo=bar.querySelector('.ph-undo');
+    if(all.length<2&&b.dataset.o!=='undo')return;
+    let ids;
+    try{
+      if(b.dataset.o==='undo'){ids=phUndo[z];if(!ids)return;delete phUndo[z];undo.hidden=true;await phWriteOrder(z,ids);say(m,'Ordre précédent rétabli.','ok');return}
+      phUndo[z]=all.map(p=>p.id);
+      if(b.dataset.o==='rnd'){const r=all.slice();for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]]}ids=withFixed(all,r).map(p=>p.id)}
+      else if(b.dataset.o==='chrono'){ids=withFixed(all,all.slice().sort((a,c)=>phDate(a).localeCompare(phDate(c)))).map(p=>p.id)}
+      else{say(m,'Analyse des photos…');const free=all.filter(p=>!p.fixe);const o=await smartOrder(free);if(!o){say(m,'Analyse impossible sur ces photos.','err');delete phUndo[z];return}ids=withFixed(all,o).map(p=>p.id)}
+      await phWriteOrder(z,ids);undo.hidden=false;say(m,{rnd:'Photos mélangées.',chrono:'Rangées de la plus ancienne à la plus récente.',smart:'Ordre intelligent appliqué : couleurs, lumières et cadrages alternés.'}[b.dataset.o],'ok');
+    }catch(err){say(m,'Rangement refusé ('+errTxt(err)+').','err')}
+  }));
   document.querySelectorAll('.ph-sort').forEach(b=>b.addEventListener('click',()=>{const g=$(b.dataset.grid),on=!g.classList.contains('compact');
     g.classList.toggle('compact',on);b.setAttribute('aria-pressed',String(on));b.textContent=on?'Terminer · afficher les options':'Réorganiser les photos';
     if(on)g.querySelectorAll('.ph.framing .ph-grip').forEach(x=>x.click())}));
@@ -1809,6 +1851,14 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     const Z=UP_Z[pvw.z];if(pvw.dlg.open)pvw.dlg.close();if(pvw.bmp&&pvw.bmp.close)pvw.bmp.close();pvw.bmp=null;$(Z.file).value='';
     if(pvw.ok)say($(Z.msg),pvw.ok>1?pvw.ok+' photos ajoutées.':'Photo ajoutée.','ok');
   }
+  // Date de prise de vue (EXIF DateTimeOriginal) lue dans le fichier d'origine, JPEG ou HEIC
+  async function exifDate(f){try{const buf=new Uint8Array(await f.slice(0,512*1024).arrayBuffer());
+    let t=-1;for(let i=0;i<buf.length-10;i++){if(buf[i]===0x45&&buf[i+1]===0x78&&buf[i+2]===0x69&&buf[i+3]===0x66&&buf[i+4]===0&&buf[i+5]===0){t=i+6;break}}if(t<0)return null;
+    const v=new DataView(buf.buffer,t),le=v.getUint16(0)===0x4949,u16=o=>v.getUint16(o,le),u32=o=>v.getUint32(o,le);
+    const ifd=(o,tag)=>{const n=u16(o);for(let k=0;k<n;k++){const e=o+2+k*12;if(u16(e)===tag)return e}return -1};
+    let e=ifd(u32(4),0x8769);if(e<0)return null;const ex=u32(e+8);e=ifd(ex,0x9003);if(e<0)e=ifd(ex,0x9004);if(e<0)return null;
+    const off=u32(e+8);let s='';for(let k=0;k<19;k++)s+=String.fromCharCode(v.getUint8(off+k));
+    const m=s.match(/^(\d{4}):(\d\d):(\d\d) (\d\d):(\d\d):(\d\d)/);return m?`${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${m[6]}`:null}catch(e){return null}}
   function addPhotos(files,z='bandeau'){
     const Z=UP_Z[z];files=[...files].filter(f=>/^image\//.test(f.type)||/\.(jpe?g|png|webp|heic|heif)$/i.test(f.name));
     if(!files.length){say($(Z.msg),'Aucune image reconnue.','err');return}
@@ -1831,9 +1881,9 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     if(pvw.busy||!pvw.bmp)return;pvw.busy=true;const b=$('pv-ok'),m=$('pv-msg'),f=pvw.queue[pvw.i];b.disabled=true;b.textContent='Envoi…';
     try{
       const {blob,tall}=await encode(draw(pvw.bmp,2000,pvOpts(),pvw.crop));
-      const res=await assets.upload(blob,{type:blob.type});
+      const res=await assets.upload(blob,{type:blob.type});const prise=await exifDate(f);
       const id='ph-'+Date.now().toString(36)+pvw.i;
-      await db.doc('photos/'+id).set(Object.assign({asset:res.id,url:res.url,alt:'',tall,ordre:++pvw.base,actif:true,cree:new Date().toISOString()},pvw.z!=='bandeau'?{zone:pvw.z}:{},(pvw.pos.x!==50||pvw.pos.y!==50)?{pos:pvw.pos.x+'% '+pvw.pos.y+'%'}:{}));
+      await db.doc('photos/'+id).set(Object.assign({asset:res.id,url:res.url,alt:'',tall,ordre:++pvw.base,actif:true,cree:new Date().toISOString()},pvw.z!=='bandeau'?{zone:pvw.z}:{},(pvw.pos.x!==50||pvw.pos.y!==50)?{pos:pvw.pos.x+'% '+pvw.pos.y+'%'}:{},prise?{prise}:{}));
       pvw.ok++;say($(UP_Z[pvw.z].msg),f.name+' : '+Math.round(f.size/1024)+' Ko → '+Math.round(res.sizeBytes/1024)+' Ko','ok');
       pvw.busy=false;b.textContent='Charger la photo';pvNext();
     }catch(e){pvw.busy=false;b.disabled=false;b.textContent='Réessayer';say(m,f.name+' : '+errTxt(e),'err')}
