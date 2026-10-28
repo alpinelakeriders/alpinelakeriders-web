@@ -172,7 +172,18 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 
 /* Spot */
 .spot{position:relative;height:clamp(460px,62vw,820px);color:#fff;overflow:hidden;padding:0}
+.spot-car{position:absolute;inset:0;touch-action:pan-y}
 .spot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.spot-car img{opacity:0;transform:scale(1.06);transition:opacity 1.6s ease,transform 8s ease-out}
+.spot-car img.on{opacity:1;transform:scale(1)}
+.spot-dots{position:absolute;right:max(20px,env(safe-area-inset-right,0px));top:24px;z-index:3;display:flex;gap:6px}
+.spot .spot-logo{position:absolute;inset:auto max(20px,env(safe-area-inset-right,0px)) 36px auto;z-index:3;width:clamp(84px,11vw,170px);height:auto;object-fit:contain;opacity:.92;filter:drop-shadow(0 2px 10px rgba(0,0,0,.35));pointer-events:none}
+@media (min-width:800px){.spot-dots,.spot .spot-logo{right:max(48px,(100vw - 1320px)/2 + 48px)}.spot-dots{top:auto;bottom:calc(36px + clamp(84px,11vw,170px) * .59 + 18px)}}
+@media (max-width:799px){.spot .wrap{padding-right:calc(84px + 36px)}}
+.spot-dots button{width:26px;height:20px;padding:0;border:0;background:none;cursor:pointer;position:relative}
+.spot-dots button::before{content:"";position:absolute;left:0;right:0;top:9px;height:2px;background:rgba(255,255,255,.45)}
+.spot-dots button[aria-current="true"]::before{background:#fff}
+@media (prefers-reduced-motion:reduce){.spot-car img{transition:opacity .4s;transform:none}}
 .spot::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.5),rgba(0,0,0,0) 50%)}
 .spot .wrap{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;justify-content:flex-end;padding-block:0 40px}
 .spot h2{font-size:clamp(40px,6vw,88px);line-height:.95}
@@ -308,7 +319,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 .admin{overflow-x:hidden;background:var(--tint);padding-top:0;--field:color-mix(in srgb,var(--fg) 24%,transparent)}
 .admin .wrap{max-width:900px;grid-template-columns:minmax(0,1fr);gap:22px}
 #admin-body{grid-template-columns:minmax(0,1fr);gap:22px!important}
-.admin-head{position:sticky;top:0;z-index:3;background:var(--tint);padding-top:calc(14px + env(safe-area-inset-top,0px));padding-bottom:12px;flex-wrap:wrap;row-gap:12px}
+.admin-head{position:sticky;top:0;z-index:6;background:var(--tint);box-shadow:0 0 0 100vmax var(--tint);clip-path:inset(0 -100vmax);padding-top:calc(14px + env(safe-area-inset-top,0px));padding-bottom:12px;flex-wrap:wrap;row-gap:12px}
 .admin-head h2{font-size:24px}
 .adm-nav{display:flex;flex-wrap:wrap;gap:6px;width:100%}
 .admin:has(#admin-body[hidden]) .adm-nav{display:none}
@@ -434,8 +445,35 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 .ph-grid.compact .ph-head .ph-grip{display:none}
 .ph-grid.compact .ph{gap:4px}
 .ph-grid.compact .ph img.adj{touch-action:none;cursor:grab;aspect-ratio:1;border-radius:4px}
+.ph-mod{display:grid;gap:12px;padding-bottom:28px;margin-bottom:28px;border-bottom:1px solid var(--line);scroll-margin-top:130px}
+.ph-mod:last-child{border-bottom:0;margin-bottom:0}
+.ph-mod-t{margin:0;font:600 17px/1.2 var(--sans);letter-spacing:-.01em}
+.ph-count{font:500 13px var(--mono);color:var(--muted)}
+.ph-lib{display:grid;gap:14px;align-content:start;border-top:1px solid var(--line);padding-top:24px;margin-top:8px}
+.ph-lib-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+.lib-it{position:relative;border-radius:4px;overflow:hidden;background:var(--tint);outline:none}
+.lib-it img{display:block;width:100%;aspect-ratio:1;object-fit:cover;cursor:grab;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none;touch-action:pan-y}
+.lib-it.used img{filter:grayscale(1);opacity:.42}
+.lib-it.dragging{outline:2px dashed var(--lake,#2a8c89)}
+.lib-tags{position:absolute;left:4px;top:4px;display:flex;gap:3px;flex-wrap:wrap;pointer-events:none}
+.lib-tags span{font:600 9px/1 var(--mono);text-transform:uppercase;letter-spacing:.04em;background:rgba(0,0,0,.6);color:#fff;padding:3px 5px;border-radius:999px}
+.lib-act{position:absolute;inset:auto 0 0 0;display:none;flex-wrap:wrap;gap:3px;padding:4px;background:linear-gradient(transparent,rgba(0,0,0,.65))}
+.lib-it.sel .lib-act,.lib-it:focus-within .lib-act{display:flex}
+@media (hover:hover){.lib-it:hover .lib-act{display:flex}}
+.lib-act button{font:600 10px var(--sans);border:0;border-radius:999px;padding:4px 7px;background:#fff;color:#111;cursor:pointer}
+.lib-act button:last-child{background:transparent;color:#fff;text-decoration:underline}
+.ph-grid.drop-on{outline:2px dashed var(--lake,#2a8c89);outline-offset:6px;border-radius:6px;min-height:80px}
+.ph.ins-b{box-shadow:-6px 0 0 -2px var(--lake,#2a8c89)}
+.ph.ins-a{box-shadow:6px 0 0 -2px var(--lake,#2a8c89)}
+@media (min-width:1100px){
+  .adm-wide.open{--W:min(1680px,calc(100vw - 64px));width:var(--W);max-width:none;margin-left:calc((100% - var(--W))/2);box-sizing:border-box}
+  .ph-split{display:grid;grid-template-columns:minmax(0,1fr) minmax(340px,36%);gap:32px;align-items:start}
+  .ph-lib{position:sticky;top:120px;max-height:calc(100dvh - 140px);overflow:auto;border-top:0;margin-top:0;padding:0 4px 0 28px;border-left:1px solid var(--line)}
+}
 .ph-ghost{position:fixed;left:0;top:0;z-index:9999;pointer-events:none;border-radius:4px;box-shadow:0 12px 32px rgba(0,0,0,.28);opacity:.92;aspect-ratio:3/2;object-fit:cover}
 .ph.ap img{aspect-ratio:4/3}
+.ph.sp img{aspect-ratio:16/9}
 .ph .hint{font-size:12px;color:var(--muted)}
 .ph-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
 .ph-rank{font:500 11px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
@@ -454,8 +492,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=29"></script>
-<script src="js/backend.js?v=29"></script>
+<script src="js/config.js?v=31"></script>
+<script src="js/backend.js?v=31"></script>
 </head>
 <body>
 
@@ -553,7 +591,9 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 </div></section>
 
 <section class="spot" id="spot">
-  <img src="media/spot-lac.jpg" alt="Le ponton du lac de la Terrasse face à la Chartreuse">
+  <div class="spot-car" id="spot-car" aria-roledescription="carrousel" aria-label="Photos du lac de la Terrasse"><img class="on" src="media/spot-lac.jpg" alt="Le ponton du lac de la Terrasse face à la Chartreuse"></div>
+  <div class="spot-dots" id="spot-dots" hidden></div>
+  <img class="spot-logo" src="media/logo-alr-blanc.svg" alt="Alpine Lake Riders" width="169" height="100">
   <div class="wrap">
     <p class="label">Le spot</p>
     <h2>Lac de la Terrasse</h2>
@@ -756,25 +796,51 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
         <div class="full adm-save"><button class="pill ink" type="submit" id="t-save">Enregistrer les textes</button><span class="msg" id="t-msg" role="status"></span></div>
       </form>
     </section>
-    <section class="adm-sec" id="sec-photos">
-      <h3>Photos du bandeau</h3>
-      <p class="adm-intro">Glissez les photos pour les ajouter. Décochez « Affichée » pour masquer une photo sans la supprimer. Elles sont redimensionnées (2000 px max), recompressées et retouchées automatiquement (niveaux, contraste, vibrance) avant l'envoi.</p>
-      <p class="adm-intro">Ordre : attrapez la photo et glissez-la à sa nouvelle place (sur mobile : appui long puis glisser). Le bouton « Cadrer » sert à choisir la partie visible. « Place fixe » garde la photo à son rang ; les photos « Aléatoire » (et, 7 visites sur 10, une ou deux photos de l'apéro) se partagent les autres places, tirées au hasard à chaque visite.</p>
-      <div class="ph-tools"><button type="button" class="pill line small ph-sort" data-grid="ph-list" aria-pressed="false">Réorganiser les photos</button></div>
-      <div class="ph-grid" id="ph-list"></div>
-      <div class="drop" id="ph-drop">
+    <section class="adm-sec adm-wide" id="sec-photos">
+      <h3>Photos du site</h3>
+      <p class="adm-intro">À droite, la photothèque : toutes les photos chargées. Glissez une vignette dans le bandeau ou le carrousel (ou touchez-la puis « + Bandeau », « + Apéro » ou « + Lac »). Une photo déjà utilisée apparaît en gris. « Retirer » enlève une photo d'un module sans la supprimer de la photothèque.</p>
+      <div class="ph-split">
+        <div class="ph-mods">
+          <div class="ph-mod" id="mod-bandeau">
+            <h4 class="ph-mod-t">Bandeau « Sessions »</h4>
+            <p class="adm-intro">Attrapez une photo pour changer sa place (mobile : appui long). « Cadrer » choisit la partie visible. « Place fixe » garde la photo à son rang ; les photos « Aléatoire » (et, 7 visites sur 10, une ou deux photos de l'apéro) se partagent les autres places, tirées au hasard à chaque visite.</p>
+            <div class="ph-tools"><button type="button" class="pill line small ph-sort" data-grid="ph-list" aria-pressed="false">Réorganiser les photos</button></div>
+            <div class="ph-grid" id="ph-list"></div>
+            <div class="drop" id="ph-drop">
         <label class="check"><input type="checkbox" id="ph-auto" checked> Retouche automatique</label>
         <div class="bar" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><label class="pill ink small" style="cursor:pointer">Choisir des photos<input type="file" id="ph-file" accept="image/*,.heic,.heif" multiple hidden></label><span class="msg" id="ph-msg" role="status">ou glissez-les ici</span></div>
       </div>
-    </section>
-    <section class="adm-sec" id="sec-apero-ph">
-      <h3>Photos de l'Apéro Pumpfoil</h3>
-      <p class="adm-intro">Carrousel affiché à côté du bloc « Apéro Pumpfoil ». Les photos défilent en fondu toutes les 5 secondes. Décochez « Affichée » pour masquer une photo sans la supprimer. Même traitement automatique que le bandeau (2000 px, compression, contraste et saturation).</p>
-      <div class="ph-tools"><button type="button" class="pill line small ph-sort" data-grid="ap-list" aria-pressed="false">Réorganiser les photos</button></div>
-      <div class="ph-grid" id="ap-list"></div>
-      <div class="drop" id="ap-drop">
+          </div>
+          <div class="ph-mod" id="sec-apero-ph">
+            <h4 class="ph-mod-t">Carrousel « Apéro Pumpfoil »</h4>
+            <p class="adm-intro">Défile en fondu toutes les 5 secondes, dans un ordre aléatoire à chaque visite.</p>
+            <div class="ph-tools"><button type="button" class="pill line small ph-sort" data-grid="ap-list" aria-pressed="false">Réorganiser les photos</button></div>
+            <div class="ph-grid" id="ap-list"></div>
+            <div class="drop" id="ap-drop">
         <label class="check"><input type="checkbox" id="ap-auto" checked> Retouche automatique</label>
         <div class="bar" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><label class="pill ink small" style="cursor:pointer">Choisir des photos<input type="file" id="ap-file" accept="image/*,.heic,.heif" multiple hidden></label><span class="msg" id="ap-msg" role="status">ou glissez-les ici</span></div>
+      </div>
+          </div>
+          <div class="ph-mod" id="mod-spot">
+            <h4 class="ph-mod-t">Carrousel « Lac de la Terrasse »</h4>
+            <p class="adm-intro">Grande photo du spot, en bas de page. Défile en fondu toutes les 6 secondes, dans un ordre aléatoire à chaque visite.</p>
+            <div class="ph-tools"><button type="button" class="pill line small ph-sort" data-grid="sp-list" aria-pressed="false">Réorganiser les photos</button></div>
+            <div class="ph-grid" id="sp-list"></div>
+            <div class="drop" id="sp-drop">
+        <label class="check"><input type="checkbox" id="sp-auto" checked> Retouche automatique</label>
+        <div class="bar" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><label class="pill ink small" style="cursor:pointer">Choisir des photos<input type="file" id="sp-file" accept="image/*,.heic,.heif" multiple hidden></label><span class="msg" id="sp-msg" role="status">ou glissez-les ici</span></div>
+      </div>
+          </div>
+        </div>
+        <aside class="ph-lib" aria-label="Photothèque">
+          <div class="ph-lib-head"><h4 class="ph-mod-t">Photothèque <span class="ph-count" id="lib-count"></span></h4>
+            <div class="ph-mode" id="lib-filter"><button type="button" data-f="all" aria-pressed="true">Toutes</button><button type="button" data-f="free" aria-pressed="false">Non utilisées</button></div></div>
+          <div class="lib-grid" id="lib-list"></div>
+          <div class="drop" id="lib-drop">
+            <label class="check"><input type="checkbox" id="lib-auto" checked> Retouche automatique</label>
+            <div class="bar" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><label class="pill ink small" style="cursor:pointer">Ajouter à la photothèque<input type="file" id="lib-file" accept="image/*,.heic,.heif" multiple hidden></label><span class="msg" id="lib-msg" role="status">ou glissez-les ici</span></div>
+          </div>
+        </aside>
       </div>
     </section>
     <section class="adm-sec" id="sec-admins">
@@ -864,7 +930,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 
   // ---------- Bande photos : contenu depuis la base ----------
   const phSrc=p=>p.url||p.src||'';
-  const zoneOf=p=>p.zone==='apero'?'apero':'bandeau';
+  const zoneOf=p=>['apero','lib','spot'].includes(p.zone)?p.zone:'bandeau';
   const phSorted=(z='bandeau',tout=false)=>(photos||[]).filter(p=>zoneOf(p)===z&&(tout||p.actif!==false)).sort((a,b)=>(a.ordre||0)-(b.ordre||0));
   // Carrousel de l'Apéro Pumpfoil : fondu toutes les 5 s, pause au survol
   const apCar=$('ap-car');let apI=0,apHover=false,apTimer=null,apSig='';
@@ -909,8 +975,20 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   apCar.addEventListener('touchend',apEnd);apCar.addEventListener('touchcancel',apEnd);
   apCar.addEventListener('mousedown',e=>{e.preventDefault();apStart(e.clientX,e.clientY)});
   addEventListener('mousemove',e=>apMove(e.clientX,e.clientY));addEventListener('mouseup',apEnd);
+  // Carrousel du spot (Lac de la Terrasse) : fondu toutes les 6 s, ordre aléatoire à chaque visite, glisser au doigt
+  const spCar=$('spot-car');let spI=0,spTimer=null,spSig='';
+  function spShow(i){const ims=spCar.querySelectorAll('img');if(!ims.length)return;spI=(i+ims.length)%ims.length;ims.forEach((im,k)=>im.classList.toggle('on',k===spI));
+    $('spot-dots').querySelectorAll('button').forEach((d,k)=>d.setAttribute('aria-current',String(k===spI)))}
+  function spRestart(){clearInterval(spTimer);if(spCar.querySelectorAll('img').length<2||matchMedia('(prefers-reduced-motion: reduce)').matches)return;spTimer=setInterval(()=>{if(!document.hidden)spShow(spI+1)},6000)}
+  function renderSpot(){const list=shuffled('spot');if(!list.length)return;const sig=list.map(p=>p.id+phSrc(p)+(p.pos||'')).join('|');if(sig===spSig)return;spSig=sig;
+    spCar.textContent='';list.forEach((p,k)=>{const im=document.createElement('img');im.src=phSrc(p);im.alt=p.alt||'Le lac de la Terrasse';im.decoding='async';if(p.pos)im.style.objectPosition=p.pos;if(k>0)im.loading='lazy';spCar.append(im)});
+    const d=$('spot-dots');d.textContent='';d.hidden=list.length<2;
+    if(list.length>1)list.forEach((p,k)=>{const b=document.createElement('button');b.type='button';b.setAttribute('aria-label','Photo '+(k+1));b.addEventListener('click',()=>{spShow(k);spRestart()});d.append(b)});
+    spShow(0);spRestart()}
+  {let sx=null,sy=0;spCar.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY},{passive:true});
+   spCar.addEventListener('touchend',e=>{if(sx===null)return;const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;sx=null;if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy)){spShow(spI+(dx<0?1:-1));spRestart()}},{passive:true})}
   function renderStrip(){
-    renderApero();
+    renderApero();renderSpot();
     if(!phSorted().length)return; // sinon on garde les photos par défaut
     st.textContent='';
     // Photos « place fixe » : gardent leur rang. Les autres places sont tirées au hasard à chaque visite,
@@ -1268,7 +1346,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     secOpen(sec,!!admOpen[sec.id]);
   });
   $('adm-all').addEventListener('click',()=>{const on=!secs.every(x=>x.classList.contains('open'));secs.forEach(x=>secOpen(x,on))});
-  document.querySelectorAll('#adm-nav [data-go]').forEach(b=>b.addEventListener('click',()=>{const t=$(b.dataset.go);if(t){secOpen(t,true);t.scrollIntoView({behavior:'smooth',block:'start'})}}));
+  document.querySelectorAll('#adm-nav [data-go]').forEach(b=>b.addEventListener('click',()=>{const t=$(b.dataset.go);if(t){secOpen(t.closest('.adm-sec'),true);t.scrollIntoView({behavior:'smooth',block:'start'})}}));
   $('adm-top').addEventListener('click',()=>{admin.scrollTo({top:0,behavior:'smooth'})});
   $('close-admin').addEventListener('click',()=>{admin.hidden=true;document.body.style.overflow=''});
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!admin.hidden)$('close-admin').click()});
@@ -1435,8 +1513,74 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   }
   const parsePos=v=>{const m=String(v||'').match(/(\d+)%\s+(\d+)%/);return m?{x:+m[1],y:+m[2]}:{x:50,y:50}};
   const PH_Z={bandeau:{list:'ph-list',drop:'ph-drop',msg:'ph-msg',auto:'ph-auto',file:'ph-file',vide:'Les photos par défaut sont affichées. Ajoutez des photos pour composer le bandeau.'},
-              apero:{list:'ap-list',drop:'ap-drop',msg:'ap-msg',auto:'ap-auto',file:'ap-file',vide:'La photo par défaut est affichée. Ajoutez des photos pour créer le carrousel.'}};
-  function renderPhEditor(){Object.keys(PH_Z).forEach(renderPhZone)}
+              apero:{list:'ap-list',drop:'ap-drop',msg:'ap-msg',auto:'ap-auto',file:'ap-file',vide:'La photo par défaut est affichée. Ajoutez des photos pour créer le carrousel.'},
+              spot:{list:'sp-list',drop:'sp-drop',msg:'sp-msg',auto:'sp-auto',file:'sp-file',vide:'La photo par défaut du lac est affichée. Ajoutez des photos pour créer le carrousel.'}};
+  const UP_Z=Object.assign({},PH_Z,{lib:{drop:'lib-drop',msg:'lib-msg',auto:'lib-auto',file:'lib-file'}});
+  function renderPhEditor(){Object.keys(PH_Z).forEach(renderPhZone);renderLib()}
+  // ---------- Photothèque : toutes les photos (une par fichier), grisées si utilisées dans un module ----------
+  let libFilter='all';
+  const libItems=()=>{const m=new Map();(photos||[]).forEach(p=>{const u=phSrc(p);if(!u)return;if(!m.has(u))m.set(u,{url:u,docs:[]});m.get(u).docs.push(p)});
+    return [...m.values()].map(it=>{it.uses=it.docs.filter(d=>zoneOf(d)!=='lib').map(d=>zoneOf(d));it.ref=it.docs.find(d=>zoneOf(d)==='lib')||it.docs[0];
+      it.date=it.docs.map(d=>d.cree||'').sort().pop()||'';return it}).sort((a,b)=>b.date.localeCompare(a.date))};
+  document.querySelectorAll('#lib-filter button').forEach(b=>b.addEventListener('click',()=>{libFilter=b.dataset.f;document.querySelectorAll('#lib-filter button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));renderLib()}));
+  function renderLib(){
+    if(admin.hidden||!isAdmin||phDragging)return;
+    const box=$('lib-list');box.textContent='';const items=libItems();
+    $('lib-count').textContent=items.length?'· '+items.length:'';
+    const shown=items.filter(it=>libFilter==='all'||!it.uses.length);
+    if(!shown.length){const p=document.createElement('p');p.className='msg';p.textContent=items.length?'Toutes les photos sont utilisées.':'Aucune photo pour l’instant.';box.append(p)}
+    shown.forEach(it=>{
+      const c=document.createElement('div');c.className='lib-it'+(it.uses.length?' used':'');c.tabIndex=0;
+      const im=document.createElement('img');im.src=it.url;im.alt='';im.loading='lazy';im.draggable=false;if(it.ref.pos)im.style.objectPosition=it.ref.pos;
+      const tags=document.createElement('div');tags.className='lib-tags';
+      [...new Set(it.uses)].forEach(u=>{const t=document.createElement('span');t.textContent={bandeau:'Bandeau',apero:'Apéro',spot:'Lac'}[u];tags.append(t)});
+      const act=document.createElement('div');act.className='lib-act';
+      const mk=(t,f)=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.addEventListener('click',e=>{e.stopPropagation();f(b)});act.append(b);return b};
+      mk('+ Bandeau',()=>libAdd(it,'bandeau'));mk('+ Apéro',()=>libAdd(it,'apero'));mk('+ Lac',()=>libAdd(it,'spot'));
+      let armed=false;mk('Supprimer',async b=>{if(!armed){armed=true;b.textContent=it.uses.length?'Supprimer partout ?':'Confirmer';setTimeout(()=>{armed=false;b.textContent='Supprimer'},4000);return}
+        try{await Promise.all(it.docs.map(d=>db.doc('photos/'+d.id).delete()));if(assets)await Promise.all([...new Set(it.docs.map(d=>d.asset).filter(Boolean))].map(a=>assets.delete(a).catch(()=>{})))}catch(e){say($('lib-msg'),'Suppression refusée.','err')}});
+      c.append(im,tags,act);
+      c.addEventListener('click',()=>{const on=!c.classList.contains('sel');box.querySelectorAll('.lib-it.sel').forEach(x=>x.classList.remove('sel'));c.classList.toggle('sel',on)});
+      libDrag(im,c,it);box.append(c);
+    });
+  }
+  // Place une photo de la photothèque dans un module, à la position voulue (fin par défaut)
+  async function libAdd(it,z,before){
+    const list=phSorted(z,true);let idx=list.length;
+    if(before){const k=list.findIndex(p=>p.id===before);if(k>=0)idx=k}
+    const free=it.docs.find(d=>zoneOf(d)==='lib'),r=it.ref,id=free?free.id:'ph-'+Date.now().toString(36)+Math.floor(Math.random()*1e4);
+    const data={asset:r.asset||null,url:r.url||r.src,alt:r.alt||'',tall:z==='bandeau'?!!r.tall:false,actif:true,zone:z,cree:r.cree||new Date().toISOString()};if(r.pos)data.pos=r.pos;
+    const ids=list.map(p=>p.id);ids.splice(idx,0,id);
+    try{
+      if(free)await db.doc('photos/'+id).update(Object.assign(data,{ordre:idx+1,fixe:false}));else await db.doc('photos/'+id).set(Object.assign(data,{ordre:idx+1}));
+      await Promise.all(ids.map((x,k)=>{if(x===id)return null;const p=list.find(q=>q.id===x);return p&&p.ordre!==k+1?db.doc('photos/'+x).update({ordre:k+1}):null}));
+      say($(PH_Z[z].msg),'Photo ajoutée.','ok');
+    }catch(e){say($(PH_Z[z].msg),'Ajout refusé ('+errTxt(e)+').','err')}
+  }
+  // Glisser une vignette de la photothèque vers un module (souris : direct ; doigt : appui long)
+  function libDrag(im,c,it){
+    let on=false,x=0,y=0,sx=0,sy=0,ghost=null,raf=0,timer=0,tgt=null,mark=null;
+    const clear=()=>{document.querySelectorAll('.ph-grid.drop-on').forEach(g=>g.classList.remove('drop-on'));if(mark){mark.classList.remove('ins-b','ins-a');mark=null}};
+    const locate=()=>{clear();tgt=null;if(ghost)ghost.style.display='none';const el=document.elementFromPoint(x,y);if(ghost)ghost.style.display='';
+      const g=el&&(el.closest('#ph-list,#ap-list,#sp-list')||el.closest('.ph-mod')?.querySelector('.ph-grid'));if(!g)return;g.classList.add('drop-on');
+      const z={'ap-list':'apero','sp-list':'spot'}[g.id]||'bandeau';const card=el.closest('.ph');let before=null;
+      if(card&&card.parentNode===g){const r=card.getBoundingClientRect(),after=x>r.left+r.width/2;mark=card;card.classList.add(after?'ins-a':'ins-b');
+        before=after?card.nextElementSibling?.dataset.id||null:card.dataset.id}
+      tgt={z,before}};
+    const tick=()=>{if(!on)return;const m=80,H=innerHeight,v=y<m?-16:y>H-m?16:0;if(v){admin.scrollBy(0,v);scrollBy(0,v);locate()}raf=requestAnimationFrame(tick)};
+    const follow=()=>{if(ghost)ghost.style.transform='translate('+(x+12)+'px,'+(y+12)+'px) rotate(-2deg)'};
+    const start=()=>{on=phDragging=true;c.classList.add('dragging');ghost=im.cloneNode();ghost.className='ph-ghost';ghost.style.width='140px';document.body.append(ghost);follow();raf=requestAnimationFrame(tick)};
+    const move=(nx,ny)=>{x=nx;y=ny;if(on){follow();locate()}};
+    const end=async()=>{clearTimeout(timer);timer=0;if(!on)return;on=false;cancelAnimationFrame(raf);ghost&&ghost.remove();ghost=null;c.classList.remove('dragging');
+      const t=tgt;clear();tgt=null;phDragging=false;if(t)await libAdd(it,t.z,t.before);renderPhEditor()};
+    im.addEventListener('mousedown',e=>{if(e.button!==0)return;e.preventDefault();sx=x=e.clientX;sy=y=e.clientY;
+      const mm=ev=>{if(!on&&Math.hypot(ev.clientX-sx,ev.clientY-sy)>4){x=ev.clientX;y=ev.clientY;start()}move(ev.clientX,ev.clientY)};
+      const mu=()=>{removeEventListener('mousemove',mm);removeEventListener('mouseup',mu);end()};addEventListener('mousemove',mm);addEventListener('mouseup',mu)});
+    im.addEventListener('touchstart',e=>{if(e.touches.length>1)return;const t=e.touches[0];sx=x=t.clientX;sy=y=t.clientY;clearTimeout(timer);timer=setTimeout(start,300)},{passive:true});
+    im.addEventListener('touchmove',e=>{const t=e.touches[0];if(on){e.preventDefault();move(t.clientX,t.clientY)}else if(Math.hypot(t.clientX-sx,t.clientY-sy)>8){clearTimeout(timer);timer=0}},{passive:false});
+    im.addEventListener('touchend',e=>{if(on)e.preventDefault();end()});im.addEventListener('touchcancel',end);
+    im.addEventListener('contextmenu',e=>{if(on||timer)e.preventDefault()});
+  }
   // Glisser-déposer pour réordonner (souris et doigt) : la carte suit, les autres se décalent, l'ordre est enregistré au lâcher
   let phDragging=false;
   document.querySelectorAll('.ph-sort').forEach(b=>b.addEventListener('click',()=>{const g=$(b.dataset.grid),on=!g.classList.contains('compact');
@@ -1447,7 +1591,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     let on=false,x=0,y=0,ghost=null,raf=0,timer=0,sx=0,sy=0;
     const place=()=>{const el=document.elementFromPoint(x,y);const t=el&&el.closest('.ph');if(!t||t===c||t.parentNode!==list)return;
       const r=t.getBoundingClientRect(),after=r.width>list.clientWidth*.6?y>r.top+r.height/2:x>r.left+r.width/2;const ref=after?t.nextSibling:t;if(ref===c||ref===c.nextSibling)return;list.insertBefore(c,ref)};
-    const tick=()=>{if(!on)return;const m=70,H=innerHeight,v=y<m?-14:y>H-m?14:0;if(v){scrollBy(0,v);place()}raf=requestAnimationFrame(tick)};
+    const tick=()=>{if(!on)return;const m=70,H=innerHeight,v=y<m?-14:y>H-m?14:0;if(v){admin.scrollBy(0,v);scrollBy(0,v);place()}raf=requestAnimationFrame(tick)};
     const start=()=>{on=phDragging=true;c.classList.add('dragging');list.classList.add('sorting');
       const r=im.getBoundingClientRect();ghost=im.cloneNode();ghost.className='ph-ghost';ghost.style.width=Math.min(r.width,180)+'px';document.body.append(ghost);follow();
       if(navigator.vibrate)try{navigator.vibrate(15)}catch(e){};raf=requestAnimationFrame(tick)};
@@ -1480,7 +1624,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     const all=phSorted(z,true);
     if(!all.length){const p=document.createElement('p');p.className='msg';p.textContent=Z.vide;list.append(p)}
     all.forEach((p,i)=>{
-      const c=document.createElement('div');c.className='ph'+(p.tall&&z==='bandeau'?' tall':'')+(z==='apero'?' ap':'')+(p.actif===false?' off':'');
+      const c=document.createElement('div');c.className='ph'+(p.tall&&z==='bandeau'?' tall':'')+(z==='apero'?' ap':'')+(z==='spot'?' sp':'')+(p.actif===false?' off':'');
       const im=document.createElement('img');im.src=phSrc(p);im.alt='';im.className='adj';im.draggable=false;im.title='Glissez la photo pour changer sa place';
       let fp=parsePos(p.pos);im.style.objectPosition=fp.x+'% '+fp.y+'%';
       focalDrag(im,im,()=>fp,v=>{fp=v},()=>db.doc('photos/'+p.id).update({pos:fp.x+'% '+fp.y+'%'}).catch(()=>{}),()=>c.classList.contains('framing'));
@@ -1498,14 +1642,15 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
         c.append(ck,fx)}
       const bar=document.createElement('div');bar.className='bar';
       const btn=(t,lab)=>{const b=document.createElement('button');b.type='button';b.className='pill line small';b.textContent=t;b.setAttribute('aria-label',lab);return b};
-      const up=btn('←','Avancer'),dn=btn('→','Reculer'),del=btn('Supprimer','Supprimer la photo');
+      const up=btn('←','Avancer'),dn=btn('→','Reculer'),del=btn('Retirer','Retirer la photo de ce module (elle reste dans la photothèque)');
       up.disabled=i===0;dn.disabled=i===all.length-1;
       const swap=async j=>{const o=all[j];try{await db.doc('photos/'+p.id).update({ordre:o.ordre||0});await db.doc('photos/'+o.id).update({ordre:p.ordre||0})}catch(e){}};
       up.addEventListener('click',()=>swap(i-1));dn.addEventListener('click',()=>swap(i+1));
       let armed=false;
       del.addEventListener('click',async()=>{
-        if(!armed){armed=true;del.textContent='Confirmer';setTimeout(()=>{armed=false;del.textContent='Supprimer'},4000);return}
-        try{await db.doc('photos/'+p.id).delete();if(p.asset&&assets)await assets.delete(p.asset).catch(()=>{})}catch(e){say($(Z.msg),'Suppression refusée.','err')}
+        if(!armed){armed=true;del.textContent='Confirmer';setTimeout(()=>{armed=false;del.textContent='Retirer'},4000);return}
+        const others=(photos||[]).filter(q=>q.id!==p.id&&phSrc(q)===phSrc(p));
+        try{if(others.length)await db.doc('photos/'+p.id).delete();else await db.doc('photos/'+p.id).update({zone:'lib',fixe:false})}catch(e){say($(Z.msg),'Retrait refusé.','err')}
       });
       bar.append(up,dn,del);c.append(bar);
       const hd=document.createElement('div');hd.className='ph-head';
@@ -1569,7 +1714,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   const pvOpts=()=>({auto:$('pv-auto').checked,lum:+$('pv-lum').value,con:+$('pv-con').value,sat:+$('pv-sat').value,bp:+$('pv-bp').value,sh:+$('pv-sh').value});
   let pvRaf=0;
   // ---- Recadrage : cadre déplaçable, coins pour redimensionner, formats prédéfinis ----
-  const RATIOS={bandeau:[['Paysage 3:2',3/2],['Portrait 4:5',4/5],['Libre',0],['Sans recadrage',-1]],apero:[['Carrousel 4:3',4/3],['Libre',0],['Sans recadrage',-1]]};
+  const RATIOS={bandeau:[['Paysage 3:2',3/2],['Portrait 4:5',4/5],['Libre',0],['Sans recadrage',-1]],apero:[['Carrousel 4:3',4/3],['Libre',0],['Sans recadrage',-1]],spot:[['Panoramique 16:9',16/9],['Libre',0],['Sans recadrage',-1]],lib:[['Sans recadrage',-1],['Paysage 3:2',3/2],['Portrait 4:5',4/5],['Carrousel 4:3',4/3],['Libre',0]]};
   pvw.crop=null;pvw.ratio=0;
   function cropFit(r){const IW=pvw.bmp.width,IH=pvw.bmp.height;
     if(r===-1){pvw.crop=null;return}
@@ -1602,7 +1747,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     const up=()=>{if(drag){drag=null;pvMocks()}};bx.addEventListener('pointerup',up);bx.addEventListener('pointercancel',up);
   })();
   pvw.pos={x:50,y:50};
-  function zoneAspect(){if(pvw.z==='apero')return 4/3;const c=pvw.crop||{w:1,h:1};const a=(c.w*pvw.bmp.width)/(c.h*pvw.bmp.height);return a<1/1.05?4/5:3/2}
+  function zoneAspect(){if(pvw.z==='apero')return 4/3;if(pvw.z==='spot')return 16/9;const c=pvw.crop||{w:1,h:1};const a=(c.w*pvw.bmp.width)/(c.h*pvw.bmp.height);return a<1/1.05?4/5:3/2}
   function pvMocks(){if(!pvw.bmp)return;const za=zoneAspect();
     const c=draw(pvw.bmp,640,pvOpts(),pvw.crop),url=c.toDataURL('image/jpeg',.8);
     [['pv-fr-d',150],['pv-fr-m',110]].forEach(([id,h])=>{const fr=$(id),im=fr.querySelector('img');fr.style.width=Math.round(h*za)+'px';im.src=url;im.style.objectPosition=pvw.pos.x+'% '+pvw.pos.y+'%'})}
@@ -1639,16 +1784,16 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   }
   function pvNext(){pvw.i++;if(pvw.i>=pvw.queue.length){pvClose();return}pvLoad()}
   function pvClose(){
-    const Z=PH_Z[pvw.z];if(pvw.dlg.open)pvw.dlg.close();if(pvw.bmp&&pvw.bmp.close)pvw.bmp.close();pvw.bmp=null;$(Z.file).value='';
+    const Z=UP_Z[pvw.z];if(pvw.dlg.open)pvw.dlg.close();if(pvw.bmp&&pvw.bmp.close)pvw.bmp.close();pvw.bmp=null;$(Z.file).value='';
     if(pvw.ok)say($(Z.msg),pvw.ok>1?pvw.ok+' photos ajoutées.':'Photo ajoutée.','ok');
   }
   function addPhotos(files,z='bandeau'){
-    const Z=PH_Z[z];files=[...files].filter(f=>/^image\//.test(f.type)||/\.(jpe?g|png|webp|heic|heif)$/i.test(f.name));
+    const Z=UP_Z[z];files=[...files].filter(f=>/^image\//.test(f.type)||/\.(jpe?g|png|webp|heic|heif)$/i.test(f.name));
     if(!files.length){say($(Z.msg),'Aucune image reconnue.','err');return}
     if(!assets){say($(Z.msg),'Ajout de photos indisponible : reconnectez-vous à l\'admin.','err');return}
     Object.assign(pvw,{queue:files,i:0,z,ok:0,orig:false,base:Math.max(0,...phSorted(z,true).map(p=>p.ordre||0))});
     $('pv-auto').checked=$(Z.auto).checked;['lum','con','sat','bp','sh'].forEach(k=>$('pv-'+k).value=0);
-    $('pv-title').textContent=z==='apero'?'Nouvelle photo · Apéro Pumpfoil':'Nouvelle photo · bandeau';
+    $('pv-title').textContent=z==='apero'?'Nouvelle photo · Apéro Pumpfoil':z==='spot'?'Nouvelle photo · Lac de la Terrasse':z==='lib'?'Nouvelle photo · photothèque':'Nouvelle photo · bandeau';
     if(pvw.dlg.showModal)pvw.dlg.showModal();else pvw.dlg.setAttribute('open','');
     pvLoad();
   }
@@ -1666,12 +1811,12 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       const {blob,tall}=await encode(draw(pvw.bmp,2000,pvOpts(),pvw.crop));
       const res=await assets.upload(blob,{type:blob.type});
       const id='ph-'+Date.now().toString(36)+pvw.i;
-      await db.doc('photos/'+id).set(Object.assign({asset:res.id,url:res.url,alt:'',tall,ordre:++pvw.base,actif:true,cree:new Date().toISOString()},pvw.z==='apero'?{zone:'apero'}:{},(pvw.pos.x!==50||pvw.pos.y!==50)?{pos:pvw.pos.x+'% '+pvw.pos.y+'%'}:{}));
-      pvw.ok++;say($(PH_Z[pvw.z].msg),f.name+' : '+Math.round(f.size/1024)+' Ko → '+Math.round(res.sizeBytes/1024)+' Ko','ok');
+      await db.doc('photos/'+id).set(Object.assign({asset:res.id,url:res.url,alt:'',tall,ordre:++pvw.base,actif:true,cree:new Date().toISOString()},pvw.z!=='bandeau'?{zone:pvw.z}:{},(pvw.pos.x!==50||pvw.pos.y!==50)?{pos:pvw.pos.x+'% '+pvw.pos.y+'%'}:{}));
+      pvw.ok++;say($(UP_Z[pvw.z].msg),f.name+' : '+Math.round(f.size/1024)+' Ko → '+Math.round(res.sizeBytes/1024)+' Ko','ok');
       pvw.busy=false;b.textContent='Charger la photo';pvNext();
     }catch(e){pvw.busy=false;b.disabled=false;b.textContent='Réessayer';say(m,f.name+' : '+errTxt(e),'err')}
   });
-  Object.entries(PH_Z).forEach(([z,Z])=>{
+  Object.entries(UP_Z).forEach(([z,Z])=>{
     $(Z.file).addEventListener('change',e=>addPhotos(e.target.files,z));
     const drop=$(Z.drop);
     ['dragenter','dragover'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.add('over')}));
