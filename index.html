@@ -381,6 +381,17 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 .pv-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .pv-foot{display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:14px}
 .pv-foot .sp{flex:1}
+.adm-sec h3{margin:0}
+.adm-tog{all:unset;box-sizing:border-box;display:flex;width:100%;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;font:500 22px/1.2 var(--sans);letter-spacing:-.02em;color:var(--fg)}
+.adm-tog:focus-visible{outline:2px solid var(--lake);outline-offset:4px;border-radius:4px}
+.adm-tog i{font-style:normal;flex:none;display:inline-flex;align-items:center;gap:6px;font:500 13px var(--sans);letter-spacing:0;color:var(--muted);padding:6px 12px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--line)}
+.adm-tog i::after{content:'';width:7px;height:7px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:translateY(-2px) rotate(45deg);transition:transform .2s}
+.adm-sec.open .adm-tog i::after{transform:translateY(2px) rotate(-135deg)}
+.adm-sec:not(.open) .adm-body{display:none}
+.adm-body{padding-top:10px}
+.adm-sec:not(.open){padding-block:16px}
+@media (max-width:700px){.adm-tog{font-size:18px}}
+.adm-nav .all{background:transparent;box-shadow:none;color:var(--muted);text-decoration:underline;text-underline-offset:3px}
 /* Bandeau cookies */
 .cookie{position:fixed;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:40;max-width:560px;margin:0 auto;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.14);padding:16px 18px;display:grid;gap:12px}
 .cookie p{font-size:14px;color:var(--muted);line-height:1.5}
@@ -389,8 +400,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=18"></script>
-<script src="js/backend.js?v=18"></script>
+<script src="js/config.js?v=19"></script>
+<script src="js/backend.js?v=19"></script>
 </head>
 <body>
 
@@ -568,7 +579,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 
 <div class="admin" id="admin" hidden role="dialog" aria-modal="true" aria-labelledby="admin-title"><div class="wrap">
   <div class="admin-head"><h2 id="admin-title">Administration</h2><div style="display:flex;gap:8px"><button class="pill line small" id="logout" type="button" hidden>Se déconnecter</button><button class="pill line small" id="close-admin" type="button">Fermer</button></div>
-    <nav class="adm-nav" id="adm-nav" aria-label="Rubriques de l'administration"><button type="button" data-go="sec-agenda">Agenda</button><button type="button" data-go="sec-msg">Messages</button><button type="button" data-go="sec-membres">Membres</button><button type="button" data-go="sec-visites">Visites</button><button type="button" data-go="sec-textes">Textes</button><button type="button" data-go="sec-photos">Photos</button><button type="button" data-go="sec-apero-ph">Photos apéro</button><button type="button" data-go="sec-admins">Administrateurs</button></nav></div>
+    <nav class="adm-nav" id="adm-nav" aria-label="Rubriques de l'administration"><button type="button" data-go="sec-agenda">Agenda</button><button type="button" data-go="sec-msg">Messages</button><button type="button" data-go="sec-membres">Membres</button><button type="button" data-go="sec-visites">Visites</button><button type="button" data-go="sec-textes">Textes</button><button type="button" data-go="sec-photos">Photos</button><button type="button" data-go="sec-apero-ph">Photos apéro</button><button type="button" data-go="sec-admins">Administrateurs</button><button type="button" class="all" id="adm-all">Tout déplier</button></nav></div>
   <button class="pill ink small adm-top" id="adm-top" type="button">↑ Menu</button>
   <div class="gate" id="gate">
     <p class="msg" id="gate-msg">Vérification de l'accès…</p>
@@ -1152,7 +1163,24 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     }catch(err){say(m,/rate|limit/i.test(err&&err.message||'')?'Trop d\'envois d\'e-mails, réessayez dans une heure.':'Ajout refusé ('+(err&&err.code||'erreur')+').','err')}
   });
   $('logout').addEventListener('click',async()=>{await user.logout();isAdmin=false;$('close-admin').click()});
-  document.querySelectorAll('#adm-nav [data-go]').forEach(b=>b.addEventListener('click',()=>{const t=$(b.dataset.go);if(t)t.scrollIntoView({behavior:'smooth',block:'start'})}));
+  // Rubriques repliables (fermées par défaut, état mémorisé sur cet appareil)
+  let admOpen={};try{admOpen=JSON.parse(localStorage.getItem('alr-adm-open')||'{}')||{}}catch(e){}
+  const secs=[...document.querySelectorAll('.adm-sec')];
+  function secOpen(sec,on){sec.classList.toggle('open',on);sec.querySelector('.adm-tog').setAttribute('aria-expanded',on?'true':'false');
+    sec.querySelector('.adm-tog i').firstChild.textContent=on?'Replier':'Déplier';
+    admOpen[sec.id]=on;try{localStorage.setItem('alr-adm-open',JSON.stringify(admOpen))}catch(e){}
+    $('adm-all').textContent=secs.every(x=>x.classList.contains('open'))?'Tout replier':'Tout déplier'}
+  secs.forEach(sec=>{
+    const h=sec.querySelector('h3'),body=document.createElement('div');body.className='adm-body';body.id=sec.id+'-c';
+    while(h.nextSibling)body.append(h.nextSibling);sec.append(body);
+    const b=document.createElement('button');b.type='button';b.className='adm-tog';b.setAttribute('aria-controls',body.id);
+    const t=document.createElement('span');t.textContent=h.textContent;const i=document.createElement('i');i.append(document.createTextNode('Déplier'));
+    b.append(t,i);h.textContent='';h.append(b);
+    b.addEventListener('click',()=>secOpen(sec,!sec.classList.contains('open')));
+    secOpen(sec,!!admOpen[sec.id]);
+  });
+  $('adm-all').addEventListener('click',()=>{const on=!secs.every(x=>x.classList.contains('open'));secs.forEach(x=>secOpen(x,on))});
+  document.querySelectorAll('#adm-nav [data-go]').forEach(b=>b.addEventListener('click',()=>{const t=$(b.dataset.go);if(t){secOpen(t,true);t.scrollIntoView({behavior:'smooth',block:'start'})}}));
   $('adm-top').addEventListener('click',()=>{admin.scrollTo({top:0,behavior:'smooth'})});
   $('close-admin').addEventListener('click',()=>{admin.hidden=true;document.body.style.overflow=''});
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!admin.hidden)$('close-admin').click()});
