@@ -424,8 +424,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=22"></script>
-<script src="js/backend.js?v=22"></script>
+<script src="js/config.js?v=23"></script>
+<script src="js/backend.js?v=23"></script>
 </head>
 <body>
 
@@ -837,8 +837,12 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   const apCar=$('ap-car');let apI=0,apHover=false,apTimer=null,apSig='';
   function apShow(i){const ims=apCar.querySelectorAll('img');if(!ims.length)return;apI=(i+ims.length)%ims.length;
     ims.forEach((im,k)=>im.classList.toggle('on',k===apI));apCar.querySelectorAll('.dot').forEach((d,k)=>d.setAttribute('aria-current',k===apI?'true':'false'))}
+  // Ordre aléatoire tiré une fois par chargement de page (stable pendant la visite)
+  const rnd=new Map(),rk=id=>{if(!rnd.has(id))rnd.set(id,Math.random());return rnd.get(id)};
+  const shuffled=z=>phSorted(z).sort((a,b)=>rk(a.id)-rk(b.id));
+  const mixN=Math.random()<.7?1+Math.floor(Math.random()*2):0; // de temps en temps, 1 ou 2 photos de l'apéro en tête du bandeau
   function renderApero(){
-    const list=phSorted('apero');if(!list.length)return; // sinon on garde la photo par défaut
+    const list=shuffled('apero');if(!list.length)return; // sinon on garde la photo par défaut
     const sig=list.map(p=>p.id+phSrc(p)+(p.alt||'')).join('|');if(sig===apSig)return;apSig=sig;
     apCar.textContent='';
     list.forEach((p,k)=>{const im=document.createElement('img');im.src=phSrc(p);im.alt=p.alt||'Apéro Pumpfoil au lac de la Terrasse';im.decoding='async';if(p.pos)im.style.objectPosition=p.pos;if(k>0)im.loading='lazy';apCar.append(im)});
@@ -859,7 +863,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     renderApero();
     if(!phSorted().length)return; // sinon on garde les photos par défaut
     st.textContent='';
-    phSorted().forEach(p=>{const im=document.createElement('img');im.src=phSrc(p);im.alt=p.alt||'Session de pumpfoil au lac';im.decoding='async';if(p.pos)im.style.objectPosition=p.pos;if(p.tall)im.className='tall';
+    const ap=shuffled('apero'),extra=(mixN?ap.slice(-mixN):[]).map(p=>Object.assign({},p,{tall:false}));
+    extra.concat(phSorted()).forEach(p=>{const im=document.createElement('img');im.src=phSrc(p);im.alt=p.alt||'Session de pumpfoil au lac';im.decoding='async';if(p.pos)im.style.objectPosition=p.pos;if(p.tall)im.className='tall';
       im.addEventListener('error',()=>im.remove());st.append(im)});
     st.scrollLeft=0;pos=0;loopify();setTimeout(edges,300);
   }
