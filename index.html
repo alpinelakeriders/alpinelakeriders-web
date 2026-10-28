@@ -524,8 +524,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=36"></script>
-<script src="js/backend.js?v=36"></script>
+<script src="js/config.js?v=37"></script>
+<script src="js/backend.js?v=37"></script>
 </head>
 <body>
 
@@ -877,7 +877,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       </div>
       <div class="sel-bar" id="sel-bar" hidden><span id="sel-n"></span><span class="sel-acts">Déplacer vers <button type="button" class="pill ink small" data-to="bandeau">Bandeau</button><button type="button" class="pill ink small" data-to="apero">Apéro</button><button type="button" class="pill ink small" data-to="spot">Lac</button><button type="button" class="pill line small" id="sel-ret">Retirer</button><button type="button" class="pill line small" id="sel-clear">Tout désélectionner</button></span></div>
     </section>
-    <dialog class="vw" id="vw" aria-label="Photo en grand"><img id="vw-img" alt=""><p id="vw-cap"></p><div class="vw-act" id="vw-act" hidden><span>Ajouter à</span><button type="button" data-to="bandeau">Bandeau</button><button type="button" data-to="apero">Apéro</button><button type="button" data-to="spot">Lac</button></div><button type="button" class="vw-b vw-p" id="vw-prev" aria-label="Photo précédente">←</button><button type="button" class="vw-b vw-n" id="vw-next" aria-label="Photo suivante">→</button><button type="button" class="vw-b vw-x" id="vw-close" aria-label="Fermer">✕</button></dialog>
+    <dialog class="vw" id="vw" aria-label="Photo en grand"><img id="vw-img" alt=""><p id="vw-cap"></p><div class="vw-act" id="vw-act" hidden><span>Afficher dans</span><button type="button" data-to="bandeau">Bandeau</button><button type="button" data-to="apero">Apéro</button><button type="button" data-to="spot">Lac</button></div><button type="button" class="vw-b vw-p" id="vw-prev" aria-label="Photo précédente">←</button><button type="button" class="vw-b vw-n" id="vw-next" aria-label="Photo suivante">→</button><button type="button" class="vw-b vw-x" id="vw-close" aria-label="Fermer">✕</button></dialog>
     <section class="adm-sec" id="sec-admins">
       <h3>Administrateurs</h3>
       <p class="adm-intro">Les administrateurs peuvent modifier tout le site. Un nouvel administrateur reçoit un e-mail de confirmation à valider avant sa première connexion.</p>
@@ -1638,7 +1638,10 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   function vwOpenLib(url){const its=[...$('lib-list').querySelectorAll('.lib-it')].map(n=>libItems().find(i=>i.url===n.dataset.sel.slice(2))).filter(Boolean);
     vwOpenList(its.map(it=>({url:it.url,alt:it.ref.alt||'',it})),its.findIndex(it=>it.url===url))}
   $('vw-act').addEventListener('click',async e=>{const b=e.target.closest('[data-to]');if(!b)return;const cur=vwList[vwI];if(!cur||!cur.it)return;
-    await libAdd(cur.it,b.dataset.to);const it=libItems().find(i=>i.url===cur.it.url);if(it){cur.it=it;it.uses.includes(b.dataset.to)||it.uses.push(b.dataset.to)}vwShow(vwI)});
+    const z=b.dataset.to,url=cur.it.url;b.disabled=true;
+    try{if(cur.it.uses.includes(z)){for(const d of (photos||[]).filter(q=>phSrc(q)===url&&zoneOf(q)===z))await phRetire(d)}else await libAdd(cur.it,z)}catch(err){}
+    // l'état réel arrive par la base ; on l'anticipe pour un retour immédiat
+    const it=libItems().find(i=>i.url===url)||cur.it;const u=new Set(it.uses);cur.it.uses.includes(z)?u.delete(z):u.add(z);cur.it=Object.assign({},it,{uses:[...u]});b.disabled=false;vwShow(vwI)});
   $('vw-prev').addEventListener('click',()=>vwShow(vwI-1));$('vw-next').addEventListener('click',()=>vwShow(vwI+1));$('vw-close').addEventListener('click',()=>$('vw').close());
   $('vw').addEventListener('click',e=>{if(e.target.id==='vw')$('vw').close()});
   $('vw').addEventListener('keydown',e=>{if(e.key==='ArrowLeft')vwShow(vwI-1);if(e.key==='ArrowRight')vwShow(vwI+1)});
