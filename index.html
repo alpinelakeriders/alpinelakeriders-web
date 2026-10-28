@@ -7,6 +7,7 @@
 <meta name="description" content="Alpine Lake Riders, l'association des riders de pumpfoil des lacs alpins : Isère, Savoie, Haute-Savoie. Sessions, Apéros Pumpfoil et initiations au lac de la Terrasse.">
 <meta property="og:title" content="Alpine Lake Riders">
 <meta property="og:description" content="Pump, vole, recommence. L'association de pumpfoil des lacs alpins.">
+<meta name="keywords" content="pumpfoil, pump foil, Alpine Lake Riders, association pumpfoil, lac de la Terrasse, Isère, Savoie, Haute-Savoie, Grésivaudan, Grenoble, Chambéry, dockstart, foil, apéro pumpfoil, initiation pumpfoil">
 <link rel="canonical" href="https://alpinelakeriders.com/">
 <meta property="og:url" content="https://alpinelakeriders.com/">
 <meta property="og:site_name" content="Alpine Lake Riders">
@@ -424,6 +425,19 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 .adm-body{padding-top:10px}
 .adm-sec:not(.open){padding-block:16px}
 @media (max-width:700px){.adm-tog{font-size:18px}}
+.seo{display:grid;gap:28px}
+@media (min-width:900px){.seo{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start}.seo-pv{position:sticky;top:130px}}
+.seo-f,.seo-pv{display:grid;gap:16px;min-width:0}
+.seo .hint{display:block;font-size:12px;color:var(--muted);margin-top:4px}
+.cnt{float:right;font-style:normal;font:500 11px var(--mono);color:var(--muted)}.cnt.ok{color:#15803d}.cnt.over{color:var(--danger)}
+.serp{background:#fff;color:#202124;border:1px solid var(--line);border-radius:12px;padding:16px 18px;font-family:Arial,sans-serif}
+.serp-site{display:flex;gap:10px;align-items:center}.serp-site img{width:28px;height:28px;border-radius:50%;border:1px solid #ecedef;padding:4px;background:#fff}
+.serp-site span{display:grid;line-height:1.25}.serp-site b{font-size:14px;font-weight:400;color:#202124}.serp-site small{font-size:12px;color:#4d5156}
+.serp-t{display:block;margin-top:8px;font-size:20px;line-height:1.3;color:#1a0dab;text-decoration:none;cursor:default}
+.serp-d{margin:4px 0 0;font-size:14px;line-height:1.58;color:#4d5156}
+.share-pv{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#f0f2f5;color:#050505;font-family:system-ui,sans-serif;max-width:520px}
+.share-pv img{display:block;width:100%;aspect-ratio:1.91/1;object-fit:cover;background:#ddd}
+.share-pv div{padding:10px 12px;display:grid;gap:3px}.share-pv small{font-size:12px;color:#65676b;text-transform:uppercase}.share-pv b{font-size:16px}.share-pv p{margin:0;font-size:14px;color:#65676b;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .nav-n{display:inline-block;min-width:18px;height:18px;margin-left:6px;padding:0 5px;border-radius:9px;background:var(--lake,#2a8c89);color:#fff;font:700 11px/18px var(--sans);text-align:center}
 .ct-adm{display:grid;gap:8px}
 .ct-it{border:1px solid var(--line);border-radius:10px;background:var(--bg);min-width:0}
@@ -544,8 +558,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=41"></script>
-<script src="js/backend.js?v=41"></script>
+<script src="js/config.js?v=42"></script>
+<script src="js/backend.js?v=42"></script>
 </head>
 <body>
 
@@ -756,7 +770,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 
 <div class="admin" id="admin" hidden role="dialog" aria-modal="true" aria-labelledby="admin-title"><div class="wrap">
   <div class="admin-head"><h2 id="admin-title">Administration</h2><div style="display:flex;gap:8px"><button class="pill line small" id="logout" type="button" hidden>Se déconnecter</button><button class="pill line small" id="close-admin" type="button">Fermer</button></div>
-    <nav class="adm-nav" id="adm-nav" aria-label="Rubriques de l'administration"><button type="button" data-go="sec-agenda">Agenda</button><button type="button" data-go="sec-contact">Reçus<b class="nav-n" id="ct-n" hidden></b></button><button type="button" data-go="sec-msg">Messages</button><button type="button" data-go="sec-membres">Membres</button><button type="button" data-go="sec-visites">Visites</button><button type="button" data-go="sec-textes">Textes</button><button type="button" data-go="sec-photos">Photos</button><button type="button" data-go="sec-apero-ph">Photos apéro</button><button type="button" data-go="sec-admins">Administrateurs</button><button type="button" class="all" id="adm-all">Tout déplier</button></nav></div>
+    <nav class="adm-nav" id="adm-nav" aria-label="Rubriques de l'administration"><button type="button" data-go="sec-agenda">Agenda</button><button type="button" data-go="sec-contact">Reçus<b class="nav-n" id="ct-n" hidden></b></button><button type="button" data-go="sec-msg">Messages</button><button type="button" data-go="sec-membres">Membres</button><button type="button" data-go="sec-visites">Visites</button><button type="button" data-go="sec-textes">Textes</button><button type="button" data-go="sec-seo">Référencement</button><button type="button" data-go="sec-photos">Photos</button><button type="button" data-go="sec-apero-ph">Photos apéro</button><button type="button" data-go="sec-admins">Administrateurs</button><button type="button" class="all" id="adm-all">Tout déplier</button></nav></div>
   <button class="pill ink small adm-top" id="adm-top" type="button">↑ Menu</button>
   <div class="gate" id="gate">
     <p class="msg" id="gate-msg">Vérification de l'accès…</p>
@@ -836,6 +850,33 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       <div class="ev-chips" id="vs-per"></div>
       <div id="vs-box" style="margin-top:16px"><p class="msg">Chargement…</p></div>
     </section>
+    <section class="adm-sec" id="sec-seo">
+      <h3>Référencement</h3>
+      <p class="adm-intro">Ce que Google, WhatsApp et Facebook affichent du site. Les aperçus se mettent à jour pendant la saisie. Après « Enregistrer », Google peut mettre quelques jours à repasser sur le site.</p>
+      <form id="seo" class="seo" novalidate>
+        <div class="seo-f">
+          <p class="adm-sub">Google</p>
+          <label class="f"><span class="label">Titre de la page <i class="cnt" data-for="t-seoTitle" data-max="60"></i></span><input id="t-seoTitle" maxlength="120"></label>
+          <label class="f"><span class="label">Description <i class="cnt" data-for="t-seoDesc" data-max="160"></i></span><textarea id="t-seoDesc" rows="3" maxlength="320"></textarea></label>
+          <label class="f"><span class="label">Mots-clés (séparés par des virgules)</span><textarea id="t-seoKeywords" rows="2"></textarea><small class="hint">Google n'en tient presque plus compte ; ils servent surtout à Bing et aux petits moteurs. Le plus important : le titre et la description.</small></label>
+          <label class="f"><span class="label">Nom du site</span><input id="t-siteName"></label>
+          <label class="f"><span class="label">Code de validation Google Search Console (facultatif)</span><input id="t-gsc" placeholder="ex. AbC123…" autocomplete="off" spellcheck="false"><small class="hint">Dans Search Console, méthode « Balise HTML » : copiez seulement la valeur de content="…".</small></label>
+          <p class="adm-sub">Partage (WhatsApp, Facebook, Messenger…)</p>
+          <label class="f"><span class="label">Titre du partage</span><input id="t-shareTitle"></label>
+          <label class="f"><span class="label">Texte du partage <i class="cnt" data-for="t-partage" data-max="160"></i></span><textarea id="t-partage" rows="3"></textarea></label>
+          <label class="f"><span class="label">Image du partage (adresse https, idéalement 1200 × 630)</span><input id="t-shareImage" type="url" spellcheck="false"><small class="hint">Astuce : ouvrez une photo de la photothèque en grand, clic droit « Copier l'adresse de l'image ».</small></label>
+          <label class="f"><span class="label">Description de l'image</span><input id="t-shareAlt"></label>
+          <div class="adm-save"><button class="pill ink" type="submit" id="seo-save">Enregistrer le référencement</button><span class="msg" id="seo-msg" role="status"></span></div>
+          <p class="hint"><a href="https://www.google.com/search?q=site%3Aalpinelakeriders.com" target="_blank" rel="noopener">Voir les pages du site dans Google</a> · <a href="https://search.google.com/search-console" target="_blank" rel="noopener">Ouvrir Search Console</a></p>
+        </div>
+        <div class="seo-pv">
+          <p class="adm-sub">Aperçu Google</p>
+          <div class="serp"><div class="serp-site"><img src="media/logo-alr-noir.svg" alt=""><span><b id="pv-sn"></b><small>https://alpinelakeriders.com</small></span></div><a class="serp-t" id="pv-st"></a><p class="serp-d" id="pv-sd"></p></div>
+          <p class="adm-sub">Aperçu partage</p>
+          <div class="share-pv"><img id="pv-si" alt=""><div><small>alpinelakeriders.com</small><b id="pv-shT"></b><p id="pv-shD"></p></div></div>
+        </div>
+      </form>
+    </section>
     <section class="adm-sec" id="sec-textes">
       <h3>Textes et horaires</h3>
       <p class="adm-intro">Modifiez les textes du site, puis cliquez sur « Enregistrer les textes » en bas.</p>
@@ -843,7 +884,6 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
         <p class="full adm-sub">Accueil</p>
         <label class="f full"><span class="label">Slogan</span><input id="t-slogan"></label>
         <label class="f full"><span class="label">Sous-titre</span><textarea id="t-accroche"></textarea></label>
-        <label class="f full"><span class="label">Texte d'aperçu (WhatsApp, Facebook, Google). Vide = slogan + sous-titre.</span><textarea id="t-partage" placeholder="Une ou deux phrases, 160 caractères maximum."></textarea></label>
         <p class="full adm-sub">L'association</p>
         <label class="f full"><span class="label">Présentation</span><textarea id="t-mission"></textarea></label>
         <label class="f full"><span class="label">Encadrer</span><textarea id="t-p1"></textarea></label>
@@ -959,7 +999,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   const $=id=>document.getElementById(id);
   const MOIS=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
   const JOURS=['dim.','lun.','mar.','mer.','jeu.','ven.','sam.'];
-  const TEXT_KEYS=['slogan','accroche','partage','mission','p1','p2','p3','prog1','prog2','prog3','debIntro','deb1','deb2','deb3','deb4','deb5','deb6','debLien','contactEmail','contactTel','inscrits','nbAperos','ride','apero','dernier','prochain','spot','prixRider','prixFamille','prixDecouverte','gaId'];
+  const TEXT_KEYS=['slogan','accroche','partage','mission','p1','p2','p3','prog1','prog2','prog3','debIntro','deb1','deb2','deb3','deb4','deb5','deb6','debLien','contactEmail','contactTel','seoTitle','seoDesc','seoKeywords','siteName','gsc','shareTitle','shareImage','shareAlt','inscrits','nbAperos','ride','apero','dernier','prochain','spot','prixRider','prixFamille','prixDecouverte','gaId'];
   let db=null,user=null,assets=null,myId=null,sorties=[],contenu={},annonces=[],presences=[],photos=null;
 
   // ---------- Vidéo ----------
@@ -1097,6 +1137,9 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   // ---------- Textes modifiables ----------
   const defaults={};
   document.querySelectorAll('[data-k]').forEach(el=>{defaults[el.dataset.k]=el.textContent});
+  {const mt=sel=>(document.querySelector(sel)||{}).content||'';
+   Object.assign(defaults,{seoTitle:document.title,seoDesc:mt('meta[name="description"]'),seoKeywords:mt('meta[name="keywords"]'),siteName:mt('meta[property="og:site_name"]'),
+     shareTitle:mt('meta[property="og:title"]'),partage:mt('meta[property="og:description"]'),shareImage:mt('meta[property="og:image"]'),shareAlt:mt('meta[property="og:image:alt"]'),gsc:''})}
   let autoCount=null;
   // ---------- Google Analytics, chargé seulement après accord (RGPD) ----------
   const GA_DEF='G-4P1WWQHMMD';
@@ -1142,6 +1185,11 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     });
     const lien=(contenu.debLien||'').trim();
     if(/^https:\/\//.test(lien))$('deb-blog').href=lien;
+    // Référencement : on aligne aussi les balises de la page (le serveur le fait déjà pour Google)
+    const sv=k=>(typeof contenu[k]==='string'&&contenu[k].trim())?contenu[k].trim():'';
+    if(sv('seoTitle'))document.title=sv('seoTitle');
+    const setM=(sel,v)=>{const m=document.querySelector(sel);if(m&&v)m.setAttribute('content',v)};
+    setM('meta[name="description"]',sv('seoDesc')||sv('partage'));setM('meta[name="keywords"]',sv('seoKeywords'));
     // Contact : liens mailto / tel / WhatsApp construits à partir des textes
     const em=$('ct-mail').textContent.trim(),tl=$('ct-tel').textContent.trim();
     if(/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em))$('ct-mail').href='mailto:'+em;
@@ -1484,14 +1532,23 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   function fillTextForm(){
     if(admin.hidden||!isAdmin)return;
     TEXT_KEYS.forEach(k=>{const el=$('t-'+k);if(el&&document.activeElement!==el)el.value=(contenu[k]!=null&&contenu[k]!=='')?contenu[k]:defaults[k]||''});
+    try{seoPreview()}catch(e){}
   }
-  $('txt').addEventListener('submit',async e=>{
-    e.preventDefault();const m=$('t-msg');say(m,'Enregistrement…');$('t-save').disabled=true;
-    const data={};TEXT_KEYS.forEach(k=>{data[k]=$('t-'+k).value.trim()});
-    try{await db.doc('contenu/site').set(data);say(m,'Textes enregistrés et publiés.','ok')}
+  async function saveTexts(m,b,okTxt){say(m,'Enregistrement…');b.disabled=true;
+    const data={};TEXT_KEYS.forEach(k=>{const el=$('t-'+k);data[k]=el?el.value.trim():(contenu[k]||'')});
+    try{await db.doc('contenu/site').set(data);say(m,okTxt,'ok')}
     catch(err){say(m,'Enregistrement refusé ('+(err&&err.code||'erreur')+').','err')}
-    $('t-save').disabled=false;
-  });
+    b.disabled=false}
+  $('txt').addEventListener('submit',e=>{e.preventDefault();saveTexts($('t-msg'),$('t-save'),'Textes enregistrés et publiés.')});
+  $('seo').addEventListener('submit',e=>{e.preventDefault();saveTexts($('seo-msg'),$('seo-save'),'Référencement enregistré et publié.')});
+  // Aperçus Google et partage, mis à jour à la frappe
+  const cut=(t,n)=>t.length>n?t.slice(0,n-1).replace(/\s+\S*$/,'')+' …':t;
+  function seoPreview(){const v=k=>($('t-'+k).value||'').trim()||defaults[k]||'';
+    $('pv-sn').textContent=v('siteName');$('pv-st').textContent=cut(v('seoTitle'),62);$('pv-sd').textContent=cut(v('seoDesc')||v('partage'),160);
+    $('pv-shT').textContent=v('shareTitle');$('pv-shD').textContent=cut(v('partage')||[$('t-slogan').value,$('t-accroche').value].filter(Boolean).join(' '),200);
+    const img=v('shareImage');$('pv-si').src=/^https:\/\//.test(img)?img:defaults.shareImage;
+    document.querySelectorAll('#seo .cnt').forEach(c=>{const n=($(c.dataset.for).value||'').trim().length,mx=+c.dataset.max;c.textContent=n+' / '+mx;c.className='cnt '+(n>mx?'over':n>mx*.55?'ok':'')})}
+  $('seo').addEventListener('input',seoPreview);
 
   const openEd=new Set(),openAn=new Set();
   function renderEditor(){

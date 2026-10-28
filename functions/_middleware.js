@@ -3,7 +3,8 @@
 //    WhatsApp, Facebook et Google voient les textes à jour (ils n'exécutent pas le JavaScript du site).
 const SB = 'https://lhnwxbgaemphzmceieht.supabase.co';
 const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxobnd4YmdhZW1waHptY2VpZWh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMwMzc1MDksImV4cCI6MjEwODYxMzUwOX0.uxcxlf3eJAKxi3z3NxVeY5P5ipqO3yvTk--WvkrrrYE'; // clé « anon » publique, déjà dans js/config.js
-const SKIP = new Set(['inscrits']); // calculé par le site lui-même
+const SKIP = new Set(['inscrits']);
+const esc = v => String(v).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); // calculé par le site lui-même
 
 const BOTS = /bot|crawl|spider|slurp|facebookexternalhit|whatsapp|telegram|preview|headless|lighthouse|curl|wget|python|monitor|uptime/i;
 
@@ -76,7 +77,19 @@ export async function onRequest(context) {
       rw = rw.on('meta[property="og:description"]', setContent(share))
              .on('meta[name="twitter:description"]', setContent(share));
     }
-    if (txt('partage')) rw = rw.on('meta[name="description"]', setContent(txt('partage')));
+    // Référencement réglé dans l'admin (rubrique « Référencement »)
+    const desc = txt('seoDesc') || txt('partage');
+    if (desc) rw = rw.on('meta[name="description"]', setContent(desc));
+    if (txt('seoKeywords')) rw = rw.on('meta[name="keywords"]', setContent(txt('seoKeywords')));
+    if (txt('seoTitle')) rw = rw.on('title', { element(e) { e.setInnerContent(txt('seoTitle')); } });
+    if (txt('siteName')) rw = rw.on('meta[property="og:site_name"]', setContent(txt('siteName')));
+    if (!so && txt('shareTitle')) rw = rw.on('meta[property="og:title"]', setContent(txt('shareTitle'))).on('meta[name="twitter:title"]', setContent(txt('shareTitle')));
+    if (/^https:\/\/[^\s"<>]+$/.test(txt('shareImage'))) {
+      rw = rw.on('meta[property="og:image"]', setContent(txt('shareImage'))).on('meta[name="twitter:image"]', setContent(txt('shareImage')))
+             .on('meta[property="og:image:width"]', { element(e) { e.remove(); } }).on('meta[property="og:image:height"]', { element(e) { e.remove(); } });
+    }
+    if (txt('shareAlt')) rw = rw.on('meta[property="og:image:alt"]', setContent(txt('shareAlt')));
+    if (/^[\w-]{10,100}$/.test(txt('gsc'))) rw = rw.on('head', { element(e) { e.append('<meta name="google-site-verification" content="' + esc(txt('gsc')) + '">', { html: true }); } });
     rw = rw.on('[data-k]', { element(e) {
       const k = e.getAttribute('data-k');
       if (!SKIP.has(k) && txt(k)) e.setInnerContent(txt(k));
