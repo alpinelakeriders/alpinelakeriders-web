@@ -558,8 +558,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=42"></script>
-<script src="js/backend.js?v=42"></script>
+<script src="js/config.js?v=43"></script>
+<script src="js/backend.js?v=43"></script>
 </head>
 <body>
 
@@ -770,7 +770,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 
 <div class="admin" id="admin" hidden role="dialog" aria-modal="true" aria-labelledby="admin-title"><div class="wrap">
   <div class="admin-head"><h2 id="admin-title">Administration</h2><div style="display:flex;gap:8px"><button class="pill line small" id="logout" type="button" hidden>Se déconnecter</button><button class="pill line small" id="close-admin" type="button">Fermer</button></div>
-    <nav class="adm-nav" id="adm-nav" aria-label="Rubriques de l'administration"><button type="button" data-go="sec-agenda">Agenda</button><button type="button" data-go="sec-contact">Reçus<b class="nav-n" id="ct-n" hidden></b></button><button type="button" data-go="sec-msg">Messages</button><button type="button" data-go="sec-membres">Membres</button><button type="button" data-go="sec-visites">Visites</button><button type="button" data-go="sec-textes">Textes</button><button type="button" data-go="sec-seo">Référencement</button><button type="button" data-go="sec-photos">Photos</button><button type="button" data-go="sec-apero-ph">Photos apéro</button><button type="button" data-go="sec-admins">Administrateurs</button><button type="button" class="all" id="adm-all">Tout déplier</button></nav></div>
+    <nav class="adm-nav" id="adm-nav" aria-label="Rubriques de l'administration"><button type="button" data-go="sec-visites">Visites</button><button type="button" data-go="sec-agenda">Agenda</button><button type="button" data-go="sec-contact">Reçus<b class="nav-n" id="ct-n" hidden></b></button><button type="button" data-go="sec-msg">Messages</button><button type="button" data-go="sec-membres">Membres</button><button type="button" data-go="sec-textes">Textes</button><button type="button" data-go="sec-photos">Photos</button><button type="button" data-go="sec-apero-ph">Photos apéro</button><button type="button" data-go="sec-admins">Administrateurs</button><button type="button" data-go="sec-seo">Référencement</button><button type="button" class="all" id="adm-all">Tout déplier</button></nav></div>
   <button class="pill ink small adm-top" id="adm-top" type="button">↑ Menu</button>
   <div class="gate" id="gate">
     <p class="msg" id="gate-msg">Vérification de l'accès…</p>
@@ -786,6 +786,13 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     </form>
   </div>
   <div id="admin-body" hidden style="display:grid">
+    <section class="adm-sec" id="sec-visites">
+      <h3>Visites du site</h3>
+      <p class="adm-intro">Compteur anonyme, sans cookie et sans adresse IP : chaque ouverture du site est comptée (robots exclus), avec le pays, le type d'appareil et le site d'où vient le visiteur.</p>
+      <label class="check" style="font-size:14px;margin-bottom:12px"><input type="checkbox" id="vs-keep"> Garder ce bloc toujours ouvert</label>
+      <div class="ev-chips" id="vs-per"></div>
+      <div id="vs-box" style="margin-top:16px"><p class="msg">Chargement…</p></div>
+    </section>
     <section class="adm-sec" id="sec-agenda">
       <h3>Agenda des sorties</h3>
       <p class="adm-intro">Créez une sortie à partir d'un modèle, puis ouvrez une sortie existante pour la modifier et voir qui vient.</p>
@@ -843,39 +850,6 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
         <span class="msg" id="mb-msg" role="status"></span>
       </div>
       <div id="insc"><p class="msg">Chargement…</p></div>
-    </section>
-    <section class="adm-sec" id="sec-visites">
-      <h3>Visites du site</h3>
-      <p class="adm-intro">Compteur anonyme, sans cookie et sans adresse IP : chaque ouverture du site est comptée (robots exclus), avec le pays, le type d'appareil et le site d'où vient le visiteur.</p>
-      <div class="ev-chips" id="vs-per"></div>
-      <div id="vs-box" style="margin-top:16px"><p class="msg">Chargement…</p></div>
-    </section>
-    <section class="adm-sec" id="sec-seo">
-      <h3>Référencement</h3>
-      <p class="adm-intro">Ce que Google, WhatsApp et Facebook affichent du site. Les aperçus se mettent à jour pendant la saisie. Après « Enregistrer », Google peut mettre quelques jours à repasser sur le site.</p>
-      <form id="seo" class="seo" novalidate>
-        <div class="seo-f">
-          <p class="adm-sub">Google</p>
-          <label class="f"><span class="label">Titre de la page <i class="cnt" data-for="t-seoTitle" data-max="60"></i></span><input id="t-seoTitle" maxlength="120"></label>
-          <label class="f"><span class="label">Description <i class="cnt" data-for="t-seoDesc" data-max="160"></i></span><textarea id="t-seoDesc" rows="3" maxlength="320"></textarea></label>
-          <label class="f"><span class="label">Mots-clés (séparés par des virgules)</span><textarea id="t-seoKeywords" rows="2"></textarea><small class="hint">Google n'en tient presque plus compte ; ils servent surtout à Bing et aux petits moteurs. Le plus important : le titre et la description.</small></label>
-          <label class="f"><span class="label">Nom du site</span><input id="t-siteName"></label>
-          <label class="f"><span class="label">Code de validation Google Search Console (facultatif)</span><input id="t-gsc" placeholder="ex. AbC123…" autocomplete="off" spellcheck="false"><small class="hint">Dans Search Console, méthode « Balise HTML » : copiez seulement la valeur de content="…".</small></label>
-          <p class="adm-sub">Partage (WhatsApp, Facebook, Messenger…)</p>
-          <label class="f"><span class="label">Titre du partage</span><input id="t-shareTitle"></label>
-          <label class="f"><span class="label">Texte du partage <i class="cnt" data-for="t-partage" data-max="160"></i></span><textarea id="t-partage" rows="3"></textarea></label>
-          <label class="f"><span class="label">Image du partage (adresse https, idéalement 1200 × 630)</span><input id="t-shareImage" type="url" spellcheck="false"><small class="hint">Astuce : ouvrez une photo de la photothèque en grand, clic droit « Copier l'adresse de l'image ».</small></label>
-          <label class="f"><span class="label">Description de l'image</span><input id="t-shareAlt"></label>
-          <div class="adm-save"><button class="pill ink" type="submit" id="seo-save">Enregistrer le référencement</button><span class="msg" id="seo-msg" role="status"></span></div>
-          <p class="hint"><a href="https://www.google.com/search?q=site%3Aalpinelakeriders.com" target="_blank" rel="noopener">Voir les pages du site dans Google</a> · <a href="https://search.google.com/search-console" target="_blank" rel="noopener">Ouvrir Search Console</a></p>
-        </div>
-        <div class="seo-pv">
-          <p class="adm-sub">Aperçu Google</p>
-          <div class="serp"><div class="serp-site"><img src="media/logo-alr-noir.svg" alt=""><span><b id="pv-sn"></b><small>https://alpinelakeriders.com</small></span></div><a class="serp-t" id="pv-st"></a><p class="serp-d" id="pv-sd"></p></div>
-          <p class="adm-sub">Aperçu partage</p>
-          <div class="share-pv"><img id="pv-si" alt=""><div><small>alpinelakeriders.com</small><b id="pv-shT"></b><p id="pv-shD"></p></div></div>
-        </div>
-      </form>
     </section>
     <section class="adm-sec" id="sec-textes">
       <h3>Textes et horaires</h3>
@@ -988,6 +962,33 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
         <p class="label">Mon mot de passe</p>
         <div class="grid2"><label class="f"><span class="label">Nouveau mot de passe</span><input id="me-new" type="password" autocomplete="new-password"></label></div>
         <div class="bar"><button class="pill line small" type="submit">Changer mon mot de passe</button><span class="msg" id="me-msg" role="status"></span></div>
+      </form>
+    </section>
+    <section class="adm-sec" id="sec-seo">
+      <h3>Référencement</h3>
+      <p class="adm-intro">Ce que Google, WhatsApp et Facebook affichent du site. Les aperçus se mettent à jour pendant la saisie. Après « Enregistrer », Google peut mettre quelques jours à repasser sur le site.</p>
+      <form id="seo" class="seo" novalidate>
+        <div class="seo-f">
+          <p class="adm-sub">Google</p>
+          <label class="f"><span class="label">Titre de la page <i class="cnt" data-for="t-seoTitle" data-max="60"></i></span><input id="t-seoTitle" maxlength="120"></label>
+          <label class="f"><span class="label">Description <i class="cnt" data-for="t-seoDesc" data-max="160"></i></span><textarea id="t-seoDesc" rows="3" maxlength="320"></textarea></label>
+          <label class="f"><span class="label">Mots-clés (séparés par des virgules)</span><textarea id="t-seoKeywords" rows="2"></textarea><small class="hint">Google n'en tient presque plus compte ; ils servent surtout à Bing et aux petits moteurs. Le plus important : le titre et la description.</small></label>
+          <label class="f"><span class="label">Nom du site</span><input id="t-siteName"></label>
+          <label class="f"><span class="label">Code de validation Google Search Console (facultatif)</span><input id="t-gsc" placeholder="ex. AbC123…" autocomplete="off" spellcheck="false"><small class="hint">Dans Search Console, méthode « Balise HTML » : copiez seulement la valeur de content="…".</small></label>
+          <p class="adm-sub">Partage (WhatsApp, Facebook, Messenger…)</p>
+          <label class="f"><span class="label">Titre du partage</span><input id="t-shareTitle"></label>
+          <label class="f"><span class="label">Texte du partage <i class="cnt" data-for="t-partage" data-max="160"></i></span><textarea id="t-partage" rows="3"></textarea></label>
+          <label class="f"><span class="label">Image du partage (adresse https, idéalement 1200 × 630)</span><input id="t-shareImage" type="url" spellcheck="false"><small class="hint">Astuce : ouvrez une photo de la photothèque en grand, clic droit « Copier l'adresse de l'image ».</small></label>
+          <label class="f"><span class="label">Description de l'image</span><input id="t-shareAlt"></label>
+          <div class="adm-save"><button class="pill ink" type="submit" id="seo-save">Enregistrer le référencement</button><span class="msg" id="seo-msg" role="status"></span></div>
+          <p class="hint"><a href="https://www.google.com/search?q=site%3Aalpinelakeriders.com" target="_blank" rel="noopener">Voir les pages du site dans Google</a> · <a href="https://search.google.com/search-console" target="_blank" rel="noopener">Ouvrir Search Console</a></p>
+        </div>
+        <div class="seo-pv">
+          <p class="adm-sub">Aperçu Google</p>
+          <div class="serp"><div class="serp-site"><img src="media/logo-alr-noir.svg" alt=""><span><b id="pv-sn"></b><small>https://alpinelakeriders.com</small></span></div><a class="serp-t" id="pv-st"></a><p class="serp-d" id="pv-sd"></p></div>
+          <p class="adm-sub">Aperçu partage</p>
+          <div class="share-pv"><img id="pv-si" alt=""><div><small>alpinelakeriders.com</small><b id="pv-shT"></b><p id="pv-shD"></p></div></div>
+        </div>
       </form>
     </section>
   </div></div>
@@ -1523,7 +1524,11 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     b.addEventListener('click',()=>secOpen(sec,!sec.classList.contains('open')));
     secOpen(sec,!!admOpen[sec.id]);
   });
-  $('adm-all').addEventListener('click',()=>{const on=!secs.every(x=>x.classList.contains('open'));secs.forEach(x=>secOpen(x,on))});
+  // « Garder ouvert » (Visites) : toujours déplié à l'ouverture de l'admin, et « Tout replier » ne le ferme pas
+  let vsKeep=false;try{vsKeep=localStorage.getItem('alr-keep-visites')==='1'}catch(e){}
+  $('vs-keep').checked=vsKeep;if(vsKeep)secOpen($('sec-visites'),true);
+  $('vs-keep').addEventListener('change',e=>{vsKeep=e.target.checked;try{localStorage.setItem('alr-keep-visites',vsKeep?'1':'0')}catch(err){}if(vsKeep)secOpen($('sec-visites'),true)});
+  $('adm-all').addEventListener('click',()=>{const on=!secs.every(x=>x.classList.contains('open'));secs.forEach(x=>secOpen(x,on||(vsKeep&&x.id==='sec-visites')))});
   document.querySelectorAll('#adm-nav [data-go]').forEach(b=>b.addEventListener('click',()=>{const t=$(b.dataset.go);if(t){secOpen(t.closest('.adm-sec'),true);t.scrollIntoView({behavior:'smooth',block:'start'})}}));
   $('adm-top').addEventListener('click',()=>{admin.scrollTo({top:0,behavior:'smooth'})});
   $('close-admin').addEventListener('click',()=>{admin.hidden=true;document.body.style.overflow=''});
