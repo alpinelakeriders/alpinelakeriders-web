@@ -498,8 +498,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=32"></script>
-<script src="js/backend.js?v=32"></script>
+<script src="js/config.js?v=33"></script>
+<script src="js/backend.js?v=33"></script>
 </head>
 <body>
 
@@ -804,7 +804,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     </section>
     <section class="adm-sec adm-wide" id="sec-photos">
       <h3>Photos du site</h3>
-      <p class="adm-intro">À droite, la photothèque : toutes les photos chargées. Glissez une vignette dans un module pour l'ajouter (ou survolez-la / touchez-la puis « + Band. », « + Apéro », « + Lac »). Glissez une photo d'un module vers la photothèque pour la retirer, ou vers un autre module pour l'y ajouter aussi : une même photo peut être à plusieurs endroits. Les photos déjà utilisées sont grisées (case à décocher pour enlever le gris).</p>
+      <p class="adm-intro">À droite, la photothèque : toutes les photos chargées. Glissez une vignette dans un module pour l'ajouter (ou survolez-la / touchez-la puis « + Band. », « + Apéro », « + Lac »). Glissez une photo d'un module vers la photothèque pour la retirer, ou vers un autre module pour l'y déplacer (maintenez Alt pendant le glisser pour la copier). Pour avoir une photo à plusieurs endroits, glissez-la aussi depuis la photothèque. Les photos déjà utilisées sont grisées (case à décocher pour enlever le gris).</p>
       <div class="ph-split">
         <div class="ph-mods">
           <div class="ph-mod" id="mod-bandeau">
@@ -1604,7 +1604,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   async function phRetire(p){const others=(photos||[]).filter(q=>q.id!==p.id&&phSrc(q)===phSrc(p));
     if(others.length)await db.doc('photos/'+p.id).delete();else await db.doc('photos/'+p.id).update({zone:'lib',fixe:false})}
   function phDrag(im,c,list,z){
-    let ext=null;
+    let ext=null,copy=false;
     let on=false,x=0,y=0,ghost=null,raf=0,timer=0,sx=0,sy=0;
     const place=()=>{ext=null;const el=document.elementFromPoint(x,y);
       if(!el||!list.contains(el)){ext=dropTarget(x,y,list);c.classList.toggle('leaving',!!ext);return}dropClear();c.classList.remove('leaving');
@@ -1620,7 +1620,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       c.classList.remove('dragging','leaving');list.classList.remove('sorting');dropClear();
       const p0=(photos||[]).find(q=>q.id===c.dataset.id);
       if(ext&&p0){const t=ext;ext=null;phDragging=false;
-        try{if(t.lib)await phRetire(p0);else{const it=libItems().find(i=>i.url===phSrc(p0));if(it)await libAdd(it,t.z,t.before)}}catch(err){say($(PH_Z[z].msg),'Action refusée ('+errTxt(err)+').','err')}
+        try{if(t.lib)await phRetire(p0);else{const it=libItems().find(i=>i.url===phSrc(p0));if(it){await libAdd(it,t.z,t.before);if(!copy)await db.doc('photos/'+p0.id).delete()}}}catch(err){say($(PH_Z[z].msg),'Action refusée ('+errTxt(err)+').','err')}
         renderPhEditor();return}
       const all=phSorted(z,true),byId=Object.fromEntries(all.map(p=>[p.id,p])),ids=[...list.querySelectorAll('.ph')].map(n=>n.dataset.id);
       const ords=all.map(p=>p.ordre||0).sort((a,b)=>a-b),uniq=new Set(ords).size===ords.length;
@@ -1628,8 +1628,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       phDragging=false;renderPhZone(z)};
     const framing=()=>c.classList.contains('framing');
     // souris
-    im.addEventListener('mousedown',e=>{if(framing()||e.button!==0)return;e.preventDefault();sx=x=e.clientX;sy=y=e.clientY;
-      const mm=ev=>{if(!on&&Math.hypot(ev.clientX-sx,ev.clientY-sy)>4){x=ev.clientX;y=ev.clientY;start()}move(ev.clientX,ev.clientY)};
+    im.addEventListener('mousedown',e=>{if(framing()||e.button!==0)return;e.preventDefault();sx=x=e.clientX;sy=y=e.clientY;copy=false;
+      const mm=ev=>{copy=ev.altKey;if(!on&&Math.hypot(ev.clientX-sx,ev.clientY-sy)>4){x=ev.clientX;y=ev.clientY;start()}move(ev.clientX,ev.clientY)};
       const mu=()=>{removeEventListener('mousemove',mm);removeEventListener('mouseup',mu);end()};
       addEventListener('mousemove',mm);addEventListener('mouseup',mu)});
     // doigt
