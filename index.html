@@ -141,19 +141,22 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 
 /* Apéro */
 .apero{display:grid;gap:40px;align-items:center}
-@media (min-width:960px){.apero{grid-template-columns:1.35fr 1fr;gap:72px}}
-.ap-fig{--bleed:max(20px,env(safe-area-inset-left,0px));margin-left:calc(-1 * var(--bleed));margin-right:calc(-1 * max(20px,env(safe-area-inset-right,0px)))}
-@media (min-width:800px){.ap-fig{--bleed:max(48px,env(safe-area-inset-left,0px),(100vw - 1320px)/2 + 48px);margin-right:0}}
-.ap-car{position:relative;aspect-ratio:4/3;overflow:hidden;background:var(--tint)}
+@media (min-width:960px){.apero{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:72px}}
+@media (max-width:959px){.apero{grid-template-columns:minmax(0,1fr)}}
+.ap-fig{--bleed:max(20px,env(safe-area-inset-left,0px));width:100vw;max-width:100vw;margin-left:calc(50% - 50vw);min-width:0}
+@media (min-width:800px){.ap-fig{--bleed:max(48px,env(safe-area-inset-left,0px),(100vw - 1320px)/2 + 48px);width:auto;max-width:none;margin-left:calc(-1 * var(--bleed))}}
+.ap-car{position:relative;aspect-ratio:4/3;overflow:hidden;background:var(--tint);touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.ap-car img{-webkit-user-drag:none;pointer-events:none}
+.ap-car.drag img{transition:none}
 .ap-car img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.06);transition:opacity 1.4s ease,transform 7s ease-out}
 .ap-car img.on{opacity:1;transform:scale(1)}
-.ap-bar{display:flex;align-items:center;gap:20px;padding:18px 0 0 var(--bleed)}
+.ap-bar{display:flex;align-items:center;gap:16px;min-width:0;padding:18px 0 0 var(--bleed)}
 @media (max-width:799px){.ap-bar{padding-right:max(20px,env(safe-area-inset-right,0px))}}
 .ap-num{font:500 12px/1 var(--mono);letter-spacing:.08em;color:var(--fg);white-space:nowrap}
 .ap-num span{color:var(--muted)}
-.ap-prog{flex:1;display:flex;gap:6px}
-.ap-prog button{flex:1;height:14px;padding:0;border:0;background:none;cursor:pointer;position:relative}
-.ap-prog button::before,.ap-prog button::after{content:"";position:absolute;left:0;right:0;top:6px;height:2px;background:var(--line)}
+.ap-prog{flex:1;min-width:0;display:flex;gap:4px}
+.ap-prog button{flex:1;min-width:0;height:24px;padding:0;border:0;background:none;cursor:pointer;position:relative}
+.ap-prog button::before,.ap-prog button::after{content:"";position:absolute;left:0;right:0;top:11px;height:2px;background:var(--line)}
 .ap-prog button::after{background:var(--fg);transform:scaleX(0);transform-origin:left}
 .ap-prog button.done::after{transform:scaleX(1)}
 .ap-prog button[aria-current="true"]::after{animation:apfill 5s linear forwards}
@@ -433,8 +436,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=25"></script>
-<script src="js/backend.js?v=25"></script>
+<script src="js/config.js?v=26"></script>
+<script src="js/backend.js?v=26"></script>
 </head>
 <body>
 
@@ -871,8 +874,20 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   function apRestart(){clearInterval(apTimer);if(apCar.querySelectorAll('img').length<2||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
     apTimer=setInterval(()=>{if(!apHover&&!document.hidden)apShow(apI+1)},5000)}
   const apFig=$('ap-fig');apFig.addEventListener('mouseenter',()=>{apHover=true;apFig.classList.add('paused')});apFig.addEventListener('mouseleave',()=>{apHover=false;apFig.classList.remove('paused')});
-  let apX=null;apCar.addEventListener('touchstart',e=>{apX=e.touches[0].clientX},{passive:true});
-  apCar.addEventListener('touchend',e=>{if(apX===null)return;const d=e.changedTouches[0].clientX-apX;apX=null;if(Math.abs(d)>40){apShow(apI+(d<0?1:-1));apRestart()}},{passive:true});
+  // Glisser au doigt (ou à la souris) : la photo suit le geste, puis on change si le geste est assez long
+  let apX=null,apY=0,apD=0,apAxis=null;
+  const apCur=()=>apCar.querySelectorAll('img')[apI];
+  const apStart=(x,y)=>{if(apCar.querySelectorAll('img').length<2)return;apX=x;apY=y;apD=0;apAxis=null};
+  const apMove=(x,y,e)=>{if(apX===null)return;const dx=x-apX,dy=y-apY;
+    if(!apAxis){if(Math.abs(dx)<6&&Math.abs(dy)<6)return;apAxis=Math.abs(dx)>Math.abs(dy)?'x':'y';if(apAxis==='x')apCar.classList.add('drag')}
+    if(apAxis!=='x')return;if(e&&e.cancelable)e.preventDefault();apD=dx;const im=apCur();if(im)im.style.transform='translateX('+dx+'px)'};
+  const apEnd=()=>{if(apX===null)return;apX=null;apCar.classList.remove('drag');const im=apCur();if(im){im.style.transition='transform .35s ease,opacity 1.4s ease';im.style.transform='';setTimeout(()=>{im.style.transition=''},400)}
+    if(apAxis==='x'&&Math.abs(apD)>40){apShow(apI+(apD<0?1:-1));apRestart()}apAxis=null};
+  apCar.addEventListener('touchstart',e=>apStart(e.touches[0].clientX,e.touches[0].clientY),{passive:true});
+  apCar.addEventListener('touchmove',e=>apMove(e.touches[0].clientX,e.touches[0].clientY,e),{passive:false});
+  apCar.addEventListener('touchend',apEnd);apCar.addEventListener('touchcancel',apEnd);
+  apCar.addEventListener('mousedown',e=>{e.preventDefault();apStart(e.clientX,e.clientY)});
+  addEventListener('mousemove',e=>apMove(e.clientX,e.clientY));addEventListener('mouseup',apEnd);
   function renderStrip(){
     renderApero();
     if(!phSorted().length)return; // sinon on garde les photos par défaut
