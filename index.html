@@ -400,8 +400,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=19"></script>
-<script src="js/backend.js?v=19"></script>
+<script src="js/config.js?v=20"></script>
+<script src="js/backend.js?v=20"></script>
 </head>
 <body>
 
@@ -1423,14 +1423,17 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     ['lum','con','sat'].forEach(k=>$('pv-'+k+'-o').textContent=$('pv-'+k).value)})}
   // Photos HEIC d'iPhone : décodées directement si le navigateur sait faire, sinon converties (heic2any, chargé à la demande)
   const isHeic=f=>/\.(heic|heif)$/i.test(f.name)||/heic|heif/i.test(f.type);
-  let heicLib=null;
-  function loadHeic(){return heicLib||(heicLib=new Promise((ok,ko)=>{const sc=document.createElement('script');sc.src='js/vendor/heic2any-0.0.4.min.js';sc.onload=()=>window.heic2any?ok(window.heic2any):ko(new Error('heic2any'));sc.onerror=()=>{heicLib=null;ko(new Error('heic2any'))};document.head.append(sc)}))}
+  const libs={};
+  function loadScript(src,name){return libs[src]||(libs[src]=new Promise((ok,ko)=>{const sc=document.createElement('script');sc.src=src;sc.onload=()=>window[name]?ok(window[name]):ko(new Error(name));sc.onerror=()=>{delete libs[src];ko(new Error(name))};document.head.append(sc)}))}
   async function decode(f){
     try{return await createImageBitmap(f,{imageOrientation:'from-image'})}
     catch(e){if(!isHeic(f))throw e}
     say($('pv-msg'),'Conversion de la photo iPhone (HEIC)…');
-    const h2a=await loadHeic();
-    let out=await h2a({blob:f,toType:'image/jpeg',quality:.92});if(Array.isArray(out))out=out[0];
+    let out=null,err=null;
+    // 1) libheif récent (heic-to, gère les HEIC des iPhone actuels), 2) heic2any en secours
+    try{const H=await loadScript('js/vendor/heic-to-1.6.7.js','HeicTo');out=await H({blob:f,type:'image/jpeg',quality:.92})}catch(e){err=e}
+    if(!out){try{const h2a=await loadScript('js/vendor/heic2any-0.0.4.min.js','heic2any');out=await h2a({blob:f,toType:'image/jpeg',quality:.92});if(Array.isArray(out))out=out[0]}catch(e){err=err||e}}
+    if(!out){const x=new Error((err&&(err.message||err.code||String(err)))||'conversion');x.heic=true;throw x}
     const bmp=await createImageBitmap(out,{imageOrientation:'from-image'});say($('pv-msg'),'');return bmp;
   }
   async function pvLoad(){
@@ -1438,7 +1441,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     if(pvw.bmp&&pvw.bmp.close)pvw.bmp.close();pvw.bmp=null;
     $('pv-ok').disabled=true;const cv=pvw.cv;cv.width=cv.width;
     try{pvw.bmp=await decode(f)}
-    catch(e){say($('pv-msg'),f.name+' : '+(isHeic(f)?'conversion HEIC impossible, exportez-la en JPEG.':'format non lu.'),'err');return}
+    catch(e){say($('pv-msg'),f.name+' : '+(isHeic(f)?'conversion HEIC impossible ('+String(e&&e.message||e).slice(0,80)+'). Exportez-la en JPEG.':'format non lu.'),'err');return}
     if(pvw.queue[pvw.i]!==f)return;
     $('pv-ok').disabled=false;pvDraw();
   }
