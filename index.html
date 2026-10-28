@@ -428,6 +428,15 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 .ph img.adj{cursor:grab;touch-action:none}
 .ph.ap img{aspect-ratio:4/3}
 .ph .hint{font-size:12px;color:var(--muted)}
+.ph-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ph-rank{font:500 11px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.ph-grip{font:500 12px var(--sans);border:1px solid var(--line);background:var(--bg);color:var(--fg);border-radius:999px;padding:6px 10px;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.ph.dragging{opacity:.55;outline:2px dashed var(--lake,#2a8c89);outline-offset:4px;border-radius:4px}
+.ph.dragging .ph-grip{cursor:grabbing}
+.sorting{user-select:none;-webkit-user-select:none}
+.ph-mode{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;width:max-content}
+.ph-mode button{font:500 12px var(--sans);border:0;background:transparent;color:var(--muted);padding:6px 11px;cursor:pointer}
+.ph-mode button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
 /* Bandeau cookies */
 .cookie{position:fixed;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:40;max-width:560px;margin:0 auto;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.14);padding:16px 18px;display:grid;gap:12px}
 .cookie p{font-size:14px;color:var(--muted);line-height:1.5}
@@ -436,8 +445,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=26"></script>
-<script src="js/backend.js?v=26"></script>
+<script src="js/config.js?v=27"></script>
+<script src="js/backend.js?v=27"></script>
 </head>
 <body>
 
@@ -741,6 +750,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     <section class="adm-sec" id="sec-photos">
       <h3>Photos du bandeau</h3>
       <p class="adm-intro">Glissez les photos pour les ajouter. Décochez « Affichée » pour masquer une photo sans la supprimer. Elles sont redimensionnées (2000 px max), recompressées et retouchées automatiquement (niveaux, contraste, vibrance) avant l'envoi.</p>
+      <p class="adm-intro">Ordre : maintenez « ⠿ Déplacer » et glissez la photo. « Place fixe » garde la photo à son rang ; les photos « Aléatoire » (et, 7 visites sur 10, une ou deux photos de l'apéro) se partagent les autres places, tirées au hasard à chaque visite.</p>
       <div class="ph-grid" id="ph-list"></div>
       <div class="drop" id="ph-drop">
         <label class="check"><input type="checkbox" id="ph-auto" checked> Retouche automatique</label>
@@ -854,7 +864,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   // Ordre aléatoire tiré une fois par chargement de page (stable pendant la visite)
   const rnd=new Map(),rk=id=>{if(!rnd.has(id))rnd.set(id,Math.random());return rnd.get(id)};
   const shuffled=z=>phSorted(z).sort((a,b)=>rk(a.id)-rk(b.id));
-  const mixN=Math.random()<.7?1+Math.floor(Math.random()*2):0; // de temps en temps, 1 ou 2 photos de l'apéro en tête du bandeau
+  const mixN=Math.random()<.7?1+Math.floor(Math.random()*2):0; // de temps en temps, 1 ou 2 photos de l'apéro mêlées au bandeau
   function renderApero(){
     const list=shuffled('apero');if(!list.length)return; // sinon on garde la photo par défaut
     const sig=list.map(p=>p.id+phSrc(p)+(p.alt||'')).join('|');if(sig===apSig)return;apSig=sig;
@@ -892,8 +902,12 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     renderApero();
     if(!phSorted().length)return; // sinon on garde les photos par défaut
     st.textContent='';
-    const ap=shuffled('apero'),extra=(mixN?ap.slice(-mixN):[]).map(p=>Object.assign({},p,{tall:false}));
-    extra.concat(phSorted()).forEach(p=>{const im=document.createElement('img');im.src=phSrc(p);im.alt=p.alt||'Session de pumpfoil au lac';im.decoding='async';if(p.pos)im.style.objectPosition=p.pos;if(p.tall)im.className='tall';
+    // Photos « place fixe » : gardent leur rang. Les autres places sont tirées au hasard à chaque visite,
+    // parmi les photos du bandeau non fixes + 1 ou 2 photos de l'apéro (de temps en temps).
+    const base=phSorted(),ap=shuffled('apero'),extra=(mixN?ap.slice(-mixN):[]).map(p=>Object.assign({},p,{tall:false}));
+    const pool=base.filter(p=>!p.fixe).concat(extra).sort((a,b)=>rk(a.id+'s')-rk(b.id+'s')),out=[];
+    for(let i=0;i<base.length+extra.length;i++)out.push(i<base.length&&base[i].fixe?base[i]:pool.shift());
+    out.filter(Boolean).forEach(p=>{const im=document.createElement('img');im.src=phSrc(p);im.alt=p.alt||'Session de pumpfoil au lac';im.decoding='async';if(p.pos)im.style.objectPosition=p.pos;if(p.tall)im.className='tall';
       im.addEventListener('error',()=>im.remove());st.append(im)});
     st.scrollLeft=0;pos=0;loopify();setTimeout(edges,300);
   }
@@ -1412,10 +1426,31 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   const PH_Z={bandeau:{list:'ph-list',drop:'ph-drop',msg:'ph-msg',auto:'ph-auto',file:'ph-file',vide:'Les photos par défaut sont affichées. Ajoutez des photos pour composer le bandeau.'},
               apero:{list:'ap-list',drop:'ap-drop',msg:'ap-msg',auto:'ap-auto',file:'ap-file',vide:'La photo par défaut est affichée. Ajoutez des photos pour créer le carrousel.'}};
   function renderPhEditor(){Object.keys(PH_Z).forEach(renderPhZone)}
+  // Glisser-déposer pour réordonner (souris et doigt) : la carte suit, les autres se décalent, l'ordre est enregistré au lâcher
+  let phDragging=false;
+  function phDrag(h,c,list,z){
+    h.addEventListener('pointerdown',e=>{
+      e.preventDefault();phDragging=true;c.classList.add('dragging');list.classList.add('sorting');let scr=0,lastY=e.clientY,lastX=e.clientX;
+      const tick=()=>{if(!phDragging)return;const m=60,H=innerHeight;scr=lastY<m?-12:lastY>H-m?12:0;if(scr)scrollBy(0,scr),place();requestAnimationFrame(tick)};requestAnimationFrame(tick);
+      function place(){c.style.visibility='hidden';const el=document.elementFromPoint(lastX,lastY);c.style.visibility='';
+        const t=el&&el.closest('.ph');if(!t||t===c||t.parentNode!==list)return;
+        const r=t.getBoundingClientRect(),after=(lastY>r.bottom-r.height/2&&lastX>r.left)||(lastX>r.left+r.width/2&&lastY>r.top);
+        list.insertBefore(c,after?t.nextSibling:t)}
+      const mv=ev=>{lastX=ev.clientX;lastY=ev.clientY;place()};
+      const up=async()=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up);removeEventListener('pointercancel',up);
+        c.classList.remove('dragging');list.classList.remove('sorting');
+        const all=phSorted(z,true),byId=Object.fromEntries(all.map(p=>[p.id,p])),ids=[...list.querySelectorAll('.ph')].map(x=>x.dataset.id);
+        const ords=all.map(p=>p.ordre||0).sort((a,b)=>a-b);const uniq=new Set(ords).size===ords.length;
+        try{await Promise.all(ids.map((id,k)=>{const o=uniq?ords[k]:k+1;return byId[id]&&byId[id].ordre!==o?db.doc('photos/'+id).update({ordre:o}):null}))}catch(err){}
+        phDragging=false;renderPhZone(z)};
+      addEventListener('pointermove',mv);addEventListener('pointerup',up);addEventListener('pointercancel',up);
+    });
+  }
   function renderPhZone(z){
     if(admin.hidden||!isAdmin)return;
     const Z=PH_Z[z],list=$(Z.list);
     if(list.contains(document.activeElement)&&document.activeElement.type==='text')return;
+    if(phDragging)return;
     list.textContent='';
     const all=phSorted(z,true);
     if(!all.length){const p=document.createElement('p');p.className='msg';p.textContent=Z.vide;list.append(p)}
@@ -1431,7 +1466,11 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       const hint=document.createElement('span');hint.className='hint';hint.textContent='Glissez la photo pour la cadrer (comme sur le site)';
       c.append(im,hint,alt,on);
       if(z==='bandeau'){const ck=document.createElement('label');ck.className='check';const cb=document.createElement('input');cb.type='checkbox';cb.checked=!!p.tall;ck.append(cb,' Portrait');
-        cb.addEventListener('change',()=>db.doc('photos/'+p.id).update({tall:cb.checked}).catch(()=>{}));c.append(ck)}
+        cb.addEventListener('change',()=>db.doc('photos/'+p.id).update({tall:cb.checked}).catch(()=>{}));
+        const fx=document.createElement('div');fx.className='ph-mode';
+        [['Place fixe',true],['Aléatoire',false]].forEach(([t,v])=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.setAttribute('aria-pressed',String(!!p.fixe===v));
+          b.addEventListener('click',()=>db.doc('photos/'+p.id).update({fixe:v}).catch(()=>{}));fx.append(b)});
+        c.append(ck,fx)}
       const bar=document.createElement('div');bar.className='bar';
       const btn=(t,lab)=>{const b=document.createElement('button');b.type='button';b.className='pill line small';b.textContent=t;b.setAttribute('aria-label',lab);return b};
       const up=btn('←','Avancer'),dn=btn('→','Reculer'),del=btn('Supprimer','Supprimer la photo');
@@ -1443,7 +1482,11 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
         if(!armed){armed=true;del.textContent='Confirmer';setTimeout(()=>{armed=false;del.textContent='Supprimer'},4000);return}
         try{await db.doc('photos/'+p.id).delete();if(p.asset&&assets)await assets.delete(p.asset).catch(()=>{})}catch(e){say($(Z.msg),'Suppression refusée.','err')}
       });
-      bar.append(up,dn,del);c.append(bar);list.append(c);
+      bar.append(up,dn,del);c.append(bar);
+      const hd=document.createElement('div');hd.className='ph-head';
+      const rank=document.createElement('span');rank.className='ph-rank';rank.textContent=String(i+1).padStart(2,'0')+(z==='bandeau'?(p.fixe?' · place fixe':' · aléatoire'):'');
+      const h=document.createElement('button');h.type='button';h.className='ph-grip';h.textContent='⠿ Déplacer';h.title='Maintenez et glissez pour changer l’ordre';
+      hd.append(rank,h);c.prepend(hd);c.dataset.id=p.id;phDrag(h,c,list,z);list.append(c);
     });
     $(Z.drop).hidden=!assets;
     if(!assets)say($(Z.msg),'Ajout de photos indisponible dans cette vue.','err');
