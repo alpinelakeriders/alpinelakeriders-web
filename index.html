@@ -21,7 +21,7 @@
 <meta name="twitter:image" content="https://alpinelakeriders.com/media/partage-v2.jpg">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#ffffff">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"SportsOrganization","name":"Alpine Lake Riders","alternateName":"Alpine Lake Riders Association","url":"https://alpinelakeriders.com/","logo":"https://alpinelakeriders.com/media/logo-alr-noir.svg","image":"https://alpinelakeriders.com/media/partage-v2.jpg","description":"Association de pumpfoil des lacs alpins (Isère, Savoie, Haute-Savoie) : sessions, initiations au dockstart et Apéros Pumpfoil au lac de la Terrasse.","sport":"Pumpfoil","email":"alpinelakeriders@gmail.com","telephone":"+33 6 73 19 37 23","address":{"@type":"PostalAddress","addressLocality":"La Terrasse","postalCode":"38660","addressRegion":"Isère","addressCountry":"FR"},"sameAs":["https://chat.whatsapp.com/D0wUPuh0QP87qtSMwNR3xT"]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"SportsOrganization","name":"Alpine Lake Riders","alternateName":"Alpine Lake Riders Association","url":"https://alpinelakeriders.com/","logo":"https://alpinelakeriders.com/media/logo-alr-noir.svg","image":"https://alpinelakeriders.com/media/partage-v2.jpg","description":"Association de pumpfoil des lacs alpins (Isère, Savoie, Haute-Savoie) : sessions, initiations au dockstart et Apéros Pumpfoil au lac de la Terrasse.","sport":"Pumpfoil","email":"alpinelakeriders@gmail.com","address":{"@type":"PostalAddress","addressLocality":"La Terrasse","postalCode":"38660","addressRegion":"Isère","addressCountry":"FR"},"sameAs":["https://chat.whatsapp.com/D0wUPuh0QP87qtSMwNR3xT"]}</script>
 <link rel="icon" href="media/logo-alr-noir.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -544,8 +544,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=40"></script>
-<script src="js/backend.js?v=40"></script>
+<script src="js/config.js?v=41"></script>
+<script src="js/backend.js?v=41"></script>
 </head>
 <body>
 
@@ -693,11 +693,11 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     <div>
       <p class="label" style="margin-bottom:24px">Nous contacter</p>
       <h2>Une question&nbsp;?</h2>
-      <p class="ct-intro">Écrivez-nous, appelez ou envoyez un message WhatsApp : on vous répond rapidement.</p>
+      <p class="ct-intro">Écrivez-nous ou envoyez un message WhatsApp : on vous répond rapidement.</p>
       <ul class="ct-list">
         <li><span class="label">E-mail</span><a id="ct-mail" href="mailto:alpinelakeriders@gmail.com" data-k="contactEmail">alpinelakeriders@gmail.com</a></li>
-        <li><span class="label">Téléphone</span><a id="ct-tel" href="tel:+33673193723" data-k="contactTel">06 73 19 37 23</a></li>
       </ul>
+      <span id="ct-tel" data-k="contactTel" hidden>06 73 19 37 23</span>
       <a class="pill ink ct-wa" id="ct-wa" href="https://wa.me/33673193723?text=Bonjour%20Alpine%20Lake%20Riders%2C%20" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2c0 1.3.9 2.5 1.1 2.7.1.2 1.8 2.8 4.4 3.9 1.6.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></svg>Écrire sur WhatsApp</a>
     </div>
     <form id="cf" novalidate>
@@ -706,6 +706,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
         <label class="f"><span class="label">Nom</span><input id="c-nom" autocomplete="name" required maxlength="120"></label>
         <label class="f"><span class="label">E-mail</span><input id="c-email" type="email" autocomplete="email" required maxlength="200"></label>
       </div>
+      <label class="f"><span class="label">Téléphone (facultatif, pour qu'on vous rappelle)</span><input id="c-tel" type="tel" autocomplete="tel" maxlength="30" placeholder="06 12 34 56 78"></label>
       <label class="f"><span class="label">Message</span><textarea id="c-msg" rows="5" required maxlength="4000"></textarea></label>
       <label class="ct-hp" aria-hidden="true">Site web<input id="c-site" tabindex="-1" autocomplete="off"></label>
       <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap"><button class="pill ink" id="c-send" type="submit">Envoyer</button><span class="msg" id="c-out" role="status"></span></div>
@@ -875,7 +876,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
         <label class="f"><span class="label">Tarif Découverte</span><input id="t-prixDecouverte"></label>
         <p class="full adm-sub">Nous contacter</p>
         <label class="f"><span class="label">E-mail de contact</span><input id="t-contactEmail" type="email" placeholder="alpinelakeriders@gmail.com"></label>
-        <label class="f"><span class="label">Téléphone (aussi pour WhatsApp)</span><input id="t-contactTel" type="tel" placeholder="06 73 19 37 23"></label>
+        <label class="f"><span class="label">Numéro WhatsApp (non affiché)</span><input id="t-contactTel" type="tel" placeholder="06 73 19 37 23"></label>
         <p class="full adm-sub">Statistiques</p>
         <label class="f full"><span class="label">Identifiant Google Analytics (G-XXXXXXXXXX)</span><input id="t-gaId" placeholder="G-XXXXXXXXXX" autocomplete="off" spellcheck="false"></label>
         <div class="full adm-save"><button class="pill ink" type="submit" id="t-save">Enregistrer les textes</button><span class="msg" id="t-msg" role="status"></span></div>
@@ -1123,13 +1124,14 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   // Formulaire de contact (anti-robots : champ piège invisible + délai minimum)
   const cfT0=Date.now();
   $('cf').addEventListener('submit',async e=>{e.preventDefault();const out=$('c-out'),b=$('c-send');
-    const nom=$('c-nom').value.trim(),email=$('c-email').value.trim(),msg=$('c-msg').value.trim(),piege=$('c-site').value;
+    const nom=$('c-nom').value.trim(),email=$('c-email').value.trim(),tel=$('c-tel').value.trim(),msg=$('c-msg').value.trim(),piege=$('c-site').value;
     if(nom.length<2){say(out,'Indiquez votre nom.','err');$('c-nom').focus();return}
     if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){say(out,'Adresse e-mail invalide.','err');$('c-email').focus();return}
+    if(tel&&!/^[+()\d][\d\s.()+-]{5,29}$/.test(tel)){say(out,'Numéro de téléphone invalide.','err');$('c-tel').focus();return}
     if(msg.length<5){say(out,'Votre message est un peu court.','err');$('c-msg').focus();return}
     if(piege||Date.now()-cfT0<3000){say(out,'Merci, message envoyé.','ok');e.target.reset();return}
     b.disabled=true;say(out,'Envoi…');
-    try{if(!db||!db.contact)throw new Error('indispo');await db.contact({nom,email,message:msg,piege});say(out,'Merci, message envoyé. On vous répond vite.','ok');e.target.reset()}
+    try{if(!db||!db.contact)throw new Error('indispo');await db.contact({nom,email,tel,message:msg,piege});say(out,'Merci, message envoyé. On vous répond vite.','ok');e.target.reset()}
     catch(err){const m=String(err&&err.message||'');say(out,/trop|54000/.test(m)?'Trop de messages en ce moment, réessayez dans quelques minutes.':'Envoi impossible pour le moment. Écrivez-nous directement à '+$('ct-mail').textContent.trim()+'.','err')}
     b.disabled=false});
   function applyTexts(){
@@ -1144,7 +1146,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     const em=$('ct-mail').textContent.trim(),tl=$('ct-tel').textContent.trim();
     if(/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em))$('ct-mail').href='mailto:'+em;
     let d=tl.replace(/[^\d+]/g,'');if(d.startsWith('+'))d=d.slice(1);else if(d.startsWith('00'))d=d.slice(2);else if(d.startsWith('0'))d='33'+d.slice(1);
-    if(d.length>=9){$('ct-tel').href='tel:+'+d;$('ct-wa').href='https://wa.me/'+d+'?text='+encodeURIComponent('Bonjour Alpine Lake Riders, ')}
+    if(d.length>=9){$('ct-wa').href='https://wa.me/'+d+'?text='+encodeURIComponent('Bonjour Alpine Lake Riders, ')}
   }
   async function refreshCount(){
     try{const n=db&&db.countMembers&&await db.countMembers();if(n>0){autoCount=String(n);applyTexts()}}catch(e){}
@@ -1381,14 +1383,14 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
         const sm=document.createElement('summary');const dt=c.date?new Date(c.date).toLocaleString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'';
         sm.innerHTML='<b></b><span></span><em></em>';sm.querySelector('b').textContent=c.nom||'';sm.querySelector('span').textContent=(c.message||'').slice(0,80);sm.querySelector('em').textContent=dt;
         const body=document.createElement('div');body.className='ct-body';const p=document.createElement('p');p.textContent=c.message||'';
-        const meta=document.createElement('p');meta.className='msg';meta.textContent=(c.email||'')+(dt?' · '+dt:'');
+        const meta=document.createElement('p');meta.className='msg';meta.textContent=(c.email||'')+(c.tel?' · '+c.tel:'')+(dt?' · '+dt:'');
         const bar=document.createElement('div');bar.className='bar';bar.style.cssText='display:flex;gap:8px;flex-wrap:wrap';
         const rep=document.createElement('a');rep.className='pill ink small';rep.textContent='Répondre';rep.href='mailto:'+encodeURIComponent(c.email||'')+'?subject='+encodeURIComponent('Re : votre message à Alpine Lake Riders');
         const lu=document.createElement('button');lu.type='button';lu.className='pill line small';lu.textContent=c.lu?'Marquer non lu':'Marquer comme lu';
         lu.addEventListener('click',async()=>{try{await db.doc('contacts/'+c.id).update({lu:!c.lu});loadContacts()}catch(e){}});
         const del=document.createElement('button');del.type='button';del.className='pill line small';del.textContent='Supprimer';let armed=false;
         del.addEventListener('click',async()=>{if(!armed){armed=true;del.textContent='Confirmer';setTimeout(()=>{armed=false;del.textContent='Supprimer'},4000);return}try{await db.doc('contacts/'+c.id).delete();loadContacts()}catch(e){}});
-        bar.append(rep,lu,del);body.append(meta,p,bar);el.append(sm,body);
+        if(c.tel){const t=document.createElement('a');t.className='pill line small';t.textContent='Appeler';t.href='tel:'+c.tel.replace(/[^\d+]/g,'');bar.append(rep,t,lu,del)}else bar.append(rep,lu,del);body.append(meta,p,bar);el.append(sm,body);
         el.addEventListener('toggle',()=>{if(el.open&&!c.lu){c.lu=true;lu.textContent='Marquer non lu';el.classList.remove('new');db.doc('contacts/'+c.id).update({lu:true}).catch(()=>{});const n=+$('ct-n').textContent-1;$('ct-n').textContent=n;$('ct-n').hidden=n<1}});
         box.append(el)});
     }catch(e){box.innerHTML='<p class="msg err">Messages indisponibles.</p>'}}

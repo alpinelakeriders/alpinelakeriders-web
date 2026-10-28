@@ -38,7 +38,12 @@
         const {error}=await sb.from('docs').upsert(rows);if(error)throw fail(error);
       }
       touch(c)},
-    async contact(d){const {error}=await sb.rpc('envoyer_contact',{p_nom:d.nom,p_email:d.email,p_message:d.message,p_piege:d.piege||''});if(error)throw fail(error);return true},
+    async contact(d){
+      let {error}=await sb.rpc('envoyer_contact',{p_nom:d.nom,p_email:d.email,p_tel:d.tel||'',p_message:d.message,p_piege:d.piege||''});
+      // ancienne version de la fonction (sans téléphone) : le numéro est ajouté au message
+      if(error&&/PGRST202|function|schema cache/i.test((error.code||'')+' '+(error.message||''))){
+        ({error}=await sb.rpc('envoyer_contact',{p_nom:d.nom,p_email:d.email,p_message:d.message+(d.tel?'\n\nTéléphone : '+d.tel:''),p_piege:d.piege||''}))}
+      if(error)throw fail(error);return true},
     async stats(j){const {data,error}=await sb.rpc('stats_visites',{p_jours:j});if(error)throw fail(error);return data},
     async countMembers(){const {data,error}=await sb.rpc('nb_membres');if(error)throw fail(error);return data},
     async clearCollection(c){const {error}=await sb.from('docs').delete().eq('collection',c);if(error)throw fail(error);touch(c)},
