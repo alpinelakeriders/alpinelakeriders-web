@@ -38,6 +38,7 @@
         const {error}=await sb.from('docs').upsert(rows);if(error)throw fail(error);
       }
       touch(c)},
+    async contact(d){const {error}=await sb.rpc('envoyer_contact',{p_nom:d.nom,p_email:d.email,p_message:d.message,p_piege:d.piege||''});if(error)throw fail(error);return true},
     async stats(j){const {data,error}=await sb.rpc('stats_visites',{p_jours:j});if(error)throw fail(error);return data},
     async countMembers(){const {data,error}=await sb.rpc('nb_membres');if(error)throw fail(error);return data},
     async clearCollection(c){const {error}=await sb.from('docs').delete().eq('collection',c);if(error)throw fail(error);touch(c)},
