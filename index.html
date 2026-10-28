@@ -427,6 +427,13 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 .pv-mock.d .pv-fr{height:150px}.pv-mock.m .pv-fr{height:110px}
 .ph img.adj{cursor:grab;touch-action:pan-y;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none}
 .ph.framing img.adj{cursor:move;touch-action:none;outline:2px solid var(--lake,#2a8c89);outline-offset:2px}
+.ph-tools{display:flex;justify-content:flex-end;margin:-6px 0 12px}
+.ph-sort[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.ph-grid.compact{grid-template-columns:repeat(auto-fill,minmax(min(120px,28vw),1fr));gap:8px}
+.ph-grid.compact .ph>*:not(img):not(.ph-head){display:none}
+.ph-grid.compact .ph-head .ph-grip{display:none}
+.ph-grid.compact .ph{gap:4px}
+.ph-grid.compact .ph img.adj{touch-action:none;cursor:grab;aspect-ratio:1;border-radius:4px}
 .ph-ghost{position:fixed;left:0;top:0;z-index:9999;pointer-events:none;border-radius:4px;box-shadow:0 12px 32px rgba(0,0,0,.28);opacity:.92;aspect-ratio:3/2;object-fit:cover}
 .ph.ap img{aspect-ratio:4/3}
 .ph .hint{font-size:12px;color:var(--muted)}
@@ -447,8 +454,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=28"></script>
-<script src="js/backend.js?v=28"></script>
+<script src="js/config.js?v=29"></script>
+<script src="js/backend.js?v=29"></script>
 </head>
 <body>
 
@@ -753,6 +760,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       <h3>Photos du bandeau</h3>
       <p class="adm-intro">Glissez les photos pour les ajouter. Décochez « Affichée » pour masquer une photo sans la supprimer. Elles sont redimensionnées (2000 px max), recompressées et retouchées automatiquement (niveaux, contraste, vibrance) avant l'envoi.</p>
       <p class="adm-intro">Ordre : attrapez la photo et glissez-la à sa nouvelle place (sur mobile : appui long puis glisser). Le bouton « Cadrer » sert à choisir la partie visible. « Place fixe » garde la photo à son rang ; les photos « Aléatoire » (et, 7 visites sur 10, une ou deux photos de l'apéro) se partagent les autres places, tirées au hasard à chaque visite.</p>
+      <div class="ph-tools"><button type="button" class="pill line small ph-sort" data-grid="ph-list" aria-pressed="false">Réorganiser les photos</button></div>
       <div class="ph-grid" id="ph-list"></div>
       <div class="drop" id="ph-drop">
         <label class="check"><input type="checkbox" id="ph-auto" checked> Retouche automatique</label>
@@ -762,6 +770,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     <section class="adm-sec" id="sec-apero-ph">
       <h3>Photos de l'Apéro Pumpfoil</h3>
       <p class="adm-intro">Carrousel affiché à côté du bloc « Apéro Pumpfoil ». Les photos défilent en fondu toutes les 5 secondes. Décochez « Affichée » pour masquer une photo sans la supprimer. Même traitement automatique que le bandeau (2000 px, compression, contraste et saturation).</p>
+      <div class="ph-tools"><button type="button" class="pill line small ph-sort" data-grid="ap-list" aria-pressed="false">Réorganiser les photos</button></div>
       <div class="ph-grid" id="ap-list"></div>
       <div class="drop" id="ap-drop">
         <label class="check"><input type="checkbox" id="ap-auto" checked> Retouche automatique</label>
@@ -1430,6 +1439,9 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   function renderPhEditor(){Object.keys(PH_Z).forEach(renderPhZone)}
   // Glisser-déposer pour réordonner (souris et doigt) : la carte suit, les autres se décalent, l'ordre est enregistré au lâcher
   let phDragging=false;
+  document.querySelectorAll('.ph-sort').forEach(b=>b.addEventListener('click',()=>{const g=$(b.dataset.grid),on=!g.classList.contains('compact');
+    g.classList.toggle('compact',on);b.setAttribute('aria-pressed',String(on));b.textContent=on?'Terminer · afficher les options':'Réorganiser les photos';
+    if(on)g.querySelectorAll('.ph.framing .ph-grip').forEach(x=>x.click())}));
   // Ordinateur : on attrape la photo et on la glisse. Mobile : appui long sur la photo, puis on glisse (un glissé rapide fait défiler la page).
   function phDrag(im,c,list,z){
     let on=false,x=0,y=0,ghost=null,raf=0,timer=0,sx=0,sy=0;
@@ -1454,7 +1466,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       const mu=()=>{removeEventListener('mousemove',mm);removeEventListener('mouseup',mu);end()};
       addEventListener('mousemove',mm);addEventListener('mouseup',mu)});
     // doigt
-    im.addEventListener('touchstart',e=>{if(framing()||e.touches.length>1)return;const t=e.touches[0];sx=x=t.clientX;sy=y=t.clientY;clearTimeout(timer);timer=setTimeout(start,280)},{passive:true});
+    im.addEventListener('touchstart',e=>{if(framing()||e.touches.length>1)return;const t=e.touches[0];sx=x=t.clientX;sy=y=t.clientY;clearTimeout(timer);if(list.classList.contains('compact'))start();else timer=setTimeout(start,280)},{passive:true});
     im.addEventListener('touchmove',e=>{const t=e.touches[0];if(on){e.preventDefault();move(t.clientX,t.clientY)}else if(Math.hypot(t.clientX-sx,t.clientY-sy)>8)clearTimeout(timer)},{passive:false});
     im.addEventListener('touchend',()=>{end();timer=0});im.addEventListener('touchcancel',end);
     im.addEventListener('contextmenu',e=>{if(on||timer)e.preventDefault()});
