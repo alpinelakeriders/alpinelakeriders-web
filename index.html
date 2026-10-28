@@ -389,8 +389,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=17"></script>
-<script src="js/backend.js?v=17"></script>
+<script src="js/config.js?v=18"></script>
+<script src="js/backend.js?v=18"></script>
 </head>
 <body>
 
@@ -692,7 +692,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       <div class="ph-grid" id="ph-list"></div>
       <div class="drop" id="ph-drop">
         <label class="check"><input type="checkbox" id="ph-auto" checked> Retouche automatique</label>
-        <div class="bar" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><label class="pill ink small" style="cursor:pointer">Choisir des photos<input type="file" id="ph-file" accept="image/*" multiple hidden></label><span class="msg" id="ph-msg" role="status">ou glissez-les ici</span></div>
+        <div class="bar" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><label class="pill ink small" style="cursor:pointer">Choisir des photos<input type="file" id="ph-file" accept="image/*,.heic,.heif" multiple hidden></label><span class="msg" id="ph-msg" role="status">ou glissez-les ici</span></div>
       </div>
     </section>
     <section class="adm-sec" id="sec-apero-ph">
@@ -701,7 +701,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       <div class="ph-grid" id="ap-list"></div>
       <div class="drop" id="ap-drop">
         <label class="check"><input type="checkbox" id="ap-auto" checked> Retouche automatique</label>
-        <div class="bar" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><label class="pill ink small" style="cursor:pointer">Choisir des photos<input type="file" id="ap-file" accept="image/*" multiple hidden></label><span class="msg" id="ap-msg" role="status">ou glissez-les ici</span></div>
+        <div class="bar" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><label class="pill ink small" style="cursor:pointer">Choisir des photos<input type="file" id="ap-file" accept="image/*,.heic,.heif" multiple hidden></label><span class="msg" id="ap-msg" role="status">ou glissez-les ici</span></div>
       </div>
     </section>
     <section class="adm-sec" id="sec-admins">
@@ -1393,11 +1393,25 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     const c=draw(pvw.bmp,1100,pvw.orig?null:pvOpts());pvw.cv.width=c.width;pvw.cv.height=c.height;pvw.cv.getContext('2d').drawImage(c,0,0);
     $('pv-tag').textContent=pvw.orig?'Original':'Après retouche';
     ['lum','con','sat'].forEach(k=>$('pv-'+k+'-o').textContent=$('pv-'+k).value)})}
+  // Photos HEIC d'iPhone : décodées directement si le navigateur sait faire, sinon converties (heic2any, chargé à la demande)
+  const isHeic=f=>/\.(heic|heif)$/i.test(f.name)||/heic|heif/i.test(f.type);
+  let heicLib=null;
+  function loadHeic(){return heicLib||(heicLib=new Promise((ok,ko)=>{const sc=document.createElement('script');sc.src='js/vendor/heic2any-0.0.4.min.js';sc.onload=()=>window.heic2any?ok(window.heic2any):ko(new Error('heic2any'));sc.onerror=()=>{heicLib=null;ko(new Error('heic2any'))};document.head.append(sc)}))}
+  async function decode(f){
+    try{return await createImageBitmap(f,{imageOrientation:'from-image'})}
+    catch(e){if(!isHeic(f))throw e}
+    say($('pv-msg'),'Conversion de la photo iPhone (HEIC)…');
+    const h2a=await loadHeic();
+    let out=await h2a({blob:f,toType:'image/jpeg',quality:.92});if(Array.isArray(out))out=out[0];
+    const bmp=await createImageBitmap(out,{imageOrientation:'from-image'});say($('pv-msg'),'');return bmp;
+  }
   async function pvLoad(){
     const f=pvw.queue[pvw.i];$('pv-count').textContent='Photo '+(pvw.i+1)+' sur '+pvw.queue.length+' · '+f.name;say($('pv-msg'),'');
     if(pvw.bmp&&pvw.bmp.close)pvw.bmp.close();pvw.bmp=null;
-    try{pvw.bmp=await createImageBitmap(f,{imageOrientation:'from-image'})}
-    catch(e){say($('pv-msg'),f.name+' : format non lu (photo HEIC d\'iPhone ? exportez-la en JPEG).','err');$('pv-ok').disabled=true;return}
+    $('pv-ok').disabled=true;const cv=pvw.cv;cv.width=cv.width;
+    try{pvw.bmp=await decode(f)}
+    catch(e){say($('pv-msg'),f.name+' : '+(isHeic(f)?'conversion HEIC impossible, exportez-la en JPEG.':'format non lu.'),'err');return}
+    if(pvw.queue[pvw.i]!==f)return;
     $('pv-ok').disabled=false;pvDraw();
   }
   function pvNext(){pvw.i++;if(pvw.i>=pvw.queue.length){pvClose();return}pvLoad()}
