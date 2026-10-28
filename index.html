@@ -142,7 +142,8 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 /* Apéro */
 .apero{display:grid;gap:40px;align-items:center}
 @media (min-width:960px){.apero{grid-template-columns:1.35fr 1fr;gap:72px}}
-.ap-car{position:relative;width:100%;aspect-ratio:4/3;border-radius:4px;overflow:hidden;background:var(--tint)}
+.ap-car{position:relative;aspect-ratio:4/3;border-radius:0;overflow:hidden;background:var(--tint);margin-left:calc(-1 * max(20px,env(safe-area-inset-left,0px)));margin-right:calc(-1 * max(20px,env(safe-area-inset-right,0px)))}
+@media (min-width:800px){.ap-car{margin-right:0;border-radius:0 4px 4px 0;margin-left:calc(-1 * max(48px,env(safe-area-inset-left,0px),(100vw - 1320px)/2 + 48px))}}
 .ap-car img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.2s ease}
 .ap-car img.on{opacity:1}
 .ap-nav{position:absolute;left:0;right:0;bottom:12px;display:flex;justify-content:center;align-items:center;gap:8px;z-index:2}
@@ -424,8 +425,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=23"></script>
-<script src="js/backend.js?v=23"></script>
+<script src="js/config.js?v=24"></script>
+<script src="js/backend.js?v=24"></script>
 </head>
 <body>
 
