@@ -493,6 +493,12 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 .vw[open]{display:grid}
 .vw::backdrop{background:rgba(5,8,8,.92)}
 .vw img{max-width:92vw;max-height:84dvh;object-fit:contain;border-radius:4px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.vw-act{position:absolute;left:50%;transform:translateX(-50%);bottom:44px;display:flex;gap:6px;align-items:center;background:rgba(0,0,0,.55);padding:6px 8px;border-radius:999px;color:#ddd;font:500 12px var(--sans);white-space:nowrap}
+.vw-act[hidden]{display:none}
+.vw-act span{padding:0 6px}
+.vw-act button{font:600 12px var(--sans);border:0;border-radius:999px;padding:7px 12px;background:#fff;color:#111;cursor:pointer}
+.vw-act button.on{background:var(--lake,#2a8c89);color:#fff}
+.vw-act button.on::before{content:'✓ '}
 .vw p{position:absolute;left:0;right:0;bottom:16px;margin:0;text-align:center;color:#ddd;font:500 12px var(--mono);letter-spacing:.04em}
 .vw-b{position:absolute;width:48px;height:48px;border-radius:50%;border:0;background:rgba(255,255,255,.12);color:#fff;font-size:20px;cursor:pointer}
 .vw-b:hover{background:rgba(255,255,255,.22)}
@@ -518,8 +524,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=35"></script>
-<script src="js/backend.js?v=35"></script>
+<script src="js/config.js?v=36"></script>
+<script src="js/backend.js?v=36"></script>
 </head>
 <body>
 
@@ -871,7 +877,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       </div>
       <div class="sel-bar" id="sel-bar" hidden><span id="sel-n"></span><span class="sel-acts">Déplacer vers <button type="button" class="pill ink small" data-to="bandeau">Bandeau</button><button type="button" class="pill ink small" data-to="apero">Apéro</button><button type="button" class="pill ink small" data-to="spot">Lac</button><button type="button" class="pill line small" id="sel-ret">Retirer</button><button type="button" class="pill line small" id="sel-clear">Tout désélectionner</button></span></div>
     </section>
-    <dialog class="vw" id="vw" aria-label="Photo en grand"><img id="vw-img" alt=""><p id="vw-cap"></p><button type="button" class="vw-b vw-p" id="vw-prev" aria-label="Photo précédente">←</button><button type="button" class="vw-b vw-n" id="vw-next" aria-label="Photo suivante">→</button><button type="button" class="vw-b vw-x" id="vw-close" aria-label="Fermer">✕</button></dialog>
+    <dialog class="vw" id="vw" aria-label="Photo en grand"><img id="vw-img" alt=""><p id="vw-cap"></p><div class="vw-act" id="vw-act" hidden><span>Ajouter à</span><button type="button" data-to="bandeau">Bandeau</button><button type="button" data-to="apero">Apéro</button><button type="button" data-to="spot">Lac</button></div><button type="button" class="vw-b vw-p" id="vw-prev" aria-label="Photo précédente">←</button><button type="button" class="vw-b vw-n" id="vw-next" aria-label="Photo suivante">→</button><button type="button" class="vw-b vw-x" id="vw-close" aria-label="Fermer">✕</button></dialog>
     <section class="adm-sec" id="sec-admins">
       <h3>Administrateurs</h3>
       <p class="adm-intro">Les administrateurs peuvent modifier tout le site. Un nouvel administrateur reçoit un e-mail de confirmation à valider avant sa première connexion.</p>
@@ -1572,7 +1578,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
         try{await Promise.all(it.docs.map(d=>db.doc('photos/'+d.id).delete()));if(assets)await Promise.all([...new Set(it.docs.map(d=>d.asset).filter(Boolean))].map(a=>assets.delete(a).catch(()=>{})))}catch(e){say($('lib-msg'),'Suppression refusée.','err')}});
       c.append(im,tags,act);
       c.dataset.sel='u:'+it.url;
-      c.addEventListener('click',e=>{if(e.target.closest('button'))return;if(selClick(e,'u:'+it.url))return;const on=!c.classList.contains('sel');box.querySelectorAll('.lib-it.sel').forEach(x=>x.classList.remove('sel'));c.classList.toggle('sel',on)});
+      c.addEventListener('click',e=>{if(e.target.closest('button'))return;if(selClick(e,'u:'+it.url))return;if(Date.now()-libDragged<400)return;vwOpenLib(it.url);return;const on=!c.classList.contains('sel');box.querySelectorAll('.lib-it.sel').forEach(x=>x.classList.remove('sel'));c.classList.toggle('sel',on)});
       libDrag(im,c,it);box.append(c);
     });
   }
@@ -1624,13 +1630,21 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   const selClick=(e,k)=>{if(selMode||e.metaKey||e.ctrlKey||e.shiftKey){e.preventDefault();selToggle(k);return true}return false};
   // ---------- Visionneuse (clic sur une photo en mode « Réorganiser ») ----------
   let vwList=[],vwI=0;
-  function vwShow(i){vwI=(i+vwList.length)%vwList.length;const p=vwList[vwI];$('vw-img').src=phSrc(p);$('vw-cap').textContent=(vwI+1)+' / '+vwList.length+(p.alt?' · '+p.alt:'')}
-  function vwOpen(z,id){vwList=phSorted(z,true);const k=vwList.findIndex(p=>p.id===id);if(k<0)return;const d=$('vw');vwShow(k);d.showModal?d.showModal():d.setAttribute('open','')}
+  // vwList : [{url, alt, it}] ; « it » = élément de la photothèque (affiche alors les boutons d'ajout)
+  function vwShow(i){vwI=(i+vwList.length)%vwList.length;const p=vwList[vwI];$('vw-img').src=p.url;$('vw-cap').textContent=(vwI+1)+' / '+vwList.length+(p.alt?' · '+p.alt:'');
+    const a=$('vw-act');a.hidden=!p.it;if(p.it){const u=p.it.uses;a.querySelectorAll('[data-to]').forEach(b=>b.classList.toggle('on',u.includes(b.dataset.to)))}}
+  function vwOpenList(list,k){if(!list.length||k<0)return;vwList=list;const d=$('vw');vwShow(k);if(!d.open)d.showModal?d.showModal():d.setAttribute('open','')}
+  function vwOpen(z,id){const l=phSorted(z,true);vwOpenList(l.map(p=>({url:phSrc(p),alt:p.alt||''})),l.findIndex(p=>p.id===id))}
+  function vwOpenLib(url){const its=[...$('lib-list').querySelectorAll('.lib-it')].map(n=>libItems().find(i=>i.url===n.dataset.sel.slice(2))).filter(Boolean);
+    vwOpenList(its.map(it=>({url:it.url,alt:it.ref.alt||'',it})),its.findIndex(it=>it.url===url))}
+  $('vw-act').addEventListener('click',async e=>{const b=e.target.closest('[data-to]');if(!b)return;const cur=vwList[vwI];if(!cur||!cur.it)return;
+    await libAdd(cur.it,b.dataset.to);const it=libItems().find(i=>i.url===cur.it.url);if(it){cur.it=it;it.uses.includes(b.dataset.to)||it.uses.push(b.dataset.to)}vwShow(vwI)});
   $('vw-prev').addEventListener('click',()=>vwShow(vwI-1));$('vw-next').addEventListener('click',()=>vwShow(vwI+1));$('vw-close').addEventListener('click',()=>$('vw').close());
   $('vw').addEventListener('click',e=>{if(e.target.id==='vw')$('vw').close()});
   $('vw').addEventListener('keydown',e=>{if(e.key==='ArrowLeft')vwShow(vwI-1);if(e.key==='ArrowRight')vwShow(vwI+1)});
   {let tx=null;$('vw').addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});$('vw').addEventListener('touchend',e=>{if(tx===null)return;const d=e.changedTouches[0].clientX-tx;tx=null;if(Math.abs(d)>40)vwShow(vwI+(d<0?1:-1))},{passive:true})}
   // Glisser une vignette de la photothèque vers un module (souris : direct ; doigt : appui long)
+  let libDragged=0;
   function libDrag(im,c,it){
     let on=false,x=0,y=0,sx=0,sy=0,ghost=null,raf=0,timer=0,tgt=null,mark=null;
     const clear=dropClear;
@@ -1640,7 +1654,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     const start=()=>{on=phDragging=true;c.classList.add('dragging');ghost=ghostOf(im,140,phSel.has('u:'+it.url)?phSel.size:1);document.body.append(ghost);follow();raf=requestAnimationFrame(tick)};
     const move=(nx,ny)=>{x=nx;y=ny;if(on){follow();locate()}};
     const end=async()=>{clearTimeout(timer);timer=0;if(!on)return;on=false;cancelAnimationFrame(raf);ghost&&ghost.remove();ghost=null;c.classList.remove('dragging');
-      const t=tgt;clear();tgt=null;phDragging=false;if(t){if(phSel.has('u:'+it.url)&&phSel.size>1)await selApply(t);else await libAdd(it,t.z,t.before)}renderPhEditor()};
+      libDragged=Date.now();const t=tgt;clear();tgt=null;phDragging=false;if(t){if(phSel.has('u:'+it.url)&&phSel.size>1)await selApply(t);else await libAdd(it,t.z,t.before)}renderPhEditor()};
     const fromBtn=e=>e.target.closest('button');
     c.addEventListener('mousedown',e=>{if(e.button!==0||fromBtn(e))return;e.preventDefault();sx=x=e.clientX;sy=y=e.clientY;
       const mm=ev=>{if(!on&&Math.hypot(ev.clientX-sx,ev.clientY-sy)>4){x=ev.clientX;y=ev.clientY;start()}move(ev.clientX,ev.clientY)};
@@ -1712,8 +1726,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   function phDrag(im,c,list,z){
     let ext=null,copy=false,touchTap=false,dragged=0;
     c.dataset.sel='d:'+c.dataset.id;
-    const tapCard=()=>{if(selMode){selToggle('d:'+c.dataset.id);return}if(list.classList.contains('compact'))vwOpen(z,c.dataset.id)};
-    im.addEventListener('click',e=>{if(c.classList.contains('framing')||Date.now()-dragged<400)return;if(selClick(e,'d:'+c.dataset.id))return;if(list.classList.contains('compact'))vwOpen(z,c.dataset.id)});
+    const tapCard=()=>{if(selMode){selToggle('d:'+c.dataset.id);return}vwOpen(z,c.dataset.id)};
+    im.addEventListener('click',e=>{if(c.classList.contains('framing')||Date.now()-dragged<400)return;if(selClick(e,'d:'+c.dataset.id))return;vwOpen(z,c.dataset.id)});
     let on=false,x=0,y=0,ghost=null,raf=0,timer=0,sx=0,sy=0;
     const place=()=>{ext=null;const el=document.elementFromPoint(x,y);
       if(!el||!list.contains(el)){ext=dropTarget(x,y,list);c.classList.toggle('leaving',!!ext);return}dropClear();c.classList.remove('leaving');
