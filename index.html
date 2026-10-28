@@ -455,13 +455,19 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 .lib-it{position:relative;border-radius:4px;overflow:hidden;background:var(--tint);outline:none}
 .lib-it img{display:block;width:100%;aspect-ratio:1;object-fit:cover;cursor:grab;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none;touch-action:pan-y}
 .lib-it.used img{filter:grayscale(1);opacity:.42}
+.nogrey .lib-it.used img{filter:none;opacity:1}
+.ph.leaving{opacity:.25}
+.ph-lib.drop-on{outline:2px dashed var(--lake,#2a8c89);outline-offset:4px;border-radius:6px;background:color-mix(in srgb,var(--lake,#2a8c89) 6%,transparent)}
 .lib-it.dragging{outline:2px dashed var(--lake,#2a8c89)}
 .lib-tags{position:absolute;left:4px;top:4px;display:flex;gap:3px;flex-wrap:wrap;pointer-events:none}
 .lib-tags span{font:600 9px/1 var(--mono);text-transform:uppercase;letter-spacing:.04em;background:rgba(0,0,0,.6);color:#fff;padding:3px 5px;border-radius:999px}
 .lib-act{position:absolute;inset:auto 0 0 0;display:none;flex-wrap:wrap;gap:3px;padding:4px;background:linear-gradient(transparent,rgba(0,0,0,.65))}
 .lib-it.sel .lib-act,.lib-it:focus-within .lib-act{display:flex}
 @media (hover:hover){.lib-it:hover .lib-act{display:flex}}
-.lib-act button{font:600 10px var(--sans);border:0;border-radius:999px;padding:4px 7px;background:#fff;color:#111;cursor:pointer}
+.lib-act button{font:600 10px/1 var(--sans);border:0;border-radius:999px;padding:4px 6px;background:#fff;color:#111;cursor:pointer}
+.lib-act button:last-child{flex-basis:100%;text-align:left;padding:2px 2px 0}
+.lib-it{cursor:grab}
+.lib-act{padding-top:18px}
 .lib-act button:last-child{background:transparent;color:#fff;text-decoration:underline}
 .ph-grid.drop-on{outline:2px dashed var(--lake,#2a8c89);outline-offset:6px;border-radius:6px;min-height:80px}
 .ph.ins-b{box-shadow:-6px 0 0 -2px var(--lake,#2a8c89)}
@@ -492,8 +498,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=31"></script>
-<script src="js/backend.js?v=31"></script>
+<script src="js/config.js?v=32"></script>
+<script src="js/backend.js?v=32"></script>
 </head>
 <body>
 
@@ -798,7 +804,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     </section>
     <section class="adm-sec adm-wide" id="sec-photos">
       <h3>Photos du site</h3>
-      <p class="adm-intro">À droite, la photothèque : toutes les photos chargées. Glissez une vignette dans le bandeau ou le carrousel (ou touchez-la puis « + Bandeau », « + Apéro » ou « + Lac »). Une photo déjà utilisée apparaît en gris. « Retirer » enlève une photo d'un module sans la supprimer de la photothèque.</p>
+      <p class="adm-intro">À droite, la photothèque : toutes les photos chargées. Glissez une vignette dans un module pour l'ajouter (ou survolez-la / touchez-la puis « + Band. », « + Apéro », « + Lac »). Glissez une photo d'un module vers la photothèque pour la retirer, ou vers un autre module pour l'y ajouter aussi : une même photo peut être à plusieurs endroits. Les photos déjà utilisées sont grisées (case à décocher pour enlever le gris).</p>
       <div class="ph-split">
         <div class="ph-mods">
           <div class="ph-mod" id="mod-bandeau">
@@ -834,6 +840,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
         </div>
         <aside class="ph-lib" aria-label="Photothèque">
           <div class="ph-lib-head"><h4 class="ph-mod-t">Photothèque <span class="ph-count" id="lib-count"></span></h4>
+            <label class="check" style="font-size:13px"><input type="checkbox" id="lib-grey" checked> Griser les photos utilisées</label>
             <div class="ph-mode" id="lib-filter"><button type="button" data-f="all" aria-pressed="true">Toutes</button><button type="button" data-f="free" aria-pressed="false">Non utilisées</button></div></div>
           <div class="lib-grid" id="lib-list"></div>
           <div class="drop" id="lib-drop">
@@ -1519,6 +1526,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   function renderPhEditor(){Object.keys(PH_Z).forEach(renderPhZone);renderLib()}
   // ---------- Photothèque : toutes les photos (une par fichier), grisées si utilisées dans un module ----------
   let libFilter='all';
+  {const g=$('lib-grey');try{if(localStorage.getItem('alr-lib-grey')==='0')g.checked=false}catch(e){}
+   const ap=()=>$('lib-list').classList.toggle('nogrey',!g.checked);ap();g.addEventListener('change',()=>{ap();try{localStorage.setItem('alr-lib-grey',g.checked?'1':'0')}catch(e){}})}
   const libItems=()=>{const m=new Map();(photos||[]).forEach(p=>{const u=phSrc(p);if(!u)return;if(!m.has(u))m.set(u,{url:u,docs:[]});m.get(u).docs.push(p)});
     return [...m.values()].map(it=>{it.uses=it.docs.filter(d=>zoneOf(d)!=='lib').map(d=>zoneOf(d));it.ref=it.docs.find(d=>zoneOf(d)==='lib')||it.docs[0];
       it.date=it.docs.map(d=>d.cree||'').sort().pop()||'';return it}).sort((a,b)=>b.date.localeCompare(a.date))};
@@ -1536,7 +1545,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       [...new Set(it.uses)].forEach(u=>{const t=document.createElement('span');t.textContent={bandeau:'Bandeau',apero:'Apéro',spot:'Lac'}[u];tags.append(t)});
       const act=document.createElement('div');act.className='lib-act';
       const mk=(t,f)=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.addEventListener('click',e=>{e.stopPropagation();f(b)});act.append(b);return b};
-      mk('+ Bandeau',()=>libAdd(it,'bandeau'));mk('+ Apéro',()=>libAdd(it,'apero'));mk('+ Lac',()=>libAdd(it,'spot'));
+      mk('+ Band.',()=>libAdd(it,'bandeau'));mk('+ Apéro',()=>libAdd(it,'apero'));mk('+ Lac',()=>libAdd(it,'spot'));
       let armed=false;mk('Supprimer',async b=>{if(!armed){armed=true;b.textContent=it.uses.length?'Supprimer partout ?':'Confirmer';setTimeout(()=>{armed=false;b.textContent='Supprimer'},4000);return}
         try{await Promise.all(it.docs.map(d=>db.doc('photos/'+d.id).delete()));if(assets)await Promise.all([...new Set(it.docs.map(d=>d.asset).filter(Boolean))].map(a=>assets.delete(a).catch(()=>{})))}catch(e){say($('lib-msg'),'Suppression refusée.','err')}});
       c.append(im,tags,act);
@@ -1560,20 +1569,16 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   // Glisser une vignette de la photothèque vers un module (souris : direct ; doigt : appui long)
   function libDrag(im,c,it){
     let on=false,x=0,y=0,sx=0,sy=0,ghost=null,raf=0,timer=0,tgt=null,mark=null;
-    const clear=()=>{document.querySelectorAll('.ph-grid.drop-on').forEach(g=>g.classList.remove('drop-on'));if(mark){mark.classList.remove('ins-b','ins-a');mark=null}};
-    const locate=()=>{clear();tgt=null;if(ghost)ghost.style.display='none';const el=document.elementFromPoint(x,y);if(ghost)ghost.style.display='';
-      const g=el&&(el.closest('#ph-list,#ap-list,#sp-list')||el.closest('.ph-mod')?.querySelector('.ph-grid'));if(!g)return;g.classList.add('drop-on');
-      const z={'ap-list':'apero','sp-list':'spot'}[g.id]||'bandeau';const card=el.closest('.ph');let before=null;
-      if(card&&card.parentNode===g){const r=card.getBoundingClientRect(),after=x>r.left+r.width/2;mark=card;card.classList.add(after?'ins-a':'ins-b');
-        before=after?card.nextElementSibling?.dataset.id||null:card.dataset.id}
-      tgt={z,before}};
+    const clear=dropClear;
+    const locate=()=>{if(ghost)ghost.style.display='none';const t=dropTarget(x,y);if(ghost)ghost.style.display='';tgt=t&&!t.lib?t:null};
     const tick=()=>{if(!on)return;const m=80,H=innerHeight,v=y<m?-16:y>H-m?16:0;if(v){admin.scrollBy(0,v);scrollBy(0,v);locate()}raf=requestAnimationFrame(tick)};
     const follow=()=>{if(ghost)ghost.style.transform='translate('+(x+12)+'px,'+(y+12)+'px) rotate(-2deg)'};
     const start=()=>{on=phDragging=true;c.classList.add('dragging');ghost=im.cloneNode();ghost.className='ph-ghost';ghost.style.width='140px';document.body.append(ghost);follow();raf=requestAnimationFrame(tick)};
     const move=(nx,ny)=>{x=nx;y=ny;if(on){follow();locate()}};
     const end=async()=>{clearTimeout(timer);timer=0;if(!on)return;on=false;cancelAnimationFrame(raf);ghost&&ghost.remove();ghost=null;c.classList.remove('dragging');
       const t=tgt;clear();tgt=null;phDragging=false;if(t)await libAdd(it,t.z,t.before);renderPhEditor()};
-    im.addEventListener('mousedown',e=>{if(e.button!==0)return;e.preventDefault();sx=x=e.clientX;sy=y=e.clientY;
+    const fromBtn=e=>e.target.closest('button');
+    c.addEventListener('mousedown',e=>{if(e.button!==0||fromBtn(e))return;e.preventDefault();sx=x=e.clientX;sy=y=e.clientY;
       const mm=ev=>{if(!on&&Math.hypot(ev.clientX-sx,ev.clientY-sy)>4){x=ev.clientX;y=ev.clientY;start()}move(ev.clientX,ev.clientY)};
       const mu=()=>{removeEventListener('mousemove',mm);removeEventListener('mouseup',mu);end()};addEventListener('mousemove',mm);addEventListener('mouseup',mu)});
     im.addEventListener('touchstart',e=>{if(e.touches.length>1)return;const t=e.touches[0];sx=x=t.clientX;sy=y=t.clientY;clearTimeout(timer);timer=setTimeout(start,300)},{passive:true});
@@ -1587,9 +1592,23 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     g.classList.toggle('compact',on);b.setAttribute('aria-pressed',String(on));b.textContent=on?'Terminer · afficher les options':'Réorganiser les photos';
     if(on)g.querySelectorAll('.ph.framing .ph-grip').forEach(x=>x.click())}));
   // Ordinateur : on attrape la photo et on la glisse. Mobile : appui long sur la photo, puis on glisse (un glissé rapide fait défiler la page).
+  // Cible sous le doigt / la souris : la photothèque, ou un module (avec la position d'insertion)
+  const GRID_Z={'ph-list':'bandeau','ap-list':'apero','sp-list':'spot'};
+  function dropClear(){document.querySelectorAll('.drop-on').forEach(g=>g.classList.remove('drop-on'));document.querySelectorAll('.ins-b,.ins-a').forEach(n=>n.classList.remove('ins-b','ins-a'))}
+  function dropTarget(x,y,skip){dropClear();const el=document.elementFromPoint(x,y);if(!el)return null;
+    const lib=el.closest('.ph-lib');if(lib){lib.classList.add('drop-on');return {lib:true}}
+    const g=el.closest('#ph-list,#ap-list,#sp-list')||el.closest('.ph-mod')?.querySelector('.ph-grid');if(!g||g===skip)return null;g.classList.add('drop-on');
+    const card=el.closest('.ph');let before=null;
+    if(card&&card.parentNode===g){const r=card.getBoundingClientRect(),after=x>r.left+r.width/2;card.classList.add(after?'ins-a':'ins-b');before=after?card.nextElementSibling?.dataset.id||null:card.dataset.id}
+    return {z:GRID_Z[g.id],before}}
+  async function phRetire(p){const others=(photos||[]).filter(q=>q.id!==p.id&&phSrc(q)===phSrc(p));
+    if(others.length)await db.doc('photos/'+p.id).delete();else await db.doc('photos/'+p.id).update({zone:'lib',fixe:false})}
   function phDrag(im,c,list,z){
+    let ext=null;
     let on=false,x=0,y=0,ghost=null,raf=0,timer=0,sx=0,sy=0;
-    const place=()=>{const el=document.elementFromPoint(x,y);const t=el&&el.closest('.ph');if(!t||t===c||t.parentNode!==list)return;
+    const place=()=>{ext=null;const el=document.elementFromPoint(x,y);
+      if(!el||!list.contains(el)){ext=dropTarget(x,y,list);c.classList.toggle('leaving',!!ext);return}dropClear();c.classList.remove('leaving');
+      const t=el.closest('.ph');if(!t||t===c||t.parentNode!==list)return;
       const r=t.getBoundingClientRect(),after=r.width>list.clientWidth*.6?y>r.top+r.height/2:x>r.left+r.width/2;const ref=after?t.nextSibling:t;if(ref===c||ref===c.nextSibling)return;list.insertBefore(c,ref)};
     const tick=()=>{if(!on)return;const m=70,H=innerHeight,v=y<m?-14:y>H-m?14:0;if(v){admin.scrollBy(0,v);scrollBy(0,v);place()}raf=requestAnimationFrame(tick)};
     const start=()=>{on=phDragging=true;c.classList.add('dragging');list.classList.add('sorting');
@@ -1598,7 +1617,11 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     const follow=()=>{if(ghost)ghost.style.transform='translate('+(x+12)+'px,'+(y+12)+'px) rotate(-2deg)'};
     const move=(nx,ny)=>{x=nx;y=ny;if(on){follow();place()}};
     const end=async()=>{clearTimeout(timer);if(!on)return;on=false;cancelAnimationFrame(raf);ghost&&ghost.remove();ghost=null;
-      c.classList.remove('dragging');list.classList.remove('sorting');
+      c.classList.remove('dragging','leaving');list.classList.remove('sorting');dropClear();
+      const p0=(photos||[]).find(q=>q.id===c.dataset.id);
+      if(ext&&p0){const t=ext;ext=null;phDragging=false;
+        try{if(t.lib)await phRetire(p0);else{const it=libItems().find(i=>i.url===phSrc(p0));if(it)await libAdd(it,t.z,t.before)}}catch(err){say($(PH_Z[z].msg),'Action refusée ('+errTxt(err)+').','err')}
+        renderPhEditor();return}
       const all=phSorted(z,true),byId=Object.fromEntries(all.map(p=>[p.id,p])),ids=[...list.querySelectorAll('.ph')].map(n=>n.dataset.id);
       const ords=all.map(p=>p.ordre||0).sort((a,b)=>a-b),uniq=new Set(ords).size===ords.length;
       try{await Promise.all(ids.map((id,k)=>{const o=uniq?ords[k]:k+1;return byId[id]&&byId[id].ordre!==o?db.doc('photos/'+id).update({ordre:o}):null}))}catch(err){}
@@ -1649,8 +1672,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       let armed=false;
       del.addEventListener('click',async()=>{
         if(!armed){armed=true;del.textContent='Confirmer';setTimeout(()=>{armed=false;del.textContent='Retirer'},4000);return}
-        const others=(photos||[]).filter(q=>q.id!==p.id&&phSrc(q)===phSrc(p));
-        try{if(others.length)await db.doc('photos/'+p.id).delete();else await db.doc('photos/'+p.id).update({zone:'lib',fixe:false})}catch(e){say($(Z.msg),'Retrait refusé.','err')}
+        try{await phRetire(p)}catch(e){say($(Z.msg),'Retrait refusé.','err')}
       });
       bar.append(up,dn,del);c.append(bar);
       const hd=document.createElement('div');hd.className='ph-head';
