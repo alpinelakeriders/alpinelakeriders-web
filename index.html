@@ -479,6 +479,24 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   .ph-split{display:grid;grid-template-columns:minmax(0,1fr) minmax(340px,36%);gap:32px;align-items:start}
   .ph-lib{position:sticky;top:120px;max-height:calc(100dvh - 140px);overflow:auto;border-top:0;margin-top:0;padding:0 4px 0 28px;border-left:1px solid var(--line)}
 }
+.ph-tools-r{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.ph-pick[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.picked{outline:3px solid var(--lake,#2a8c89);outline-offset:3px;border-radius:4px;position:relative}
+.picked::after{content:"✓";position:absolute;right:6px;top:30px;width:24px;height:24px;border-radius:50%;background:var(--lake,#2a8c89);color:#fff;font:700 13px/24px var(--sans);text-align:center;z-index:2;pointer-events:none}
+.lib-it.picked::after{top:6px}
+.selecting .ph img.adj,.selecting .lib-it img{cursor:pointer}
+.sel-bar{position:sticky;bottom:12px;z-index:7;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-top:18px;padding:10px 14px;border-radius:14px;background:var(--bg);box-shadow:0 8px 30px rgba(0,0,0,.18),0 0 0 1px var(--line);font-size:14px}
+.sel-acts{display:flex;flex-wrap:wrap;gap:6px;align-items:center;color:var(--muted)}
+.ph-ghost img{display:block;width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:4px}
+.ph-ghost b{position:absolute;right:-8px;top:-8px;min-width:24px;height:24px;border-radius:12px;background:var(--lake,#2a8c89);color:#fff;font:700 12px/24px var(--sans);text-align:center;padding:0 6px}
+.vw{border:0;padding:0;background:transparent;max-width:100vw;max-height:100dvh;width:100vw;height:100dvh;display:none;place-items:center}
+.vw[open]{display:grid}
+.vw::backdrop{background:rgba(5,8,8,.92)}
+.vw img{max-width:92vw;max-height:84dvh;object-fit:contain;border-radius:4px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.vw p{position:absolute;left:0;right:0;bottom:16px;margin:0;text-align:center;color:#ddd;font:500 12px var(--mono);letter-spacing:.04em}
+.vw-b{position:absolute;width:48px;height:48px;border-radius:50%;border:0;background:rgba(255,255,255,.12);color:#fff;font-size:20px;cursor:pointer}
+.vw-b:hover{background:rgba(255,255,255,.22)}
+.vw-p{left:16px;top:50%;transform:translateY(-50%)}.vw-n{right:16px;top:50%;transform:translateY(-50%)}.vw-x{right:16px;top:16px}
 .ph-ghost{position:fixed;left:0;top:0;z-index:9999;pointer-events:none;border-radius:4px;box-shadow:0 12px 32px rgba(0,0,0,.28);opacity:.92;aspect-ratio:3/2;object-fit:cover}
 .ph.ap img{aspect-ratio:4/3}
 .ph.sp img{aspect-ratio:16/9}
@@ -500,8 +518,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=34"></script>
-<script src="js/backend.js?v=34"></script>
+<script src="js/config.js?v=35"></script>
+<script src="js/backend.js?v=35"></script>
 </head>
 <body>
 
@@ -812,7 +830,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
           <div class="ph-mod" id="mod-bandeau">
             <h4 class="ph-mod-t">Bandeau « Sessions »</h4>
             <p class="adm-intro">Attrapez une photo pour changer sa place (mobile : appui long). « Cadrer » choisit la partie visible. « Place fixe » garde la photo à son rang ; les photos « Aléatoire » (et, 7 visites sur 10, une ou deux photos de l'apéro) se partagent les autres places, tirées au hasard à chaque visite.</p>
-            <div class="ph-tools"><div class="ph-arr" data-grid="ph-list"><button type="button" class="pill line small" data-o="rnd">Mélanger</button><button type="button" class="pill line small" data-o="chrono">Chronologique</button><button type="button" class="pill line small" data-o="smart">✦ Ordre intelligent</button><button type="button" class="pill line small ph-undo" data-o="undo" hidden>Annuler</button><span class="msg" role="status"></span></div><button type="button" class="pill line small ph-sort" data-grid="ph-list" aria-pressed="false">Réorganiser les photos</button></div>
+            <div class="ph-tools"><div class="ph-arr" data-grid="ph-list"><button type="button" class="pill line small" data-o="rnd">Mélanger</button><button type="button" class="pill line small" data-o="chrono">Chronologique</button><button type="button" class="pill line small" data-o="smart">✦ Ordre intelligent</button><button type="button" class="pill line small ph-undo" data-o="undo" hidden>Annuler</button><span class="msg" role="status"></span></div><span class="ph-tools-r"><button type="button" class="pill line small ph-pick" aria-pressed="false">Sélectionner</button><button type="button" class="pill line small ph-sort" data-grid="ph-list" aria-pressed="false">Réorganiser les photos</button></span></div>
             <div class="ph-grid" id="ph-list"></div>
             <div class="drop" id="ph-drop">
         <label class="check"><input type="checkbox" id="ph-auto" checked> Retouche automatique</label>
@@ -822,7 +840,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
           <div class="ph-mod" id="sec-apero-ph">
             <h4 class="ph-mod-t">Carrousel « Apéro Pumpfoil »</h4>
             <p class="adm-intro">Défile en fondu toutes les 5 secondes, dans un ordre aléatoire à chaque visite.</p>
-            <div class="ph-tools"><div class="ph-arr" data-grid="ap-list"><button type="button" class="pill line small" data-o="rnd">Mélanger</button><button type="button" class="pill line small" data-o="chrono">Chronologique</button><button type="button" class="pill line small" data-o="smart">✦ Ordre intelligent</button><button type="button" class="pill line small ph-undo" data-o="undo" hidden>Annuler</button><span class="msg" role="status"></span></div><button type="button" class="pill line small ph-sort" data-grid="ap-list" aria-pressed="false">Réorganiser les photos</button></div>
+            <div class="ph-tools"><div class="ph-arr" data-grid="ap-list"><button type="button" class="pill line small" data-o="rnd">Mélanger</button><button type="button" class="pill line small" data-o="chrono">Chronologique</button><button type="button" class="pill line small" data-o="smart">✦ Ordre intelligent</button><button type="button" class="pill line small ph-undo" data-o="undo" hidden>Annuler</button><span class="msg" role="status"></span></div><span class="ph-tools-r"><button type="button" class="pill line small ph-pick" aria-pressed="false">Sélectionner</button><button type="button" class="pill line small ph-sort" data-grid="ap-list" aria-pressed="false">Réorganiser les photos</button></span></div>
             <div class="ph-grid" id="ap-list"></div>
             <div class="drop" id="ap-drop">
         <label class="check"><input type="checkbox" id="ap-auto" checked> Retouche automatique</label>
@@ -832,7 +850,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
           <div class="ph-mod" id="mod-spot">
             <h4 class="ph-mod-t">Carrousel « Lac de la Terrasse »</h4>
             <p class="adm-intro">Grande photo du spot, en bas de page. Défile en fondu toutes les 6 secondes, dans un ordre aléatoire à chaque visite.</p>
-            <div class="ph-tools"><div class="ph-arr" data-grid="sp-list"><button type="button" class="pill line small" data-o="rnd">Mélanger</button><button type="button" class="pill line small" data-o="chrono">Chronologique</button><button type="button" class="pill line small" data-o="smart">✦ Ordre intelligent</button><button type="button" class="pill line small ph-undo" data-o="undo" hidden>Annuler</button><span class="msg" role="status"></span></div><button type="button" class="pill line small ph-sort" data-grid="sp-list" aria-pressed="false">Réorganiser les photos</button></div>
+            <div class="ph-tools"><div class="ph-arr" data-grid="sp-list"><button type="button" class="pill line small" data-o="rnd">Mélanger</button><button type="button" class="pill line small" data-o="chrono">Chronologique</button><button type="button" class="pill line small" data-o="smart">✦ Ordre intelligent</button><button type="button" class="pill line small ph-undo" data-o="undo" hidden>Annuler</button><span class="msg" role="status"></span></div><span class="ph-tools-r"><button type="button" class="pill line small ph-pick" aria-pressed="false">Sélectionner</button><button type="button" class="pill line small ph-sort" data-grid="sp-list" aria-pressed="false">Réorganiser les photos</button></span></div>
             <div class="ph-grid" id="sp-list"></div>
             <div class="drop" id="sp-drop">
         <label class="check"><input type="checkbox" id="sp-auto" checked> Retouche automatique</label>
@@ -851,7 +869,9 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
           </div>
         </aside>
       </div>
+      <div class="sel-bar" id="sel-bar" hidden><span id="sel-n"></span><span class="sel-acts">Déplacer vers <button type="button" class="pill ink small" data-to="bandeau">Bandeau</button><button type="button" class="pill ink small" data-to="apero">Apéro</button><button type="button" class="pill ink small" data-to="spot">Lac</button><button type="button" class="pill line small" id="sel-ret">Retirer</button><button type="button" class="pill line small" id="sel-clear">Tout désélectionner</button></span></div>
     </section>
+    <dialog class="vw" id="vw" aria-label="Photo en grand"><img id="vw-img" alt=""><p id="vw-cap"></p><button type="button" class="vw-b vw-p" id="vw-prev" aria-label="Photo précédente">←</button><button type="button" class="vw-b vw-n" id="vw-next" aria-label="Photo suivante">→</button><button type="button" class="vw-b vw-x" id="vw-close" aria-label="Fermer">✕</button></dialog>
     <section class="adm-sec" id="sec-admins">
       <h3>Administrateurs</h3>
       <p class="adm-intro">Les administrateurs peuvent modifier tout le site. Un nouvel administrateur reçoit un e-mail de confirmation à valider avant sa première connexion.</p>
@@ -1358,7 +1378,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   document.querySelectorAll('#adm-nav [data-go]').forEach(b=>b.addEventListener('click',()=>{const t=$(b.dataset.go);if(t){secOpen(t.closest('.adm-sec'),true);t.scrollIntoView({behavior:'smooth',block:'start'})}}));
   $('adm-top').addEventListener('click',()=>{admin.scrollTo({top:0,behavior:'smooth'})});
   $('close-admin').addEventListener('click',()=>{admin.hidden=true;document.body.style.overflow=''});
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!admin.hidden)$('close-admin').click()});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!admin.hidden&&!document.querySelector('dialog[open]'))$('close-admin').click()});
 
   function fillTextForm(){
     if(admin.hidden||!isAdmin)return;
@@ -1525,7 +1545,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
               apero:{list:'ap-list',drop:'ap-drop',msg:'ap-msg',auto:'ap-auto',file:'ap-file',vide:'La photo par défaut est affichée. Ajoutez des photos pour créer le carrousel.'},
               spot:{list:'sp-list',drop:'sp-drop',msg:'sp-msg',auto:'sp-auto',file:'sp-file',vide:'La photo par défaut du lac est affichée. Ajoutez des photos pour créer le carrousel.'}};
   const UP_Z=Object.assign({},PH_Z,{lib:{drop:'lib-drop',msg:'lib-msg',auto:'lib-auto',file:'lib-file'}});
-  function renderPhEditor(){Object.keys(PH_Z).forEach(renderPhZone);renderLib()}
+  function renderPhEditor(){Object.keys(PH_Z).forEach(renderPhZone);renderLib();try{selPaint()}catch(e){}}
   // ---------- Photothèque : toutes les photos (une par fichier), grisées si utilisées dans un module ----------
   let libFilter='all';
   {const g=$('lib-grey');try{if(localStorage.getItem('alr-lib-grey')==='0')g.checked=false}catch(e){}
@@ -1551,23 +1571,65 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       let armed=false;mk('Supprimer',async b=>{if(!armed){armed=true;b.textContent=it.uses.length?'Supprimer partout ?':'Confirmer';setTimeout(()=>{armed=false;b.textContent='Supprimer'},4000);return}
         try{await Promise.all(it.docs.map(d=>db.doc('photos/'+d.id).delete()));if(assets)await Promise.all([...new Set(it.docs.map(d=>d.asset).filter(Boolean))].map(a=>assets.delete(a).catch(()=>{})))}catch(e){say($('lib-msg'),'Suppression refusée.','err')}});
       c.append(im,tags,act);
-      c.addEventListener('click',()=>{const on=!c.classList.contains('sel');box.querySelectorAll('.lib-it.sel').forEach(x=>x.classList.remove('sel'));c.classList.toggle('sel',on)});
+      c.dataset.sel='u:'+it.url;
+      c.addEventListener('click',e=>{if(e.target.closest('button'))return;if(selClick(e,'u:'+it.url))return;const on=!c.classList.contains('sel');box.querySelectorAll('.lib-it.sel').forEach(x=>x.classList.remove('sel'));c.classList.toggle('sel',on)});
       libDrag(im,c,it);box.append(c);
     });
   }
   // Place une photo de la photothèque dans un module, à la position voulue (fin par défaut)
-  async function libAdd(it,z,before){
-    const list=phSorted(z,true);let idx=list.length;
+  // Place une ou plusieurs photos de la photothèque dans un module, à la position voulue (fin par défaut)
+  async function libAddMany(items,z,before){
+    const list=phSorted(z,true).filter(p=>!items.some(it=>it.__src===p.id));let idx=list.length;
     if(before){const k=list.findIndex(p=>p.id===before);if(k>=0)idx=k}
-    const free=it.docs.find(d=>zoneOf(d)==='lib'),r=it.ref,id=free?free.id:'ph-'+Date.now().toString(36)+Math.floor(Math.random()*1e4);
-    const data={asset:r.asset||null,url:r.url||r.src,alt:r.alt||'',prise:r.prise||null,tall:z==='bandeau'?!!r.tall:false,actif:true,zone:z,cree:r.cree||new Date().toISOString()};if(r.pos)data.pos=r.pos;
-    const ids=list.map(p=>p.id);ids.splice(idx,0,id);
+    const used=new Set(),news=[];
+    items.forEach((it,n)=>{const free=it.docs.find(d=>zoneOf(d)==='lib'&&!used.has(d.id)),r=it.ref;if(free)used.add(free.id);
+      const id=free?free.id:'ph-'+Date.now().toString(36)+n+Math.floor(Math.random()*1e4);
+      const data={asset:r.asset||null,url:r.url||r.src,alt:r.alt||'',prise:r.prise||null,tall:z==='bandeau'?!!r.tall:false,actif:true,zone:z,fixe:false,cree:r.cree||new Date().toISOString()};if(r.pos)data.pos=r.pos;
+      news.push({id,free:!!free,data})});
+    const ids=list.map(p=>p.id);ids.splice(idx,0,...news.map(x=>x.id));
     try{
-      if(free)await db.doc('photos/'+id).update(Object.assign(data,{ordre:idx+1,fixe:false}));else await db.doc('photos/'+id).set(Object.assign(data,{ordre:idx+1}));
-      await Promise.all(ids.map((x,k)=>{if(x===id)return null;const p=list.find(q=>q.id===x);return p&&p.ordre!==k+1?db.doc('photos/'+x).update({ordre:k+1}):null}));
-      say($(PH_Z[z].msg),'Photo ajoutée.','ok');
-    }catch(e){say($(PH_Z[z].msg),'Ajout refusé ('+errTxt(e)+').','err')}
+      await Promise.all(news.map(x=>{const o=ids.indexOf(x.id)+1;return x.free?db.doc('photos/'+x.id).update(Object.assign(x.data,{ordre:o})):db.doc('photos/'+x.id).set(Object.assign(x.data,{ordre:o}))}));
+      await Promise.all(ids.map((x,k)=>{const p=list.find(q=>q.id===x);return p&&p.ordre!==k+1?db.doc('photos/'+x).update({ordre:k+1}):null}));
+      say($(PH_Z[z].msg),news.length>1?news.length+' photos ajoutées.':'Photo ajoutée.','ok');
+    }catch(e){say($(PH_Z[z].msg),'Ajout refusé ('+errTxt(e)+').','err');throw e}
   }
+  const libAdd=(it,z,before)=>libAddMany([it],z,before).catch(()=>{});
+  // ---------- Sélection multiple (bouton « Sélectionner », ou Cmd/Ctrl/Maj + clic) ----------
+  const phSel=new Set();let selMode=false;   // clés « d:<id> » (photo d'un module) ou « u:<url> » (photothèque)
+  const selDocs=()=>[...phSel].filter(k=>k[0]==='d').map(k=>(photos||[]).find(p=>p.id===k.slice(2))).filter(Boolean)
+    .sort((a,b)=>(['bandeau','apero','spot'].indexOf(zoneOf(a))-['bandeau','apero','spot'].indexOf(zoneOf(b)))||(a.ordre||0)-(b.ordre||0));
+  const selUrls=()=>[...phSel].filter(k=>k[0]==='u').map(k=>k.slice(2));
+  function selPaint(){document.querySelectorAll('[data-sel]').forEach(n=>n.classList.toggle('picked',phSel.has(n.dataset.sel)));
+    const n=phSel.size,bar=$('sel-bar');bar.hidden=!n&&!selMode;$('sel-n').textContent=n?(n>1?n+' photos sélectionnées':'1 photo sélectionnée'):'Touchez les photos à sélectionner';
+    bar.querySelectorAll('[data-to],#sel-ret').forEach(b=>b.disabled=!n);$('sel-ret').hidden=!selDocs().length;
+    document.querySelectorAll('.ph-pick').forEach(b=>{b.setAttribute('aria-pressed',String(selMode));b.textContent=selMode?'Terminer la sélection':'Sélectionner'});
+    $('sec-photos').classList.toggle('selecting',selMode)}
+  function selToggle(k){phSel.has(k)?phSel.delete(k):phSel.add(k);selPaint()}
+  function selClear(){phSel.clear();selPaint()}
+  // Applique une action à la sélection : vers un module (déplace les photos des modules, ajoute celles de la photothèque) ou retour en photothèque
+  async function selApply(t,copy){const docs=selDocs(),urls=selUrls(),all=libItems();
+    try{
+      if(t.lib){for(const d of docs)await phRetire(d)}
+      else{const items=[];docs.forEach(d=>{if(zoneOf(d)===t.z&&!copy)return;const it=all.find(i=>i.url===phSrc(d));if(it)items.push(Object.assign({},it,{__src:copy?null:d.id}))});
+        urls.forEach(u=>{const it=all.find(i=>i.url===u);if(it)items.push(it)});
+        if(items.length)await libAddMany(items,t.z,t.before);
+        if(!copy)for(const d of docs)if(zoneOf(d)!==t.z)await db.doc('photos/'+d.id).delete()}
+      selClear();
+    }catch(e){}
+    renderPhEditor()}
+  document.querySelectorAll('.ph-pick').forEach(b=>b.addEventListener('click',()=>{selMode=!selMode;if(!selMode)phSel.clear();selPaint()}));
+  $('sel-bar').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+    if(b.dataset.to)selApply({z:b.dataset.to});else if(b.id==='sel-ret')selApply({lib:true});else if(b.id==='sel-clear')selClear()});
+  // Clic : sélection (Cmd/Ctrl/Maj ou mode sélection), sinon rien. Renvoie true si le clic a servi à sélectionner.
+  const selClick=(e,k)=>{if(selMode||e.metaKey||e.ctrlKey||e.shiftKey){e.preventDefault();selToggle(k);return true}return false};
+  // ---------- Visionneuse (clic sur une photo en mode « Réorganiser ») ----------
+  let vwList=[],vwI=0;
+  function vwShow(i){vwI=(i+vwList.length)%vwList.length;const p=vwList[vwI];$('vw-img').src=phSrc(p);$('vw-cap').textContent=(vwI+1)+' / '+vwList.length+(p.alt?' · '+p.alt:'')}
+  function vwOpen(z,id){vwList=phSorted(z,true);const k=vwList.findIndex(p=>p.id===id);if(k<0)return;const d=$('vw');vwShow(k);d.showModal?d.showModal():d.setAttribute('open','')}
+  $('vw-prev').addEventListener('click',()=>vwShow(vwI-1));$('vw-next').addEventListener('click',()=>vwShow(vwI+1));$('vw-close').addEventListener('click',()=>$('vw').close());
+  $('vw').addEventListener('click',e=>{if(e.target.id==='vw')$('vw').close()});
+  $('vw').addEventListener('keydown',e=>{if(e.key==='ArrowLeft')vwShow(vwI-1);if(e.key==='ArrowRight')vwShow(vwI+1)});
+  {let tx=null;$('vw').addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});$('vw').addEventListener('touchend',e=>{if(tx===null)return;const d=e.changedTouches[0].clientX-tx;tx=null;if(Math.abs(d)>40)vwShow(vwI+(d<0?1:-1))},{passive:true})}
   // Glisser une vignette de la photothèque vers un module (souris : direct ; doigt : appui long)
   function libDrag(im,c,it){
     let on=false,x=0,y=0,sx=0,sy=0,ghost=null,raf=0,timer=0,tgt=null,mark=null;
@@ -1575,10 +1637,10 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     const locate=()=>{if(ghost)ghost.style.display='none';const t=dropTarget(x,y);if(ghost)ghost.style.display='';tgt=t&&!t.lib?t:null};
     const tick=()=>{if(!on)return;const m=80,H=innerHeight,v=y<m?-16:y>H-m?16:0;if(v){admin.scrollBy(0,v);scrollBy(0,v);locate()}raf=requestAnimationFrame(tick)};
     const follow=()=>{if(ghost)ghost.style.transform='translate('+(x+12)+'px,'+(y+12)+'px) rotate(-2deg)'};
-    const start=()=>{on=phDragging=true;c.classList.add('dragging');ghost=im.cloneNode();ghost.className='ph-ghost';ghost.style.width='140px';document.body.append(ghost);follow();raf=requestAnimationFrame(tick)};
+    const start=()=>{on=phDragging=true;c.classList.add('dragging');ghost=ghostOf(im,140,phSel.has('u:'+it.url)?phSel.size:1);document.body.append(ghost);follow();raf=requestAnimationFrame(tick)};
     const move=(nx,ny)=>{x=nx;y=ny;if(on){follow();locate()}};
     const end=async()=>{clearTimeout(timer);timer=0;if(!on)return;on=false;cancelAnimationFrame(raf);ghost&&ghost.remove();ghost=null;c.classList.remove('dragging');
-      const t=tgt;clear();tgt=null;phDragging=false;if(t)await libAdd(it,t.z,t.before);renderPhEditor()};
+      const t=tgt;clear();tgt=null;phDragging=false;if(t){if(phSel.has('u:'+it.url)&&phSel.size>1)await selApply(t);else await libAdd(it,t.z,t.before)}renderPhEditor()};
     const fromBtn=e=>e.target.closest('button');
     c.addEventListener('mousedown',e=>{if(e.button!==0||fromBtn(e))return;e.preventDefault();sx=x=e.clientX;sy=y=e.clientY;
       const mm=ev=>{if(!on&&Math.hypot(ev.clientX-sx,ev.clientY-sy)>4){x=ev.clientX;y=ev.clientY;start()}move(ev.clientX,ev.clientY)};
@@ -1634,6 +1696,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     g.classList.toggle('compact',on);b.setAttribute('aria-pressed',String(on));b.textContent=on?'Terminer · afficher les options':'Réorganiser les photos';
     if(on)g.querySelectorAll('.ph.framing .ph-grip').forEach(x=>x.click())}));
   // Ordinateur : on attrape la photo et on la glisse. Mobile : appui long sur la photo, puis on glisse (un glissé rapide fait défiler la page).
+  const ghostOf=(im,w,n)=>{const g=document.createElement('div');g.className='ph-ghost';g.style.width=w+'px';const i=im.cloneNode();i.removeAttribute('style');i.className='';g.append(i);
+    if(n>1){const b=document.createElement('b');b.textContent=n;g.append(b)}return g};
   // Cible sous le doigt / la souris : la photothèque, ou un module (avec la position d'insertion)
   const GRID_Z={'ph-list':'bandeau','ap-list':'apero','sp-list':'spot'};
   function dropClear(){document.querySelectorAll('.drop-on').forEach(g=>g.classList.remove('drop-on'));document.querySelectorAll('.ins-b,.ins-a').forEach(n=>n.classList.remove('ins-b','ins-a'))}
@@ -1646,7 +1710,10 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   async function phRetire(p){const others=(photos||[]).filter(q=>q.id!==p.id&&phSrc(q)===phSrc(p));
     if(others.length)await db.doc('photos/'+p.id).delete();else await db.doc('photos/'+p.id).update({zone:'lib',fixe:false})}
   function phDrag(im,c,list,z){
-    let ext=null,copy=false;
+    let ext=null,copy=false,touchTap=false,dragged=0;
+    c.dataset.sel='d:'+c.dataset.id;
+    const tapCard=()=>{if(selMode){selToggle('d:'+c.dataset.id);return}if(list.classList.contains('compact'))vwOpen(z,c.dataset.id)};
+    im.addEventListener('click',e=>{if(c.classList.contains('framing')||Date.now()-dragged<400)return;if(selClick(e,'d:'+c.dataset.id))return;if(list.classList.contains('compact'))vwOpen(z,c.dataset.id)});
     let on=false,x=0,y=0,ghost=null,raf=0,timer=0,sx=0,sy=0;
     const place=()=>{ext=null;const el=document.elementFromPoint(x,y);
       if(!el||!list.contains(el)){ext=dropTarget(x,y,list);c.classList.toggle('leaving',!!ext);return}dropClear();c.classList.remove('leaving');
@@ -1654,13 +1721,15 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       const r=t.getBoundingClientRect(),after=r.width>list.clientWidth*.6?y>r.top+r.height/2:x>r.left+r.width/2;const ref=after?t.nextSibling:t;if(ref===c||ref===c.nextSibling)return;list.insertBefore(c,ref)};
     const tick=()=>{if(!on)return;const m=70,H=innerHeight,v=y<m?-14:y>H-m?14:0;if(v){admin.scrollBy(0,v);scrollBy(0,v);place()}raf=requestAnimationFrame(tick)};
     const start=()=>{on=phDragging=true;c.classList.add('dragging');list.classList.add('sorting');
-      const r=im.getBoundingClientRect();ghost=im.cloneNode();ghost.className='ph-ghost';ghost.style.width=Math.min(r.width,180)+'px';document.body.append(ghost);follow();
+      const r=im.getBoundingClientRect();ghost=ghostOf(im,Math.min(r.width,180),phSel.has('d:'+c.dataset.id)?phSel.size:1);document.body.append(ghost);follow();
       if(navigator.vibrate)try{navigator.vibrate(15)}catch(e){};raf=requestAnimationFrame(tick)};
     const follow=()=>{if(ghost)ghost.style.transform='translate('+(x+12)+'px,'+(y+12)+'px) rotate(-2deg)'};
     const move=(nx,ny)=>{x=nx;y=ny;if(on){follow();place()}};
-    const end=async()=>{clearTimeout(timer);if(!on)return;on=false;cancelAnimationFrame(raf);ghost&&ghost.remove();ghost=null;
+    const end=async(ev)=>{clearTimeout(timer);if(!on)return;on=false;dragged=Date.now();cancelAnimationFrame(raf);ghost&&ghost.remove();ghost=null;
+      if(touchTap&&Math.hypot(x-sx,y-sy)<8){touchTap=false;c.classList.remove('dragging','leaving');list.classList.remove('sorting');phDragging=false;dropClear();tapCard();return}
       c.classList.remove('dragging','leaving');list.classList.remove('sorting');dropClear();
       const p0=(photos||[]).find(q=>q.id===c.dataset.id);
+      if(ext&&p0&&phSel.has('d:'+p0.id)&&phSel.size>1){const t=ext;ext=null;phDragging=false;await selApply(t,copy);return}
       if(ext&&p0){const t=ext;ext=null;phDragging=false;
         try{if(t.lib)await phRetire(p0);else{const it=libItems().find(i=>i.url===phSrc(p0));if(it){await libAdd(it,t.z,t.before);if(!copy)await db.doc('photos/'+p0.id).delete()}}}catch(err){say($(PH_Z[z].msg),'Action refusée ('+errTxt(err)+').','err')}
         renderPhEditor();return}
@@ -1675,9 +1744,9 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       const mu=()=>{removeEventListener('mousemove',mm);removeEventListener('mouseup',mu);end()};
       addEventListener('mousemove',mm);addEventListener('mouseup',mu)});
     // doigt
-    im.addEventListener('touchstart',e=>{if(framing()||e.touches.length>1)return;const t=e.touches[0];sx=x=t.clientX;sy=y=t.clientY;clearTimeout(timer);if(list.classList.contains('compact'))start();else timer=setTimeout(start,280)},{passive:true});
+    im.addEventListener('touchstart',e=>{if(framing()||e.touches.length>1)return;const t=e.touches[0];sx=x=t.clientX;sy=y=t.clientY;clearTimeout(timer);touchTap=false;if(list.classList.contains('compact')||selMode){touchTap=true;start()}else timer=setTimeout(start,280)},{passive:true});
     im.addEventListener('touchmove',e=>{const t=e.touches[0];if(on){e.preventDefault();move(t.clientX,t.clientY)}else if(Math.hypot(t.clientX-sx,t.clientY-sy)>8)clearTimeout(timer)},{passive:false});
-    im.addEventListener('touchend',()=>{end();timer=0});im.addEventListener('touchcancel',end);
+    im.addEventListener('touchend',e=>{if(touchTap)e.preventDefault();end();timer=0});im.addEventListener('touchcancel',end);
     im.addEventListener('contextmenu',e=>{if(on||timer)e.preventDefault()});
   }
   function renderPhZone(z){
