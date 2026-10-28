@@ -142,17 +142,25 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 /* Apéro */
 .apero{display:grid;gap:40px;align-items:center}
 @media (min-width:960px){.apero{grid-template-columns:1.35fr 1fr;gap:72px}}
-.ap-car{position:relative;aspect-ratio:4/3;border-radius:0;overflow:hidden;background:var(--tint);margin-left:calc(-1 * max(20px,env(safe-area-inset-left,0px)));margin-right:calc(-1 * max(20px,env(safe-area-inset-right,0px)))}
-@media (min-width:800px){.ap-car{margin-right:0;border-radius:0 4px 4px 0;margin-left:calc(-1 * max(48px,env(safe-area-inset-left,0px),(100vw - 1320px)/2 + 48px))}}
-.ap-car img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.2s ease}
-.ap-car img.on{opacity:1}
-.ap-nav{position:absolute;left:0;right:0;bottom:12px;display:flex;justify-content:center;align-items:center;gap:8px;z-index:2}
-.ap-nav button.dot{width:8px;height:8px;padding:0;border:0;border-radius:50%;background:rgba(255,255,255,.55);cursor:pointer}
-.ap-nav button.dot[aria-current="true"]{background:#fff;width:22px;border-radius:4px}
-.ap-arr{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:40px;height:40px;border-radius:50%;border:0;background:rgba(0,0,0,.28);color:#fff;font-size:18px;cursor:pointer;opacity:0;transition:opacity .2s;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
-.ap-car:hover .ap-arr,.ap-arr:focus-visible{opacity:1}
-@media (hover:none){.ap-arr{opacity:.85}}
-.ap-arr.prev{left:12px}.ap-arr.next{right:12px}
+.ap-fig{--bleed:max(20px,env(safe-area-inset-left,0px));margin-left:calc(-1 * var(--bleed));margin-right:calc(-1 * max(20px,env(safe-area-inset-right,0px)))}
+@media (min-width:800px){.ap-fig{--bleed:max(48px,env(safe-area-inset-left,0px),(100vw - 1320px)/2 + 48px);margin-right:0}}
+.ap-car{position:relative;aspect-ratio:4/3;overflow:hidden;background:var(--tint)}
+.ap-car img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transform:scale(1.06);transition:opacity 1.4s ease,transform 7s ease-out}
+.ap-car img.on{opacity:1;transform:scale(1)}
+.ap-bar{display:flex;align-items:center;gap:20px;padding:18px 0 0 var(--bleed)}
+@media (max-width:799px){.ap-bar{padding-right:max(20px,env(safe-area-inset-right,0px))}}
+.ap-num{font:500 12px/1 var(--mono);letter-spacing:.08em;color:var(--fg);white-space:nowrap}
+.ap-num span{color:var(--muted)}
+.ap-prog{flex:1;display:flex;gap:6px}
+.ap-prog button{flex:1;height:14px;padding:0;border:0;background:none;cursor:pointer;position:relative}
+.ap-prog button::before,.ap-prog button::after{content:"";position:absolute;left:0;right:0;top:6px;height:2px;background:var(--line)}
+.ap-prog button::after{background:var(--fg);transform:scaleX(0);transform-origin:left}
+.ap-prog button.done::after{transform:scaleX(1)}
+.ap-prog button[aria-current="true"]::after{animation:apfill 5s linear forwards}
+.ap-fig.paused .ap-prog button[aria-current="true"]::after{animation-play-state:paused}
+@keyframes apfill{to{transform:scaleX(1)}}
+@media (prefers-reduced-motion:reduce){.ap-car img{transition:opacity .4s;transform:none}.ap-prog button[aria-current="true"]::after{animation:none;transform:scaleX(1)}}
+.ap-bar .arrow{flex:none}
 .ph.off img{opacity:.35;filter:grayscale(1)}
 .apero h2{font-size:clamp(44px,6.4vw,96px);line-height:.95}
 .dl{display:grid;margin:40px 0 36px;border-top:1px solid var(--line)}
@@ -425,8 +433,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=24"></script>
-<script src="js/backend.js?v=24"></script>
+<script src="js/config.js?v=25"></script>
+<script src="js/backend.js?v=25"></script>
 </head>
 <body>
 
@@ -508,7 +516,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 
 <section id="apero" style="padding-top:0"><div class="wrap">
   <div class="apero">
-    <div class="ap-car" id="ap-car" aria-roledescription="carrousel" aria-label="Photos des Apéros Pumpfoil"><img class="on" src="media/briefing.jpg" alt="Riders réunis sur le ponton avant la session"></div>
+    <div class="ap-fig" id="ap-fig"><div class="ap-car" id="ap-car" aria-roledescription="carrousel" aria-label="Photos des Apéros Pumpfoil"><img class="on" src="media/briefing.jpg" alt="Riders réunis sur le ponton avant la session"></div><div class="ap-bar" id="ap-bar" hidden></div></div>
     <div>
       <p class="label" style="margin-bottom:24px">Le rendez-vous</p>
       <h2>Apéro Pumpfoil</h2>
@@ -837,7 +845,9 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   // Carrousel de l'Apéro Pumpfoil : fondu toutes les 5 s, pause au survol
   const apCar=$('ap-car');let apI=0,apHover=false,apTimer=null,apSig='';
   function apShow(i){const ims=apCar.querySelectorAll('img');if(!ims.length)return;apI=(i+ims.length)%ims.length;
-    ims.forEach((im,k)=>im.classList.toggle('on',k===apI));apCar.querySelectorAll('.dot').forEach((d,k)=>d.setAttribute('aria-current',k===apI?'true':'false'))}
+    ims.forEach((im,k)=>im.classList.toggle('on',k===apI));
+    $('ap-bar').querySelectorAll('.ap-prog button').forEach((d,k)=>{d.classList.toggle('done',k<apI);d.removeAttribute('aria-current');if(k===apI){void d.offsetWidth;d.setAttribute('aria-current','true')}});
+    const n=$('ap-n');if(n)n.textContent=String(apI+1).padStart(2,'0')}
   // Ordre aléatoire tiré une fois par chargement de page (stable pendant la visite)
   const rnd=new Map(),rk=id=>{if(!rnd.has(id))rnd.set(id,Math.random());return rnd.get(id)};
   const shuffled=z=>phSorted(z).sort((a,b)=>rk(a.id)-rk(b.id));
@@ -847,17 +857,20 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     const sig=list.map(p=>p.id+phSrc(p)+(p.alt||'')).join('|');if(sig===apSig)return;apSig=sig;
     apCar.textContent='';
     list.forEach((p,k)=>{const im=document.createElement('img');im.src=phSrc(p);im.alt=p.alt||'Apéro Pumpfoil au lac de la Terrasse';im.decoding='async';if(p.pos)im.style.objectPosition=p.pos;if(k>0)im.loading='lazy';apCar.append(im)});
+    const bar=$('ap-bar');bar.textContent='';bar.hidden=list.length<2;
     if(list.length>1){
-      const nav=document.createElement('div');nav.className='ap-nav';
-      list.forEach((p,k)=>{const d=document.createElement('button');d.type='button';d.className='dot';d.setAttribute('aria-label','Photo '+(k+1));d.addEventListener('click',()=>{apShow(k);apRestart()});nav.append(d)});
-      const mk=(c,t,l,f)=>{const b=document.createElement('button');b.type='button';b.className='ap-arr '+c;b.textContent=t;b.setAttribute('aria-label',l);b.addEventListener('click',()=>{apShow(apI+f);apRestart()});return b};
-      apCar.append(nav,mk('prev','←','Photo précédente',-1),mk('next','→','Photo suivante',1));
+      const num=document.createElement('div');num.className='ap-num';num.innerHTML='<b id="ap-n" style="font-weight:500">01</b> <span>/ '+String(list.length).padStart(2,'0')+'</span>';
+      const prog=document.createElement('div');prog.className='ap-prog';
+      list.forEach((p,k)=>{const d=document.createElement('button');d.type='button';d.setAttribute('aria-label','Photo '+(k+1));d.addEventListener('click',()=>{apShow(k);apRestart()});prog.append(d)});
+      const mk=(t,l,f)=>{const b=document.createElement('button');b.type='button';b.className='arrow';b.textContent=t;b.setAttribute('aria-label',l);b.addEventListener('click',()=>{apShow(apI+f);apRestart()});return b};
+      const ar=document.createElement('div');ar.className='arrows';ar.append(mk('←','Photo précédente',-1),mk('→','Photo suivante',1));
+      bar.append(num,prog,ar);
     }
     apShow(0);apRestart();
   }
   function apRestart(){clearInterval(apTimer);if(apCar.querySelectorAll('img').length<2||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
     apTimer=setInterval(()=>{if(!apHover&&!document.hidden)apShow(apI+1)},5000)}
-  apCar.addEventListener('mouseenter',()=>{apHover=true});apCar.addEventListener('mouseleave',()=>{apHover=false});
+  const apFig=$('ap-fig');apFig.addEventListener('mouseenter',()=>{apHover=true;apFig.classList.add('paused')});apFig.addEventListener('mouseleave',()=>{apHover=false;apFig.classList.remove('paused')});
   let apX=null;apCar.addEventListener('touchstart',e=>{apX=e.touches[0].clientX},{passive:true});
   apCar.addEventListener('touchend',e=>{if(apX===null)return;const d=e.changedTouches[0].clientX-apX;apX=null;if(Math.abs(d)>40){apShow(apI+(d<0?1:-1));apRestart()}},{passive:true});
   function renderStrip(){
