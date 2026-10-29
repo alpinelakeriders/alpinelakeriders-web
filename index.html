@@ -173,12 +173,12 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .dl dt,.dl dd{margin:0}
 
 /* Comptes rendus (public) */
-.cr-art{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.7fr);gap:clamp(24px,4vw,64px);align-items:start;padding-block:36px;border-top:1px solid var(--fg)}
+.cr-art{display:grid;grid-template-columns:minmax(0,.78fr) minmax(0,2.22fr);gap:clamp(24px,3.4vw,52px);align-items:start;padding-block:36px;border-top:1px solid var(--fg)}
 .cr-art+.cr-art{border-top-color:var(--line)}
 .cr-txt{display:grid;gap:14px;align-content:start}
 .cr-txt h3{font-size:clamp(26px,2.6vw,36px);line-height:1.05;letter-spacing:-.03em}
 .cr-recit{color:var(--muted);white-space:pre-line;max-width:46ch}
-.cr-th{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px;max-width:420px}
+.cr-th{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px;max-width:340px}
 .cr-th button{position:relative;padding:0;border:0;aspect-ratio:1;border-radius:2px;overflow:hidden;background:var(--tint);cursor:pointer;opacity:.62;transition:opacity .25s}
 .cr-th button:hover,.cr-th button[aria-current]{opacity:1}
 .cr-th button[aria-current]::after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 2px var(--fg)}
@@ -198,9 +198,28 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .cr-bar{position:absolute;left:0;right:0;top:0;height:2px;z-index:2;background:rgba(255,255,255,.25)}
 .cr-bar i{display:block;height:100%;background:#fff;transition:width .4s}
 @media (prefers-reduced-motion:reduce){.cr-car .sl{transition:opacity .3s}}
-@media (max-width:799px){.cr-art{grid-template-columns:minmax(0,1fr)}.cr-art{gap:12px}.cr-th{order:4;grid-template-columns:repeat(8,1fr);max-width:none;gap:4px;margin-top:0}.cr-txt{display:contents}.cr-art>.cr-car{order:3;margin-top:8px}.cr-txt>.label{order:0}.cr-txt>h3{order:1}.cr-recit{order:2}.cr-car{margin-inline:calc(-1 * var(--gut,20px));border-radius:0}.cr-car{aspect-ratio:4/3}}
+@media (max-width:799px){.cr-art{grid-template-columns:minmax(0,1fr)}.cr-art{gap:12px}.cr-th{order:4;grid-template-columns:repeat(9,1fr);max-width:none;gap:4px;margin-top:0}.cr-txt{display:contents}.cr-art>.cr-car{order:3;margin-top:8px}.cr-txt>.label{order:0}.cr-txt>h3{order:1}.cr-recit{order:2}.cr-soc{order:5}.cr-car{margin-inline:calc(-1 * var(--gut,20px));border-radius:0}.cr-car{aspect-ratio:4/3}}
 .ag-cr{display:inline-block;margin-top:8px;font-size:14px;color:var(--lake);text-decoration:none}
 .ag-cr:hover{text-decoration:underline}
+.cr-car .sl .fg{cursor:zoom-in}
+.cr-soc{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:6px}
+.cr-soc .chip{height:36px}
+.cr-like[aria-pressed="true"]{background:var(--fg);color:var(--bg);box-shadow:none}
+.cr-like b{font-weight:600;font-variant-numeric:tabular-nums}
+.cr-soc .msg{flex-basis:100%;font-size:13px;color:var(--muted);min-height:0}
+.cr-soc .msg:empty{display:none}
+/* Visionneuse plein écran (public) */
+.fsv{border:0;padding:0;margin:0;background:#000;color:#fff;width:100vw;height:100dvh;max-width:100vw;max-height:100dvh;overflow:hidden;inset:0}
+.fsv[open]{display:block}
+.fsv::backdrop{background:#000}
+.fsv-track{position:absolute;inset:0;display:grid;place-items:center;touch-action:none}
+.fsv-track img{max-width:100%;max-height:100%;object-fit:contain;user-select:none;-webkit-user-drag:none;will-change:transform}
+.fsv-cap{position:absolute;left:0;right:0;bottom:calc(14px + env(safe-area-inset-bottom,0px));margin:0;text-align:center;font:500 12px var(--mono);letter-spacing:.06em;color:rgba(255,255,255,.75);pointer-events:none}
+.fsv-b{position:absolute;z-index:2;width:48px;height:48px;border-radius:50%;border:0;background:rgba(255,255,255,.14);color:#fff;font-size:20px;cursor:pointer}
+.fsv-b:hover{background:rgba(255,255,255,.26)}
+.fsv-p{left:16px;top:50%;transform:translateY(-50%)}.fsv-n{right:16px;top:50%;transform:translateY(-50%)}
+.fsv-x{right:max(14px,env(safe-area-inset-right,0px));top:calc(14px + env(safe-area-inset-top,0px))}
+@media (hover:none){.fsv-p,.fsv-n{display:none}}
 /* Comptes rendus (admin) */
 .cr-select{font:400 16px var(--sans);color:var(--fg);background:var(--bg);border:1px solid var(--field,var(--line));border-radius:8px;padding:10px 12px;width:100%;max-width:560px}
 #cr-ed{display:grid;gap:18px;margin-top:18px}
@@ -226,6 +245,33 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .cr-state{font:600 11px/1 var(--mono);text-transform:uppercase;letter-spacing:.04em;padding:7px 10px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--line);color:var(--muted)}
 .cr-state.on{background:var(--lake);color:#fff;box-shadow:none}
 #cr-list:empty{display:none}
+.cr-dict{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:8px}
+#cr-mic[aria-pressed="true"]{background:#c2410c;color:#fff;box-shadow:none}
+.cr-ig{border:1px solid var(--line);border-radius:10px}
+.cr-ig summary{cursor:pointer;padding:14px 16px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;list-style:none}
+.cr-ig summary::-webkit-details-marker{display:none}
+.cr-ig summary span{font-weight:600}
+.cr-ig summary span::before{content:"▸ ";color:var(--muted)}
+.cr-ig[open] summary span::before{content:"▾ "}
+.cr-ig summary small{color:var(--muted);font-size:13px}
+.cr-ig-body{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:22px;padding:0 16px 16px}
+@media (max-width:760px){.cr-ig-body{grid-template-columns:minmax(0,1fr)}}
+.cr-ig-pick{display:grid;gap:14px;align-content:start;min-width:0}
+.cr-ig-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:6px}
+.cr-ig-grid button{position:relative;padding:0;border:0;aspect-ratio:1;border-radius:4px;overflow:hidden;cursor:pointer;background:var(--tint);opacity:.55}
+.cr-ig-grid button img{width:100%;height:100%;object-fit:cover;display:block}
+.cr-ig-grid button.on{opacity:1;box-shadow:0 0 0 2px var(--lake)}
+.cr-ig-grid button i{position:absolute;top:4px;left:4px;min-width:20px;height:20px;border-radius:999px;background:var(--lake);color:#fff;font:700 11px/20px var(--sans);font-style:normal;text-align:center}
+.cr-ig-mock{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--bg);align-self:start;font-size:13px}
+.igm-h{display:flex;gap:8px;align-items:center;padding:10px 12px}
+.igm-h img{width:30px;height:30px;border-radius:50%;object-fit:contain;background:#fff;box-shadow:0 0 0 1px var(--line);padding:3px}
+.igm-ph{position:relative;aspect-ratio:4/5;background:var(--tint);overflow:hidden}
+.igm-ph img{width:100%;height:100%;object-fit:cover;display:block}
+.igm-ph span{position:absolute;right:8px;top:8px;background:rgba(0,0,0,.6);color:#fff;font:600 11px var(--sans);padding:3px 8px;border-radius:999px}
+.igm-dots{display:flex;justify-content:center;gap:4px;padding:8px 0 2px}
+.igm-dots i{width:6px;height:6px;border-radius:50%;background:var(--line)}
+.igm-dots i:first-child{background:#3897f0}
+.igm-cap{margin:0;padding:6px 12px 12px;white-space:pre-line;max-height:220px;overflow:auto;color:var(--fg)}
 
 /* Spot */
 .spot{position:relative;height:clamp(460px,62vw,820px);color:#fff;overflow:hidden;padding:0}
@@ -618,8 +664,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=46"></script>
-<script src="js/backend.js?v=46"></script>
+<script src="js/config.js?v=47"></script>
+<script src="js/backend.js?v=47"></script>
 </head>
 <body>
 
@@ -679,6 +725,9 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   <details class="past" id="cr-old-wrap" hidden><summary class="label">Comptes rendus précédents</summary><div id="cr-old"></div></details>
 </div></section>
 
+<dialog class="fsv" id="fsv" aria-label="Photos en plein écran"><div class="fsv-track" id="fsv-track"><img id="fsv-img" alt=""></div>
+  <p class="fsv-cap" id="fsv-cap"></p>
+  <button type="button" class="fsv-b fsv-p" id="fsv-prev" aria-label="Photo précédente">←</button><button type="button" class="fsv-b fsv-n" id="fsv-next" aria-label="Photo suivante">→</button><button type="button" class="fsv-b fsv-x" id="fsv-close" aria-label="Fermer">✕</button></dialog>
 <section id="programme" style="padding-top:0"><div class="wrap">
   <div class="head"><h2>Au programme</h2><span class="label">Sans vent, sans moteur</span></div>
   <div class="trio">
@@ -714,8 +763,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       <dl class="dl">
         <div><dt class="label">Ride</dt><dd data-k="ride">17h – 20h au ponton</dd></div>
         <div><dt class="label">Apéro</dt><dd data-k="apero">20h – 22h au snack du lac</dd></div>
-        <div><dt class="label">Dernier</dt><dd data-k="dernier">5e édition, jeudi 24 septembre 2026</dd></div>
-        <div><dt class="label">Prochain</dt><dd data-k="prochain">Date annoncée sur le groupe WhatsApp</dd></div>
+        <div id="ap-last-row"><dt class="label">Dernier</dt><dd id="ap-last">Jeudi 24 septembre 2026</dd></div>
+        <div id="ap-next-row" hidden><dt class="label">Prochain</dt><dd id="ap-next"></dd></div>
       </dl>
       <a class="pill ink" href="https://chat.whatsapp.com/D0wUPuh0QP87qtSMwNR3xT" target="_blank" rel="noopener">Rejoindre le groupe WhatsApp</a>
     </div>
@@ -888,7 +937,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       <label class="f"><span class="label">Sortie</span><select id="cr-sel" class="cr-select"></select></label>
       <div id="cr-ed" hidden>
         <div class="cr-info" id="cr-info"></div>
-        <label class="f"><span class="label">Récit de la sortie (facultatif)</span><textarea id="cr-txt" rows="5" placeholder="Conditions, ambiance, progrès de chacun, l'apéro…"></textarea></label>
+        <div class="f"><label class="label" for="cr-txt">Récit de la sortie (facultatif)</label><textarea id="cr-txt" rows="5" placeholder="Conditions, ambiance, progrès de chacun, l'apéro…"></textarea>
+          <div class="cr-dict"><button type="button" class="pill line small" id="cr-mic" aria-pressed="false">🎤 Dicter le texte</button><span class="msg" id="cr-mic-msg" role="status"></span></div></div>
         <div class="drop" id="cr-drop">
           <label class="check"><input type="checkbox" id="cr-auto" checked> Retouche automatique des couleurs sur chaque photo (même outil que le bandeau)</label>
           <div class="bar" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><label class="pill ink small" style="cursor:pointer">Déposer les photos en vrac<input type="file" id="cr-file" accept="image/*,.heic,.heif" multiple hidden></label><span class="msg" id="cr-msg" role="status">ou glissez-les toutes ici, sans trier</span></div>
@@ -902,6 +952,17 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
         </div>
         <div class="ph-tools"><p class="label" style="margin:0">Photos du compte rendu <span id="cr-count"></span></p><div class="ph-arr" data-grid="cr-list"><button type="button" class="pill line small" data-o="chrono">Chronologique</button><button type="button" class="pill line small" data-o="smart">✦ Ordre intelligent</button><button type="button" class="pill line small" data-o="rnd">Mélanger</button><button type="button" class="pill line small ph-undo" data-o="undo" hidden>Annuler</button><span class="msg" role="status"></span></div><span class="ph-tools-r"><button type="button" class="pill line small ph-sort" data-grid="cr-list" aria-pressed="false">Réorganiser les photos</button></span></div>
         <div class="ph-grid" id="cr-list"></div>
+        <details class="cr-ig" id="cr-ig">
+          <summary><span>Post Instagram</span><small>3 meilleures photos présélectionnées, légende prête à copier</small></summary>
+          <div class="cr-ig-body">
+            <div class="cr-ig-pick"><p class="adm-intro" style="margin:0">Touchez les photos dans l'ordre voulu (10 au plus). Les numéros donnent l'ordre du carrousel Instagram.</p>
+              <div class="cr-ig-grid" id="cr-ig-grid"></div>
+              <div class="ph-mode" id="cr-ig-fmt"><button type="button" data-r="1.25" aria-pressed="true">Portrait 4:5</button><button type="button" data-r="1" aria-pressed="false">Carré 1:1</button></div>
+              <label class="f"><span class="label">Légende</span><textarea id="cr-ig-cap" rows="10"></textarea></label>
+              <div class="bar" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button type="button" class="pill line small" id="cr-ig-gen">Proposer une autre légende</button><button type="button" class="pill line small" id="cr-ig-copy">Copier la légende</button><button type="button" class="pill ink small" id="cr-ig-dl">Télécharger les images</button><button type="button" class="pill ink small" id="cr-ig-share" hidden>Envoyer vers Instagram</button><span class="msg" id="cr-ig-msg" role="status"></span></div></div>
+            <div class="cr-ig-mock" aria-label="Aperçu du post"><div class="igm-h"><img src="media/logo-alr-noir.svg" alt=""><b>alpinelakeriders</b></div><div class="igm-ph" id="cr-ig-ph"></div><div class="igm-dots" id="cr-ig-dots"></div><p class="igm-cap" id="cr-ig-prev"></p></div>
+          </div>
+        </details>
         <div class="cr-pub-bar"><span class="cr-state" id="cr-state"></span><button type="button" class="pill line small" id="cr-save">Enregistrer le récit</button><button type="button" class="pill ink small" id="cr-go">Valider et publier</button><button type="button" class="pill line small" id="cr-off" hidden>Retirer du site</button><span class="msg" id="cr-pmsg" role="status"></span></div>
       </div>
     </section>
@@ -970,8 +1031,9 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
         <label class="f"><span class="label">Apéros organisés</span><input id="t-nbAperos"></label>
         <label class="f"><span class="label">Apéro : horaires ride</span><input id="t-ride"></label>
         <label class="f"><span class="label">Apéro : horaires apéro</span><input id="t-apero"></label>
-        <label class="f"><span class="label">Dernier apéro</span><input id="t-dernier"></label>
-        <label class="f"><span class="label">Prochain apéro</span><input id="t-prochain"></label>
+        <label class="f" hidden><span class="label">Dernier apéro</span><input id="t-dernier"></label>
+        <label class="f" hidden><span class="label">Prochain apéro</span><input id="t-prochain"></label>
+        <p class="full hint" style="margin:0">« Dernier » et « Prochain » (bloc Apéro Pumpfoil) se remplissent tout seuls d'après l'agenda.</p>
         <p class="full adm-sub">Le spot et les tarifs</p>
         <label class="f full"><span class="label">Texte du spot</span><textarea id="t-spot"></textarea></label>
         <label class="f"><span class="label">Tarif Rider</span><input id="t-prixRider"></label>
@@ -1435,6 +1497,10 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     if(!next.length){const e=document.createElement('div');e.className='ag-empty';e.textContent='Pas de sortie programmée pour l\'instant. Les prochaines dates sont annoncées sur le groupe WhatsApp.';n.append(e)}
     next.forEach((s,i)=>n.append(row(s,i===0,true)));
     const p=$('ag-past');p.textContent='';past.slice(0,6).forEach(s=>p.append(row(s,false,false)));
+    // Bloc Apéro Pumpfoil : dernier = dernière sortie passée, prochain = prochaine sortie prévue (rien s'il n'y en a pas)
+    {const fmt=s=>{const d=new Date((s.date||'')+'T12:00:00');if(isNaN(d))return s.titre||'';const t=d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});return t.charAt(0).toUpperCase()+t.slice(1)+(s.titre?' · '+s.titre:'')};
+     if(past[0])$('ap-last').textContent=fmt(past[0]);$('ap-last-row').hidden=!past[0]&&!$('ap-last').textContent;
+     $('ap-next').textContent=next[0]?fmt(next[0]):'';$('ap-next-row').hidden=!next[0]}
     $('ag-past-wrap').hidden=!past.length;
     if(focusId&&!focusDone&&sorties.length){const el=document.getElementById('s-'+focusId);if(el){focusDone=true;setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'center'}),300)}}
   }
@@ -2265,7 +2331,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     $('cr').hidden=!L.length;crCars.forEach(c=>c());crCars=[];
     const pub=$('cr-pub'),old=$('cr-old');pub.textContent='';old.textContent='';
     L.forEach((x,i)=>(i<2?pub:old).append(crArticle(x.s,x.ph)));
-    $('cr-old-wrap').hidden=L.length<3;
+    $('cr-old-wrap').hidden=L.length<3;crDoFocus();
   }
   function crArticle(s,ph){
     const a=document.createElement('article');a.className='cr-art';a.id='cr-'+s.id;
@@ -2274,17 +2340,19 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     const h=document.createElement('h3');h.textContent=s.titre||'Sortie';t.append(lb,h);
     if(s.crTexte){const p=document.createElement('p');p.className='cr-recit';p.textContent=s.crTexte;t.append(p)}
     // Planche-contact : un aperçu des photos, un clic affiche la photo dans le carrousel
-    const th=document.createElement('div');th.className='cr-th';const TH=ph.length>8?7:8;
+    const th=document.createElement('div');th.className='cr-th';const TH=ph.length>9?8:9;
     ph.slice(0,TH).forEach((p,k)=>{const b=document.createElement('button');b.type='button';b.setAttribute('aria-label','Voir la photo '+(k+1));const im=document.createElement('img');im.src=phSrc(p);im.alt='';im.loading='lazy';im.decoding='async';b.append(im);
       b.addEventListener('click',()=>{show(k);restart()});th.append(b)});
     if(ph.length>TH){const b=document.createElement('button');b.type='button';b.className='more';b.textContent='+'+(ph.length-TH);b.setAttribute('aria-label','Photos suivantes');b.addEventListener('click',()=>{show(TH);restart()});th.append(b)}
     if(ph.length>1)t.append(th);
+    t.append(crSocial(s,ph));
     const fig=document.createElement('figure');fig.className='cr-car';fig.setAttribute('aria-roledescription','carrousel');fig.setAttribute('aria-label','Photos de la sortie : '+(s.titre||''));
     const alt0=(s.titre||'Sortie')+' · '+crDateLong(s.date);
     const sls=ph.map(p=>{const sl=document.createElement('div');sl.className='sl'+(p.tall?' tall':'');const u=phSrc(p);
       if(p.tall){const bg=document.createElement('img');bg.className='bg';bg.alt='';bg.setAttribute('aria-hidden','true');bg.dataset.src=u;sl.append(bg)}
       const im=document.createElement('img');im.className='fg';im.alt=p.alt||alt0;im.decoding='async';im.dataset.src=u;if(p.pos&&!p.tall)im.style.objectPosition=p.pos;
       im.addEventListener('error',()=>sl.classList.add('bad'));sl.append(im);fig.append(sl);return sl});
+    fig.addEventListener('click',e=>{if(e.target.closest('.cr-ctl'))return;fsvOpen(ph.map(p=>({url:phSrc(p),alt:p.alt||alt0})),i,(s.titre||'Sortie'))});
     const bar=document.createElement('div');bar.className='cr-bar';const bi=document.createElement('i');bar.append(bi);
     const ctl=document.createElement('div');ctl.className='cr-ctl';
     const mkA=(txt,lab)=>{const b=document.createElement('button');b.type='button';b.className='arrow';b.textContent=txt;b.setAttribute('aria-label',lab);return b};
@@ -2311,6 +2379,53 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   document.addEventListener('click',e=>{const l=e.target.closest('a.ag-cr');if(!l)return;const el=document.getElementById(l.getAttribute('href').slice(1));
     if(el&&$('cr-old').contains(el))$('cr-old-wrap').open=true});
 
+  // J'aime + partage. Le visiteur est un identifiant aléatoire gardé dans son navigateur (aucune donnée personnelle).
+  const crVid=()=>{try{let v=localStorage.getItem('alr-vid');if(!v){v=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2)).replace(/-/g,'');localStorage.setItem('alr-vid',v)}return v}catch(e){return ''}};
+  const crLiked=()=>{try{return JSON.parse(localStorage.getItem('alr-likes')||'[]')||[]}catch(e){return []}};
+  const crUrl=s=>location.origin+'/?cr='+encodeURIComponent(s.id);
+  function crSocial(s,ph){
+    const w=document.createElement('div');w.className='cr-soc';
+    const msg=document.createElement('span');msg.className='msg';msg.setAttribute('role','status');
+    const mk=(t,lab)=>{const b=document.createElement('button');b.type='button';b.className='chip';b.textContent=t;if(lab)b.setAttribute('aria-label',lab);w.append(b);return b};
+    const like=mk('');like.classList.add('cr-like');let n=+s.crJaime||0,on=crLiked().includes(s.id);
+    const paint=()=>{like.textContent='';like.append('👍 J\'aime ');const b=document.createElement('b');b.textContent=n?String(n):'';like.append(b);like.setAttribute('aria-pressed',String(on));like.setAttribute('aria-label',"J'aime"+(n?' ('+n+')':''))};paint();
+    like.addEventListener('click',async()=>{const v=crVid();if(!v||!db||!db.like){msg.textContent='Impossible pour le moment.';return}
+      const want=!on;on=want;n=Math.max(0,n+(want?1:-1));paint();like.disabled=true;
+      try{n=await db.like(s.id,v,want);let L=crLiked().filter(x=>x!==s.id);if(want)L.push(s.id);try{localStorage.setItem('alr-likes',JSON.stringify(L))}catch(e){}}
+      catch(e){on=!want;n=Math.max(0,n+(want?-1:1));msg.textContent='Impossible pour le moment, réessayez plus tard.'}
+      like.disabled=false;paint()});
+    const txt=(s.titre||'Sortie')+' · '+crDateLong(s.date)+' : le compte rendu et les photos d\'Alpine Lake Riders';
+    mk('WhatsApp','Partager sur WhatsApp').addEventListener('click',()=>window.open('https://wa.me/?text='+encodeURIComponent(txt+' '+crUrl(s)),'_blank','noopener'));
+    mk('Facebook','Partager sur Facebook').addEventListener('click',()=>window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(crUrl(s)),'_blank','noopener,width=640,height=560'));
+    // Instagram n'a pas de lien de partage web : sur téléphone, on passe par le partage du téléphone avec la photo ; sinon on copie le lien
+    mk('Instagram','Partager sur Instagram').addEventListener('click',async()=>{
+      try{if(navigator.canShare&&ph[0]){const r=await fetch(phSrc(ph[0]));const bl=await r.blob();const f=new File([bl],'alpine-lake-riders.'+(bl.type.includes('webp')?'webp':'jpg'),{type:bl.type||'image/jpeg'});
+        if(navigator.canShare({files:[f]})){try{await navigator.clipboard.writeText(txt+' '+crUrl(s))}catch(e){}await navigator.share({files:[f],title:s.titre||'Alpine Lake Riders',text:txt+' '+crUrl(s)});msg.textContent='Choisissez Instagram dans la liste. Le texte et le lien sont copiés : collez-les en légende.';return}}}
+      catch(e){if(e&&e.name==='AbortError')return}
+      try{await navigator.clipboard.writeText(crUrl(s));msg.textContent='Lien copié : collez-le dans votre story Instagram (sticker « Lien »).'}catch(e){msg.textContent=crUrl(s)}});
+    mk('Copier le lien').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(crUrl(s));msg.textContent='Lien copié.'}catch(e){msg.textContent=crUrl(s)}});
+    w.append(msg);return w}
+  // Visionneuse plein écran : glisser au doigt sur mobile, flèches et boutons sur ordinateur
+  const fsv={list:[],i:0,title:''};
+  function fsvShow(k){const L=fsv.list;if(!L.length)return;fsv.i=(k+L.length)%L.length;const im=$('fsv-img');im.src=L[fsv.i].url;im.alt=L[fsv.i].alt||'';im.style.transform='';
+    $('fsv-cap').textContent=String(fsv.i+1).padStart(2,'0')+' / '+String(L.length).padStart(2,'0')+(fsv.title?'  ·  '+fsv.title:'');
+    [fsv.i+1,fsv.i-1].forEach(j=>{const x=L[(j+L.length)%L.length];if(x){const p=new Image();p.src=x.url}})}
+  function fsvOpen(list,k,title){if(!list.length)return;fsv.list=list;fsv.title=title||'';const d=$('fsv');fsvShow(k);
+    if(!d.open){d.showModal?d.showModal():d.setAttribute('open','');try{if(d.requestFullscreen)d.requestFullscreen().catch(()=>{})}catch(e){}}}
+  function fsvClose(){const d=$('fsv');try{if(document.fullscreenElement)document.exitFullscreen().catch(()=>{})}catch(e){}if(d.open)d.close()}
+  $('fsv-prev').addEventListener('click',()=>fsvShow(fsv.i-1));$('fsv-next').addEventListener('click',()=>fsvShow(fsv.i+1));$('fsv-close').addEventListener('click',fsvClose);
+  $('fsv').addEventListener('keydown',e=>{if(e.key==='ArrowLeft')fsvShow(fsv.i-1);if(e.key==='ArrowRight')fsvShow(fsv.i+1);if(e.key==='Escape'){e.preventDefault();fsvClose()}});
+  $('fsv').addEventListener('click',e=>{if(e.target.id==='fsv-track')fsvClose()});
+  {const tr=$('fsv-track'),im=$('fsv-img');let sx=null,sy=0,dx=0;
+   tr.addEventListener('touchstart',e=>{if(e.touches.length>1){sx=null;return}sx=e.touches[0].clientX;sy=e.touches[0].clientY;dx=0;im.style.transition='none'},{passive:true});
+   tr.addEventListener('touchmove',e=>{if(sx===null)return;dx=e.touches[0].clientX-sx;const dy=e.touches[0].clientY-sy;if(Math.abs(dx)>Math.abs(dy))im.style.transform='translateX('+dx+'px)';else if(dy>0)im.style.transform='translateY('+dy+'px)';e.preventDefault()},{passive:false});
+   tr.addEventListener('touchend',e=>{if(sx===null)return;const dy=e.changedTouches[0].clientY-sy;sx=null;im.style.transition='transform .22s ease';
+     if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)){const dir=dx<0?1:-1;im.style.transform='translateX('+(dir<0?'':'-')+'110%)';setTimeout(()=>{im.style.transition='none';fsvShow(fsv.i+dir)},180)}
+     else if(dy>120&&Math.abs(dy)>Math.abs(dx))fsvClose();else im.style.transform=''})}
+  // Lien partagé « ?cr=ID » : la page s'ouvre sur ce compte rendu
+  const crFocus=(()=>{try{return new URLSearchParams(location.search).get('cr')||''}catch(e){return ''}})();let crFocusDone=false;
+  function crDoFocus(){if(!crFocus||crFocusDone)return;const el=document.getElementById('cr-'+crFocus);if(!el)return;crFocusDone=true;if($('cr-old').contains(el))$('cr-old-wrap').open=true;setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),400)}
+
   // --- Administration ---
   let crId=null,crDirty=false;
   const crPast=()=>{const t=today();return (sorties||[]).filter(s=>s.date&&s.date<=t).sort((a,b)=>b.date.localeCompare(a.date))};
@@ -2335,11 +2450,11 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     const pub=s.crStatut==='publie',st=$('cr-state');st.textContent=pub?'Publié sur le site':'Brouillon · non visible';st.classList.toggle('on',pub);
     $('cr-go').textContent=pub?'Mettre à jour':'Valider et publier';$('cr-off').hidden=!pub;
     const shown=all.filter(p=>p.actif!==false).length;$('cr-count').textContent=all.length?'· '+all.length+(shown<all.length?' ('+shown+' affichées)':''):'';
-    renderPhZone(z);
+    renderPhZone(z);try{renderIg()}catch(e){}
   }
   $('cr-sel').addEventListener('change',e=>{if(crTri.busy){e.target.value=crId;return}crId=e.target.value;crDirty=false;crTriReset();renderCr()});
-  $('cr-txt').addEventListener('input',()=>{crDirty=true});
-  async function crSave(extra,okTxt){const m=$('cr-pmsg');if(!crId)return;
+  $('cr-txt').addEventListener('input',()=>{crDirty=true;try{igCaption(false)}catch(e){}});
+  async function crSave(extra,okTxt){const m=$('cr-pmsg');if(!crId)return;try{igCaption(false)}catch(e){}
     try{await db.doc('sorties/'+crId).update(Object.assign({crTexte:$('cr-txt').value.trim()},extra||{}));crDirty=false;say(m,okTxt,'ok')}catch(e){say(m,'Enregistrement refusé ('+errTxt(e)+').','err')}}
   $('cr-save').addEventListener('click',()=>crSave(null,'Récit enregistré.'));
   $('cr-go').addEventListener('click',()=>{const n=phSorted('cr:'+crId).length;if(!n){say($('cr-pmsg'),'Ajoutez au moins une photo affichée avant de publier.','err');return}
@@ -2441,7 +2556,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       try{const bmp=await decode(x.f);const cv=draw(bmp,2000,$('cr-auto').checked?{auto:true}:null);if(bmp.close)bmp.close();
         const {blob,tall}=await encode(cv);const res=await assets.upload(blob,{type:blob.type});
         const id='ph-'+Date.now().toString(36)+Math.floor(Math.random()*1e4);
-        await db.doc('photos/'+id).set(Object.assign({asset:res.id,url:res.url,alt,tall,ordre:++base,actif:true,zone:z,bib:'cr',fixe:false,cree:new Date().toISOString()},x.m.prise?{prise:x.m.prise}:{}));
+        await db.doc('photos/'+id).set(Object.assign({asset:res.id,url:res.url,alt,tall,ordre:++base,actif:true,zone:z,bib:'cr',fixe:false,score:Math.round((x.score||0)*100)/100,cree:new Date().toISOString()},x.m.prise?{prise:x.m.prise}:{}));
         x.done=true;ok++}catch(e){ko++;x.err=errTxt(e)}
       x.up=false;crPaint()}
     crTri.busy=false;crPaint();
@@ -2451,6 +2566,73 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   $('cr-file').addEventListener('change',e=>{crIngest(e.target.files);e.target.value=''});
   {const drop=$('cr-drop');['dragenter','dragover'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.add('over')}));
    ['dragleave','drop'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.remove('over')}));drop.addEventListener('drop',e=>crIngest(e.dataTransfer.files))}
+
+  // --- Dictée vocale du récit (reconnaissance vocale du navigateur, en français) ---
+  {const SR=window.SpeechRecognition||window.webkitSpeechRecognition,b=$('cr-mic'),m=$('cr-mic-msg'),ta=$('cr-txt');let rec=null,on=false,base='';
+   const stop=()=>{on=false;b.setAttribute('aria-pressed','false');b.textContent='🎤 Dicter le texte';try{rec&&rec.stop()}catch(e){}};
+   b.addEventListener('click',()=>{
+     if(!SR){say(m,'Dictée indisponible dans ce navigateur : utilisez Chrome ou Safari, ou le micro du clavier de votre téléphone.','err');return}
+     if(on){stop();return}
+     rec=new SR();rec.lang='fr-FR';rec.continuous=true;rec.interimResults=true;
+     base=ta.value.trim();let fin='';
+     rec.onresult=e=>{let tmp='';for(let i=e.resultIndex;i<e.results.length;i++){const t=e.results[i][0].transcript;if(e.results[i].isFinal)fin+=t.trim()+' ';else tmp+=t}
+       const txt=(fin+tmp).trim();ta.value=(base?base+(/[.!?]$/.test(base)?' ':' '):'')+(txt?txt.charAt(0).toUpperCase()+txt.slice(1):'');crDirty=true;igCaption(false)};
+     rec.onerror=e=>{say(m,e.error==='not-allowed'?'Autorisez le micro pour ce site.':'Dictée interrompue ('+e.error+').','err');stop()};
+     rec.onend=()=>{if(on){try{rec.start()}catch(e){stop()}}else say(m,ta.value.trim()?'Pensez à « Enregistrer le récit ».':'','ok')};
+     try{rec.start();on=true;b.setAttribute('aria-pressed','true');b.textContent='■ Arrêter la dictée';say(m,'Parlez, le texte s\'écrit au fur et à mesure.')}catch(e){say(m,'Impossible de démarrer le micro.','err')}});
+   $('cr-sel').addEventListener('change',stop)}
+
+  // --- Post Instagram : présélection des meilleures photos, légende, images au format Instagram ---
+  const ig={id:null,sel:[],r:1.25,capAuto:true,v:0};
+  const IG_TAGS='#pumpfoil #pumpfoiling #foil #dockstart #foilboarding #lacdelaterrasse #isere #grenoble #alpes #alpinelakeriders';
+  function igPreselect(all){const sc=all.filter(p=>typeof p.score==='number');
+    if(sc.length>=2){return sc.slice().sort((a,b)=>b.score-a.score).slice(0,3).map(p=>p.id)}
+    return all.slice(0,3).map(p=>p.id)}
+  function igText(s,v){
+    const d=new Date((s.date||'')+'T12:00:00'),quand=isNaN(d)?'':d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+    const r=($('cr-txt').value||s.crTexte||'').trim(),short=r.length>700?r.slice(0,700).replace(/\s+\S*$/,'')+'…':r;
+    const heads=[['🌊',(s.titre||'Sortie')+(quand?' · '+quand:'')],['🏄',(s.titre||'Session')+(quand?', '+quand:'')],['💧','Retour sur '+(s.titre||'la sortie').toLowerCase()+(quand?' du '+quand:'')]];
+    const outs=['Merci à tous les riders présents ! 🙌','Merci à tous pour cette belle session 🙏','À la prochaine sur le ponton ! 🤙'];
+    const fill=['Belle session au ponton : du pumpfoil, des premiers vols et beaucoup de sourires.','Eau calme, bonne ambiance et de beaux runs en pumpfoil.','Une sortie comme on les aime : on ride, on s\'entraide et on finit autour d\'un apéro.'];
+    const h=heads[v%heads.length];
+    return [h[0]+' '+h[1],s.lieu?'📍 '+s.lieu:'','',short||fill[v%fill.length],'',outs[v%outs.length],'Toutes les photos sur alpinelakeriders.com (lien en bio)','',IG_TAGS].filter((x,i,a)=>!(x===''&&a[i-1]==='')).join('\n').replace(/\n{3,}/g,'\n\n')}
+  function igCaption(force){if(!crId)return;const s=crPast().find(x=>x.id===crId);if(!s)return;if(force||ig.capAuto){$('cr-ig-cap').value=igText(s,ig.v);ig.capAuto=true}igPreview()}
+  function igPreview(){const all=phSorted('cr:'+crId,true),pick=ig.sel.map(id=>all.find(p=>p.id===id)).filter(Boolean);
+    const ph=$('cr-ig-ph');ph.textContent='';ph.style.aspectRatio=ig.r===1?'1':'4/5';
+    if(pick[0]){const im=document.createElement('img');im.src=phSrc(pick[0]);im.alt='';if(pick[0].pos)im.style.objectPosition=pick[0].pos;ph.append(im);if(pick.length>1){const c=document.createElement('span');c.textContent='1/'+pick.length;ph.append(c)}}
+    const d=$('cr-ig-dots');d.textContent='';if(pick.length>1)pick.forEach(()=>d.append(document.createElement('i')));
+    const t=$('cr-ig-prev');t.textContent='';const b=document.createElement('b');b.textContent='alpinelakeriders ';t.append(b,$('cr-ig-cap').value);
+    $('cr-ig-dl').disabled=!pick.length;$('cr-ig-dl').textContent=pick.length>1?'Télécharger les '+pick.length+' images':'Télécharger l\'image'}
+  function renderIg(){if(!crId)return;const all=phSorted('cr:'+crId,true);
+    if(ig.id!==crId){ig.id=crId;ig.touched=false;ig.sel=[];ig.capAuto=true;ig.v=0;igCaption(true)}
+    if(!ig.touched&&ig.sel.length<Math.min(3,all.length))ig.sel=igPreselect(all);
+    ig.sel=ig.sel.filter(id=>all.some(p=>p.id===id));
+    const g=$('cr-ig-grid');g.textContent='';
+    if(!all.length){const p=document.createElement('p');p.className='msg';p.textContent='Ajoutez d\'abord des photos au compte rendu.';g.append(p)}
+    all.forEach(p=>{const b=document.createElement('button');b.type='button';const k=ig.sel.indexOf(p.id);b.className=k>=0?'on':'';b.setAttribute('aria-pressed',String(k>=0));
+      const im=document.createElement('img');im.src=phSrc(p);im.alt='';im.loading='lazy';b.append(im);if(k>=0){const n=document.createElement('i');n.textContent=k+1;b.append(n)}
+      b.addEventListener('click',()=>{ig.touched=true;const j=ig.sel.indexOf(p.id);if(j>=0)ig.sel.splice(j,1);else if(ig.sel.length<10)ig.sel.push(p.id);else{say($('cr-ig-msg'),'10 photos au plus sur Instagram.','err');return}renderIg()});g.append(b)});
+    igPreview();
+    $('cr-ig-share').hidden=!(navigator.canShare&&matchMedia('(hover:none)').matches)}
+  $('cr-ig-cap').addEventListener('input',()=>{ig.capAuto=false;igPreview()});
+  $('cr-ig-gen').addEventListener('click',()=>{ig.v++;igCaption(true)});
+  $('cr-ig-copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText($('cr-ig-cap').value);say($('cr-ig-msg'),'Légende copiée.','ok')}catch(e){$('cr-ig-cap').select();say($('cr-ig-msg'),'Sélectionnée : faites Copier.','ok')}});
+  document.querySelectorAll('#cr-ig-fmt button').forEach(b=>b.addEventListener('click',()=>{ig.r=+b.dataset.r;document.querySelectorAll('#cr-ig-fmt button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));igPreview()}));
+  // Image au format Instagram (1080 px de large), recadrée autour du point choisi (« Cadrer »)
+  async function igImage(p){const im=new Image();im.crossOrigin='anonymous';im.src=phSrc(p);await im.decode();
+    const W=1080,H=Math.round(1080*ig.r),cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d');x.imageSmoothingQuality='high';
+    const fp=parsePos(p.pos),k=Math.max(W/im.naturalWidth,H/im.naturalHeight),sw=W/k,sh=H/k,sx=(im.naturalWidth-sw)*fp.x/100,sy=(im.naturalHeight-sh)*fp.y/100;
+    x.drawImage(im,sx,sy,sw,sh,0,0,W,H);return new Promise(r=>cv.toBlob(r,'image/jpeg',.92))}
+  async function igFiles(){const all=phSorted('cr:'+crId,true),pick=ig.sel.map(id=>all.find(p=>p.id===id)).filter(Boolean),s=crPast().find(x=>x.id===crId)||{};
+    const out=[];for(let k=0;k<pick.length;k++){const b=await igImage(pick[k]);out.push(new File([b],'alr-'+(s.date||'sortie')+'-'+(k+1)+'.jpg',{type:'image/jpeg'}))}return out}
+  $('cr-ig-dl').addEventListener('click',async()=>{const m=$('cr-ig-msg'),b=$('cr-ig-dl');b.disabled=true;say(m,'Préparation des images…');
+    try{const fs=await igFiles();for(const f of fs){const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=f.name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);await new Promise(r=>setTimeout(r,350))}
+      say(m,fs.length+' image'+(fs.length>1?'s téléchargées':' téléchargée')+' (1080 px). Copiez la légende puis publiez sur Instagram.','ok')}
+    catch(e){say(m,'Préparation impossible ('+(e&&e.message||'erreur')+').','err')}b.disabled=false});
+  $('cr-ig-share').addEventListener('click',async()=>{const m=$('cr-ig-msg');try{const fs=await igFiles();try{await navigator.clipboard.writeText($('cr-ig-cap').value)}catch(e){}
+      if(!navigator.canShare({files:fs})){say(m,'Partage impossible sur cet appareil : utilisez « Télécharger ».','err');return}
+      await navigator.share({files:fs,text:$('cr-ig-cap').value});say(m,'Choisissez Instagram. La légende est copiée : collez-la au moment de publier.','ok')}
+    catch(e){if(!(e&&e.name==='AbortError'))say(m,'Partage impossible ('+(e&&e.message||'erreur')+').','err')}});
 
   // ---------- Membres (admin) ----------
   let membres=[];

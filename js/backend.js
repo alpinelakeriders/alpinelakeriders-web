@@ -44,6 +44,7 @@
       if(error&&/PGRST202|function|schema cache/i.test((error.code||'')+' '+(error.message||''))){
         ({error}=await sb.rpc('envoyer_contact',{p_nom:d.nom,p_email:d.email,p_message:d.message+(d.tel?'\n\nTéléphone : '+d.tel:''),p_piege:d.piege||''}))}
       if(error)throw fail(error);return true},
+    async like(sortie,visiteur,aime){const {data,error}=await sb.rpc('aimer_cr',{p_sortie:sortie,p_visiteur:visiteur,p_aime:!!aime});if(error)throw fail(error);return data},
     async stats(j){const {data,error}=await sb.rpc('stats_visites',{p_jours:j});if(error)throw fail(error);return data},
     async countMembers(){const {data,error}=await sb.rpc('nb_membres');if(error)throw fail(error);return data},
     async clearCollection(c){const {error}=await sb.from('docs').delete().eq('collection',c);if(error)throw fail(error);touch(c)},

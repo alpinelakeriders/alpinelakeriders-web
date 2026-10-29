@@ -35,8 +35,9 @@ export async function onRequest(context) {
   const res = await next();
   if (request.method !== 'GET' || !(res.headers.get('content-type') || '').includes('text/html')) return res;
   try { const p = logVisite(request, url); if (p) context.waitUntil(p); } catch (e) {}
-  const sid = (url.searchParams.get('sortie') || '').slice(0, 80);
-  let c = null, so = null;
+  const crId = (url.searchParams.get('cr') || '').slice(0, 80);
+  const sid = crId || (url.searchParams.get('sortie') || '').slice(0, 80);
+  let c = null, so = null, crImg = '';
   if (/^[\w-]+$/.test(sid)) {
     try {
       const r = await fetch(SB + '/rest/v1/docs?collection=eq.sorties&id=eq.' + encodeURIComponent(sid) + '&select=data', {
@@ -45,6 +46,19 @@ export async function onRequest(context) {
       });
       if (r.ok) { const j = await r.json(); so = j && j[0] && j[0].data; }
     } catch (e) {}
+    // Compte rendu partagé : la première photo affichée devient l'image de l'aperçu
+    if (crId && so && so.crStatut === 'publie') {
+      try {
+        const r = await fetch(SB + '/rest/v1/docs?collection=eq.photos&data->>zone=eq.' + encodeURIComponent('cr:' + sid) + '&select=data', {
+          headers: { apikey: KEY, Authorization: 'Bearer ' + KEY },
+          cf: { cacheTtl: 60, cacheEverything: true },
+        });
+        if (r.ok) {
+          const ph = ((await r.json()) || []).map(x => x.data || {}).filter(p => p.actif !== false && /^https:\/\//.test(p.url || '')).sort((a, b) => (a.ordre || 0) - (b.ordre || 0));
+          if (ph[0]) crImg = ph[0].url;
+        }
+      } catch (e) {}
+    } else if (crId) so = null;
   }
   try {
     const r = await fetch(SB + '/rest/v1/docs?collection=eq.contenu&id=eq.site&select=data', {
@@ -65,14 +79,19 @@ export async function onRequest(context) {
       const JOURS = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
       const d = new Date((so.date || '') + 'T12:00:00Z');
       const quand = isNaN(d) ? '' : JOURS[d.getUTCDay()] + ' ' + d.getUTCDate() + ' ' + MOIS[d.getUTCMonth()];
-      const title = (so.titre || 'Sortie') + (quand ? ' · ' + quand : '');
-      const desc = [[so.heure, so.lieu].filter(Boolean).join(' · '), 'Inscris-toi sur le site d\'Alpine Lake Riders.'].filter(Boolean).join('. ');
-      const u = 'https://alpinelakeriders.com/?sortie=' + encodeURIComponent(sid);
+      const title = (crId ? 'Compte rendu · ' : '') + (so.titre || 'Sortie') + (quand ? ' · ' + quand : '');
+      const recit = typeof so.crTexte === 'string' ? so.crTexte.trim().replace(/\s+/g, ' ') : '';
+      const desc = crId ? (recit ? (recit.length > 180 ? recit.slice(0, 180).replace(/\s+\S*$/, '') + '…' : recit) : 'Le compte rendu et les photos de la sortie, sur le site d\'Alpine Lake Riders.')
+                        : [[so.heure, so.lieu].filter(Boolean).join(' · '), 'Inscris-toi sur le site d\'Alpine Lake Riders.'].filter(Boolean).join('. ');
+      const u = 'https://alpinelakeriders.com/?' + (crId ? 'cr=' : 'sortie=') + encodeURIComponent(sid);
       rw = rw.on('meta[property="og:title"]', setContent(title))
              .on('meta[name="twitter:title"]', setContent(title))
              .on('meta[property="og:description"]', setContent(desc))
              .on('meta[name="twitter:description"]', setContent(desc))
              .on('meta[property="og:url"]', setContent(u));
+      if (crImg) rw = rw.on('meta[property="og:image"]', setContent(crImg)).on('meta[name="twitter:image"]', setContent(crImg))
+             .on('meta[property="og:image:width"]', { element(e) { e.remove(); } }).on('meta[property="og:image:height"]', { element(e) { e.remove(); } })
+             .on('meta[property="og:image:alt"]', setContent(so.titre || 'Sortie Alpine Lake Riders'));
     } else if (share) {
       rw = rw.on('meta[property="og:description"]', setContent(share))
              .on('meta[name="twitter:description"]', setContent(share));
@@ -84,11 +103,11 @@ export async function onRequest(context) {
     if (txt('seoTitle')) rw = rw.on('title', { element(e) { e.setInnerContent(txt('seoTitle')); } });
     if (txt('siteName')) rw = rw.on('meta[property="og:site_name"]', setContent(txt('siteName')));
     if (!so && txt('shareTitle')) rw = rw.on('meta[property="og:title"]', setContent(txt('shareTitle'))).on('meta[name="twitter:title"]', setContent(txt('shareTitle')));
-    if (/^https:\/\/[^\s"<>]+$/.test(txt('shareImage'))) {
+    if (!crImg && /^https:\/\/[^\s"<>]+$/.test(txt('shareImage'))) {
       rw = rw.on('meta[property="og:image"]', setContent(txt('shareImage'))).on('meta[name="twitter:image"]', setContent(txt('shareImage')))
              .on('meta[property="og:image:width"]', { element(e) { e.remove(); } }).on('meta[property="og:image:height"]', { element(e) { e.remove(); } });
     }
-    if (txt('shareAlt')) rw = rw.on('meta[property="og:image:alt"]', setContent(txt('shareAlt')));
+    if (!crImg && txt('shareAlt')) rw = rw.on('meta[property="og:image:alt"]', setContent(txt('shareAlt')));
     if (/^[\w-]{10,100}$/.test(txt('gsc'))) rw = rw.on('meta[name="google-site-verification"]', setContent(txt('gsc')));
     rw = rw.on('[data-k]', { element(e) {
       const k = e.getAttribute('data-k');
