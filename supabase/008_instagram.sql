@@ -35,7 +35,7 @@ create or replace function public.ig_deconnecter()
 returns boolean language plpgsql security definer set search_path = public as $$
 begin
   if not public.is_admin() then raise exception 'reserve aux administrateurs' using errcode = '42501'; end if;
-  delete from ig_connexion; return true;
+  delete from ig_connexion where id = 1; return true;
 end $$;
 
 revoke all on function public.ig_jeton_set(text,text,text,timestamptz), public.ig_jeton_get(), public.ig_deconnecter() from public, anon;
