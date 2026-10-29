@@ -304,6 +304,13 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .ct-list a{color:var(--fg);text-decoration:none;font-size:clamp(17px,1.6vw,20px);letter-spacing:-.01em;overflow-wrap:anywhere}
 .ct-list a:hover{color:var(--lake)}
 .ct-wa{display:inline-flex;align-items:center;gap:8px}
+.soc{margin-top:40px;display:grid;gap:14px}
+.soc-l{display:flex;flex-wrap:wrap;gap:10px}
+.soc-a{display:inline-flex;align-items:center;gap:10px;height:48px;padding:0 18px 0 14px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--line);color:var(--fg);text-decoration:none;font:500 15px var(--sans);transition:box-shadow .2s,color .2s}
+.soc-a:hover{box-shadow:inset 0 0 0 1px var(--fg);color:var(--lake)}
+.soc-f{display:flex;gap:8px;margin-top:14px}
+.soc-f a{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;box-shadow:inset 0 0 0 1px var(--line);color:var(--fg)}
+.soc-f a:hover{box-shadow:inset 0 0 0 1px var(--fg)}
 #cf{display:grid;gap:20px;align-content:start}
 #cf textarea{resize:vertical;min-height:130px}
 .ct-hp{position:absolute!important;left:-9999px;width:1px;height:1px;overflow:hidden}
@@ -664,8 +671,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=47"></script>
-<script src="js/backend.js?v=47"></script>
+<script src="js/config.js?v=48"></script>
+<script src="js/backend.js?v=48"></script>
 </head>
 <body>
 
@@ -828,6 +835,10 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       </ul>
       <span id="ct-tel" data-k="contactTel" hidden>06 73 19 37 23</span>
       <a class="pill ink ct-wa" id="ct-wa" href="https://wa.me/33673193723?text=Bonjour%20Alpine%20Lake%20Riders%2C%20" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2c0 1.3.9 2.5 1.1 2.7.1.2 1.8 2.8 4.4 3.9 1.6.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></svg>Écrire sur WhatsApp</a>
+      <div class="soc" aria-label="Réseaux sociaux"><p class="label">Suivez-nous sur les réseaux</p><div class="soc-l">
+        <a class="soc-a" data-soc="socInsta" href="#" target="_blank" rel="noopener" hidden><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="17.4" cy="6.6" r="1.2" fill="currentColor"/></svg><span>Instagram</span></a>
+        <a class="soc-a" data-soc="socFb" href="#" target="_blank" rel="noopener" hidden><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M13.5 21v-7.6h2.6l.4-3h-3V8.5c0-.9.3-1.5 1.5-1.5h1.6V4.3c-.3 0-1.2-.1-2.3-.1-2.3 0-3.9 1.4-3.9 4v2.2H7.8v3h2.6V21h3.1Z"/></svg><span>Facebook</span></a>
+        <a class="soc-a" data-soc="socWa" href="https://chat.whatsapp.com/D0wUPuh0QP87qtSMwNR3xT" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2c0 1.3.9 2.5 1.1 2.7.1.2 1.8 2.8 4.4 3.9 1.6.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></svg><span>Groupe WhatsApp</span></a></div></div>
     </div>
     <form id="cf" novalidate>
       <div><p class="label" style="margin-bottom:12px">Formulaire</p><p style="font-size:20px;letter-spacing:-.02em">Laissez-nous un message.</p></div>
@@ -855,6 +866,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 <footer><div class="wrap">
   <div class="top">
     <a href="#top" aria-label="Alpine Lake Riders, retour en haut"><img class="logo-light" src="media/logo-alr-noir.svg" alt="Alpine Lake Riders" width="2869" height="1699"><img class="logo-dark" src="media/logo-alr-blanc.svg" alt="Alpine Lake Riders" width="2869" height="1699"></a>
+    <div class="soc-f" aria-label="Réseaux sociaux"><a data-soc="socInsta" href="#" target="_blank" rel="noopener" aria-label="Instagram" hidden><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="17.4" cy="6.6" r="1.2" fill="currentColor"/></svg></a><a data-soc="socFb" href="#" target="_blank" rel="noopener" aria-label="Facebook" hidden><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M13.5 21v-7.6h2.6l.4-3h-3V8.5c0-.9.3-1.5 1.5-1.5h1.6V4.3c-.3 0-1.2-.1-2.3-.1-2.3 0-3.9 1.4-3.9 4v2.2H7.8v3h2.6V21h3.1Z"/></svg></a><a data-soc="socWa" href="https://chat.whatsapp.com/D0wUPuh0QP87qtSMwNR3xT" target="_blank" rel="noopener" aria-label="Groupe WhatsApp"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2c0 1.3.9 2.5 1.1 2.7.1.2 1.8 2.8 4.4 3.9 1.6.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"/></svg></a></div>
     <ul><li><a href="#asso">L'asso</a></li><li><a href="#agenda">Agenda</a></li><li><a href="#debuter">Débuter</a></li><li><a href="#apero">Apéros Pumpfoil</a></li><li><a href="https://chat.whatsapp.com/D0wUPuh0QP87qtSMwNR3xT" target="_blank" rel="noopener">WhatsApp</a></li><li><a href="#rejoindre">Adhérer</a></li><li><a href="#contact">Contact</a></li></ul>
   </div>
   <div class="legal"><span>© 2027 Alpine Lake Riders · Association loi 1901 · La Terrasse, Isère</span><span>Mentions légales · Statuts · <button class="link" id="cookie-open" type="button" hidden>Cookies</button> · <button class="link" id="open-admin" type="button">Administration</button></span></div>
@@ -1042,6 +1054,10 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
         <p class="full adm-sub">Nous contacter</p>
         <label class="f"><span class="label">E-mail de contact</span><input id="t-contactEmail" type="email" placeholder="alpinelakeriders@gmail.com"></label>
         <label class="f"><span class="label">Numéro WhatsApp (non affiché)</span><input id="t-contactTel" type="tel" placeholder="06 73 19 37 23"></label>
+        <p class="full adm-sub">Réseaux sociaux (bloc « Suivez-nous »)</p>
+        <label class="f"><span class="label">Instagram (adresse du compte)</span><input id="t-socInsta" type="url" placeholder="https://www.instagram.com/…" spellcheck="false"></label>
+        <label class="f"><span class="label">Facebook (adresse de la page)</span><input id="t-socFb" type="url" placeholder="https://www.facebook.com/…" spellcheck="false"></label>
+        <label class="f full"><span class="label">Groupe WhatsApp</span><input id="t-socWa" type="url" placeholder="https://chat.whatsapp.com/…" spellcheck="false"><small class="hint">Laisser vide pour masquer un réseau.</small></label>
         <p class="full adm-sub">Statistiques</p>
         <label class="f full"><span class="label">Identifiant Google Analytics (G-XXXXXXXXXX)</span><input id="t-gaId" placeholder="G-XXXXXXXXXX" autocomplete="off" spellcheck="false"></label>
         <div class="full adm-save"><button class="pill ink" type="submit" id="t-save">Enregistrer les textes</button><span class="msg" id="t-msg" role="status"></span></div>
@@ -1152,7 +1168,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   const $=id=>document.getElementById(id);
   const MOIS=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
   const JOURS=['dim.','lun.','mar.','mer.','jeu.','ven.','sam.'];
-  const TEXT_KEYS=['slogan','accroche','partage','mission','p1','p2','p3','prog1','prog2','prog3','debIntro','deb1','deb2','deb3','deb4','deb5','deb6','debLien','contactEmail','contactTel','seoTitle','seoDesc','seoKeywords','siteName','gsc','shareTitle','shareImage','shareAlt','inscrits','nbAperos','ride','apero','dernier','prochain','spot','prixRider','prixFamille','prixDecouverte','gaId'];
+  const TEXT_KEYS=['slogan','accroche','partage','mission','p1','p2','p3','prog1','prog2','prog3','debIntro','deb1','deb2','deb3','deb4','deb5','deb6','debLien','contactEmail','contactTel','seoTitle','seoDesc','seoKeywords','siteName','gsc','shareTitle','shareImage','shareAlt','inscrits','nbAperos','ride','apero','dernier','prochain','spot','prixRider','prixFamille','prixDecouverte','gaId','socInsta','socFb','socWa'];
   let db=null,user=null,assets=null,myId=null,sorties=[],contenu={},annonces=[],presences=[],photos=null;
 
   // ---------- Vidéo ----------
@@ -1317,7 +1333,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   $('cookie-no').addEventListener('click',()=>{const was=ckGet()==='oui';ckSet('non');$('cookie').hidden=true;
     if(was){document.cookie.split(';').forEach(c=>{const n=c.split('=')[0].trim();if(/^_ga/.test(n)){[location.hostname,'.'+location.hostname.replace(/^www\./,'')].forEach(d=>{document.cookie=n+'=;Max-Age=0;path=/;domain='+d});document.cookie=n+'=;Max-Age=0;path=/'}});location.reload()}});
   $('cookie-open').addEventListener('click',()=>{$('cookie').hidden=false});
-  defaults.gaId=GA_DEF;
+  defaults.gaId=GA_DEF;defaults.socWa='https://chat.whatsapp.com/D0wUPuh0QP87qtSMwNR3xT';
   // Formulaire de contact (anti-robots : champ piège invisible + délai minimum)
   const cfT0=Date.now();
   $('cf').addEventListener('submit',async e=>{e.preventDefault();const out=$('c-out'),b=$('c-send');
@@ -1337,6 +1353,10 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       el.textContent=(typeof val==='string'&&val.trim())?val:defaults[el.dataset.k];
       if(el.dataset.k==='inscrits'&&autoCount)el.textContent=autoCount;
     });
+    // Réseaux sociaux : un lien vide masque le bouton (WhatsApp : lien du groupe par défaut)
+    document.querySelectorAll('[data-soc]').forEach(a=>{const k=a.dataset.soc,v=typeof contenu[k]==='string'?contenu[k].trim():null;
+      const u=v===null||(k==='socWa'&&v===''&&contenu[k]==null)?(k==='socWa'?'https://chat.whatsapp.com/D0wUPuh0QP87qtSMwNR3xT':''):v;
+      if(/^https:\/\//.test(u)){a.href=u;a.hidden=false}else a.hidden=true});
     const lien=(contenu.debLien||'').trim();
     if(/^https:\/\//.test(lien))$('deb-blog').href=lien;
     // Référencement : on aligne aussi les balises de la page (le serveur le fait déjà pour Google)
