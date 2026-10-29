@@ -89,7 +89,7 @@ export async function onRequest(context) {
              .on('meta[property="og:image:width"]', { element(e) { e.remove(); } }).on('meta[property="og:image:height"]', { element(e) { e.remove(); } });
     }
     if (txt('shareAlt')) rw = rw.on('meta[property="og:image:alt"]', setContent(txt('shareAlt')));
-    if (/^[\w-]{10,100}$/.test(txt('gsc'))) rw = rw.on('head', { element(e) { e.append('<meta name="google-site-verification" content="' + esc(txt('gsc')) + '">', { html: true }); } });
+    if (/^[\w-]{10,100}$/.test(txt('gsc'))) rw = rw.on('meta[name="google-site-verification"]', setContent(txt('gsc')));
     rw = rw.on('[data-k]', { element(e) {
       const k = e.getAttribute('data-k');
       if (!SKIP.has(k) && txt(k)) e.setInnerContent(txt(k));

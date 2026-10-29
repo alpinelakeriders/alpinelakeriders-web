@@ -7,6 +7,7 @@
 <meta name="description" content="Alpine Lake Riders, l'association des riders de pumpfoil des lacs alpins : Isère, Savoie, Haute-Savoie. Sessions, Apéros Pumpfoil et initiations au lac de la Terrasse.">
 <meta property="og:title" content="Alpine Lake Riders">
 <meta property="og:description" content="Pump, vole, recommence. L'association de pumpfoil des lacs alpins.">
+<meta name="google-site-verification" content="IsKzfpN8INwAeJAcFQTSVf19hSqw8YAn_95OqQUgroE">
 <meta name="keywords" content="pumpfoil, pump foil, Alpine Lake Riders, association pumpfoil, lac de la Terrasse, Isère, Savoie, Haute-Savoie, Grésivaudan, Grenoble, Chambéry, dockstart, foil, apéro pumpfoil, initiation pumpfoil">
 <link rel="canonical" href="https://alpinelakeriders.com/">
 <meta property="og:url" content="https://alpinelakeriders.com/">
@@ -558,8 +559,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=43"></script>
-<script src="js/backend.js?v=43"></script>
+<script src="js/config.js?v=44"></script>
+<script src="js/backend.js?v=44"></script>
 </head>
 <body>
 
@@ -974,7 +975,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
           <label class="f"><span class="label">Description <i class="cnt" data-for="t-seoDesc" data-max="160"></i></span><textarea id="t-seoDesc" rows="3" maxlength="320"></textarea></label>
           <label class="f"><span class="label">Mots-clés (séparés par des virgules)</span><textarea id="t-seoKeywords" rows="2"></textarea><small class="hint">Google n'en tient presque plus compte ; ils servent surtout à Bing et aux petits moteurs. Le plus important : le titre et la description.</small></label>
           <label class="f"><span class="label">Nom du site</span><input id="t-siteName"></label>
-          <label class="f"><span class="label">Code de validation Google Search Console (facultatif)</span><input id="t-gsc" placeholder="ex. AbC123…" autocomplete="off" spellcheck="false"><small class="hint">Dans Search Console, méthode « Balise HTML » : copiez seulement la valeur de content="…".</small></label>
+          <label class="f"><span class="label">Code de validation Google Search Console (facultatif)</span><input id="t-gsc" placeholder="Collez la balise ou seulement le code" autocomplete="off" spellcheck="false"><small class="hint">Dans Search Console, méthode « Balise HTML » : collez la balise complète, le code est extrait automatiquement. Le code actuel est déjà installé sur le site.</small></label>
           <p class="adm-sub">Partage (WhatsApp, Facebook, Messenger…)</p>
           <label class="f"><span class="label">Titre du partage</span><input id="t-shareTitle"></label>
           <label class="f"><span class="label">Texte du partage <i class="cnt" data-for="t-partage" data-max="160"></i></span><textarea id="t-partage" rows="3"></textarea></label>
@@ -1139,8 +1140,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   const defaults={};
   document.querySelectorAll('[data-k]').forEach(el=>{defaults[el.dataset.k]=el.textContent});
   {const mt=sel=>(document.querySelector(sel)||{}).content||'';
-   Object.assign(defaults,{seoTitle:document.title,seoDesc:mt('meta[name="description"]'),seoKeywords:mt('meta[name="keywords"]'),siteName:mt('meta[property="og:site_name"]'),
-     shareTitle:mt('meta[property="og:title"]'),partage:mt('meta[property="og:description"]'),shareImage:mt('meta[property="og:image"]'),shareAlt:mt('meta[property="og:image:alt"]'),gsc:''})}
+   Object.assign(defaults,{gsc:mt('meta[name="google-site-verification"]'),seoTitle:document.title,seoDesc:mt('meta[name="description"]'),seoKeywords:mt('meta[name="keywords"]'),siteName:mt('meta[property="og:site_name"]'),
+     shareTitle:mt('meta[property="og:title"]'),partage:mt('meta[property="og:description"]'),shareImage:mt('meta[property="og:image"]'),shareAlt:mt('meta[property="og:image:alt"]')})}
   let autoCount=null;
   // ---------- Google Analytics, chargé seulement après accord (RGPD) ----------
   const GA_DEF='G-4P1WWQHMMD';
@@ -1554,6 +1555,9 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     const img=v('shareImage');$('pv-si').src=/^https:\/\//.test(img)?img:defaults.shareImage;
     document.querySelectorAll('#seo .cnt').forEach(c=>{const n=($(c.dataset.for).value||'').trim().length,mx=+c.dataset.max;c.textContent=n+' / '+mx;c.className='cnt '+(n>mx?'over':n>mx*.55?'ok':'')})}
   $('seo').addEventListener('input',seoPreview);
+  // Search Console : on accepte la balise complète et on n'en garde que le code
+  const gscFix=()=>{const el=$('t-gsc'),m=el.value.match(/content\s*=\s*["']([^"']+)["']/i);if(m)el.value=m[1].trim();else el.value=el.value.replace(/[^\w-]/g,'')};
+  $('t-gsc').addEventListener('change',gscFix);$('t-gsc').addEventListener('paste',()=>setTimeout(gscFix,0));
 
   const openEd=new Set(),openAn=new Set();
   function renderEditor(){
