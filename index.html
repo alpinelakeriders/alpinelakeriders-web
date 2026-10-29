@@ -585,6 +585,10 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 .vw img{max-width:92vw;max-height:84dvh;object-fit:contain;border-radius:4px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
 .vw-act{position:absolute;left:50%;transform:translateX(-50%);bottom:44px;display:flex;gap:6px;align-items:center;background:rgba(0,0,0,.55);padding:6px 8px;border-radius:999px;color:#ddd;font:500 12px var(--sans);white-space:nowrap}
 .vw-act[hidden]{display:none}
+.vw-keep button{min-width:150px}
+.vw-keep button.out{background:#c2410c;color:#fff}
+.vw-keep button.on{background:var(--lake,#2a8c89);color:#fff}
+@media (max-width:640px){.vw-keep span{display:none}}
 .vw-act span{padding:0 6px}
 .vw-act button{font:600 12px var(--sans);border:0;border-radius:999px;padding:7px 12px;background:#fff;color:#111;cursor:pointer}
 .vw-act button.on{background:var(--lake,#2a8c89);color:#fff}
@@ -614,8 +618,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=45"></script>
-<script src="js/backend.js?v=45"></script>
+<script src="js/config.js?v=46"></script>
+<script src="js/backend.js?v=46"></script>
 </head>
 <body>
 
@@ -886,13 +890,13 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
         <div class="cr-info" id="cr-info"></div>
         <label class="f"><span class="label">Récit de la sortie (facultatif)</span><textarea id="cr-txt" rows="5" placeholder="Conditions, ambiance, progrès de chacun, l'apéro…"></textarea></label>
         <div class="drop" id="cr-drop">
-          <label class="check"><input type="checkbox" id="cr-auto" checked> Retouche automatique</label>
+          <label class="check"><input type="checkbox" id="cr-auto" checked> Retouche automatique des couleurs sur chaque photo (même outil que le bandeau)</label>
           <div class="bar" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><label class="pill ink small" style="cursor:pointer">Déposer les photos en vrac<input type="file" id="cr-file" accept="image/*,.heic,.heif" multiple hidden></label><span class="msg" id="cr-msg" role="status">ou glissez-les toutes ici, sans trier</span></div>
         </div>
         <div class="cr-tri" id="cr-tri" hidden>
           <div class="cr-tri-head"><p class="cr-tri-sum" id="cr-tri-sum"></p>
             <label class="cr-max">Garder au plus <select id="cr-max"><option value="20">20 photos</option><option value="30" selected>30 photos</option><option value="50">50 photos</option><option value="0">toutes les bonnes</option></select></label></div>
-          <p class="adm-intro" style="margin:0">Touchez une photo pour la garder ou l'écarter. Les photos écartées ne sont pas envoyées.</p>
+          <p class="adm-intro" style="margin:0">Clic sur une photo : garder ou écarter. Clic droit (appui long sur mobile) : la photo en grand, puis Espace pour garder / écarter et les flèches pour passer à la suivante. Les photos écartées ne sont pas envoyées.</p>
           <div class="cr-tri-grid" id="cr-tri-grid"></div>
           <div class="bar" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button type="button" class="pill ink small" id="cr-tri-ok" disabled>Ajouter les photos gardées</button><button type="button" class="pill line small" id="cr-tri-x">Annuler</button><span class="msg" id="cr-tri-msg" role="status"></span></div>
         </div>
@@ -1031,7 +1035,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       </div>
       <div class="sel-bar" id="sel-bar" hidden><span id="sel-n"></span><span class="sel-acts">Déplacer vers <button type="button" class="pill ink small" data-to="bandeau">Bandeau</button><button type="button" class="pill ink small" data-to="apero">Apéro</button><button type="button" class="pill ink small" data-to="spot">Lac</button><button type="button" class="pill line small" id="sel-ret">Retirer</button><button type="button" class="pill line small" id="sel-bib">Changer de bibliothèque</button><button type="button" class="pill line small" id="sel-clear">Tout désélectionner</button></span></div>
     </section>
-    <dialog class="vw" id="vw" aria-label="Photo en grand"><img id="vw-img" alt=""><p id="vw-cap"></p><div class="vw-act" id="vw-act" hidden><span>Afficher dans</span><button type="button" data-to="bandeau">Bandeau</button><button type="button" data-to="apero">Apéro</button><button type="button" data-to="spot">Lac</button></div><button type="button" class="vw-b vw-p" id="vw-prev" aria-label="Photo précédente">←</button><button type="button" class="vw-b vw-n" id="vw-next" aria-label="Photo suivante">→</button><button type="button" class="vw-b vw-x" id="vw-close" aria-label="Fermer">✕</button></dialog>
+    <dialog class="vw" id="vw" aria-label="Photo en grand"><img id="vw-img" alt=""><p id="vw-cap"></p><div class="vw-act vw-keep" id="vw-keep" hidden><button type="button" id="vw-keep-b" tabindex="-1"></button><span>Espace : garder / écarter · ← → : photo suivante</span></div><div class="vw-act" id="vw-act" hidden><span>Afficher dans</span><button type="button" data-to="bandeau">Bandeau</button><button type="button" data-to="apero">Apéro</button><button type="button" data-to="spot">Lac</button></div><button type="button" class="vw-b vw-p" id="vw-prev" aria-label="Photo précédente">←</button><button type="button" class="vw-b vw-n" id="vw-next" aria-label="Photo suivante">→</button><button type="button" class="vw-b vw-x" id="vw-close" aria-label="Fermer">✕</button></dialog>
     <section class="adm-sec" id="sec-admins">
       <h3>Administrateurs</h3>
       <p class="adm-intro">Les administrateurs peuvent modifier tout le site. Un nouvel administrateur reçoit un e-mail de confirmation à valider avant sa première connexion.</p>
@@ -1894,6 +1898,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   let vwList=[],vwI=0;
   // vwList : [{url, alt, it}] ; « it » = élément de la photothèque (affiche alors les boutons d'ajout)
   function vwShow(i){vwI=(i+vwList.length)%vwList.length;const p=vwList[vwI];$('vw-img').src=p.url;$('vw-cap').textContent=(vwI+1)+' / '+vwList.length+(p.alt?' · '+p.alt:'');
+    const kp=$('vw-keep');kp.hidden=!p.tri;if(p.tri){const x=p.tri,k=crKept(x),b=$('vw-keep-b');b.className=x.done?'':k?'on':'out';
+      b.textContent=x.done?'Déjà ajoutée':k?'✓ Gardée':'✕ Écartée'+(x.why&&!(x.man===false)?' · '+x.why.toLowerCase():'');$('vw-cap').textContent=(vwI+1)+' / '+vwList.length+' · '+x.f.name}
     const a=$('vw-act');a.hidden=!p.it;if(p.it){const u=p.it.uses;a.querySelectorAll('[data-to]').forEach(b=>b.classList.toggle('on',u.includes(b.dataset.to)))}}
   function vwOpenList(list,k){if(!list.length||k<0)return;vwList=list;const d=$('vw');vwShow(k);if(!d.open)d.showModal?d.showModal():d.setAttribute('open','')}
   function vwOpen(z,id){const l=phSorted(z,true);vwOpenList(l.map(p=>({url:phSrc(p),alt:p.alt||''})),l.findIndex(p=>p.id===id))}
@@ -1906,7 +1912,10 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     const it=libItems().find(i=>i.url===url)||cur.it;const u=new Set(it.uses);cur.it.uses.includes(z)?u.delete(z):u.add(z);cur.it=Object.assign({},it,{uses:[...u]});b.disabled=false;vwShow(vwI)});
   $('vw-prev').addEventListener('click',()=>vwShow(vwI-1));$('vw-next').addEventListener('click',()=>vwShow(vwI+1));$('vw-close').addEventListener('click',()=>$('vw').close());
   $('vw').addEventListener('click',e=>{if(e.target.id==='vw')$('vw').close()});
-  $('vw').addEventListener('keydown',e=>{if(e.key==='ArrowLeft')vwShow(vwI-1);if(e.key==='ArrowRight')vwShow(vwI+1)});
+  $('vw').addEventListener('keydown',e=>{if(e.key==='ArrowLeft')vwShow(vwI-1);if(e.key==='ArrowRight')vwShow(vwI+1);
+    if((e.key===' '||e.key==='Enter')&&vwList[vwI]&&vwList[vwI].tri){e.preventDefault();crToggle(vwList[vwI].tri);vwShow(vwI)}});
+  $('vw').addEventListener('keyup',e=>{if((e.key===' '||e.key==='Enter')&&vwList[vwI]&&vwList[vwI].tri)e.preventDefault()});
+  $('vw-keep-b').addEventListener('click',()=>{const x=vwList[vwI]&&vwList[vwI].tri;if(x){crToggle(x);vwShow(vwI)}});
   {let tx=null;$('vw').addEventListener('touchstart',e=>{tx=e.touches[0].clientX},{passive:true});$('vw').addEventListener('touchend',e=>{if(tx===null)return;const d=e.changedTouches[0].clientX-tx;tx=null;if(Math.abs(d)>40)vwShow(vwI+(d<0?1:-1))},{passive:true})}
   // Glisser une vignette de la photothèque vers un module (souris : direct ; doigt : appui long)
   let libDragged=0;
@@ -2358,9 +2367,9 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     let m=0;for(let c=0;c<fp.length;c++){fp[c]/=fc[c]||1;m+=fp[c]}m/=fp.length;let sd=0;for(let c=0;c<fp.length;c++){fp[c]-=m;sd+=fp[c]*fp[c]}sd=Math.sqrt(sd/fp.length)||1;for(let c=0;c<fp.length;c++)fp[c]/=sd;
     const hu=new Float32Array(8);{for(let i=0;i<d.length;i+=16){const r=d[i],gg=d[i+1],b=d[i+2];hu[(r>127?4:0)+(gg>127?2:0)+(b>127?1:0)]++}const t=hu.reduce((a,b)=>a+b,0)||1;for(let c=0;c<8;c++)hu[c]/=t}
     const tk=Math.min(1,260/Math.max(w,h)),tc=document.createElement('canvas');tc.width=Math.round(w*tk);tc.height=Math.round(h*tk);tc.getContext('2d').drawImage(cv,0,0,tc.width,tc.height);
-    const blob=await new Promise(r=>tc.toBlob(r,'image/jpeg',.72));
+    const blob=await new Promise(r=>tc.toBlob(r,'image/jpeg',.72)),bigB=await new Promise(r=>($('cr-auto').checked?draw(cv,1024,{auto:true}):cv).toBlob(r,'image/jpeg',.85)); // aperçu en grand, déjà retouché comme à l'envoi
     const prise=await exifDate(f);
-    return {w:W,h:H,L,dark:dk/n,blown:bl/n,col,sharp,fp,hu,tall:H>W*1.05,thumb:blob?URL.createObjectURL(blob):'',prise,t:prise?Date.parse(prise):(f.lastModified||0)}
+    return {w:W,h:H,L,dark:dk/n,blown:bl/n,col,sharp,fp,hu,tall:H>W*1.05,thumb:blob?URL.createObjectURL(blob):'',big:bigB?URL.createObjectURL(bigB):'',prise,t:prise?Date.parse(prise):(f.lastModified||0)}
   }
   // Ressemblance entre deux photos (0 = rien à voir, 1 = identiques) : corrélation des empreintes + histogrammes de couleurs
   function crSim(a,b){if(a.tall!==b.tall)return 0;let c=0;for(let i=0;i<a.fp.length;i++)c+=a.fp[i]*b.fp[i];c/=a.fp.length;
@@ -2385,6 +2394,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     crTri.items.forEach(x=>{if(x.m)x.auto=!x.why});
     crPaint();
   }
+  const crKept=x=>!!(x.m&&!x.m.err&&(x.man!=null?x.man:x.auto));
+  function crToggle(x){if(!x.m||x.done||crTri.busy||x.m.err)return;const cur=crKept(x);x.man=!cur;if(x.man===x.auto)x.man=null;crPaint()}
   function crPaint(){
     const its=crTri.items,done=its.filter(x=>x.m),keep=its.filter(x=>x.m&&(x.man!=null?x.man:x.auto)&&!x.done);
     its.forEach(x=>{const el=x.el,k=x.m&&(x.man!=null?x.man:x.auto);el.classList.toggle('keep',!!k&&!x.done);el.classList.toggle('out',!!x.m&&!k&&!x.done);el.classList.toggle('wait',!x.m);el.classList.toggle('done',!!x.done);
@@ -2397,7 +2408,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     $('cr-tri-sum').textContent=(done.length<its.length?'Analyse '+done.length+' / '+its.length+'… ':'')+keep.length+' photo'+(keep.length>1?'s':'')+' gardée'+(keep.length>1?'s':'')+' sur '+its.length+(parts.length?' · écartées : '+parts.join(', '):'');
     const b=$('cr-tri-ok');b.disabled=crTri.busy||!keep.length||done.length<its.length;b.textContent=keep.length?'Ajouter les '+keep.length+' photo'+(keep.length>1?'s':'')+' gardée'+(keep.length>1?'s':''):'Ajouter les photos gardées';
   }
-  function crTriReset(){crTri.items.forEach(x=>{if(x.m&&x.m.thumb)URL.revokeObjectURL(x.m.thumb)});crTri.items=[];crTri.run=(crTri.run||0)+1;$('cr-tri-grid').textContent='';$('cr-tri').hidden=true;say($('cr-tri-msg'),'')}
+  function crTriReset(){crTri.items.forEach(x=>{if(x.m&&x.m.thumb)URL.revokeObjectURL(x.m.thumb);if(x.m&&x.m.big)URL.revokeObjectURL(x.m.big)});crTri.items=[];crTri.run=(crTri.run||0)+1;$('cr-tri-grid').textContent='';$('cr-tri').hidden=true;say($('cr-tri-msg'),'')}
   async function crIngest(files){
     files=[...files].filter(f=>/^image\//.test(f.type)||/\.(jpe?g|png|webp|heic|heif)$/i.test(f.name));const m=$('cr-msg');
     if(!files.length){say(m,'Aucune image reconnue.','err');return}
@@ -2407,7 +2418,10 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     $('cr-tri').hidden=false;say(m,files.length+' photo'+(files.length>1?'s':'')+' à analyser…');
     const run=crTri.run,news=files.map(f=>{const el=document.createElement('button');el.type='button';el.className='cr-t wait';const im=document.createElement('img');im.alt='';const b=document.createElement('b');el.append(im,b);
       const x={f,el,m:null,man:null,auto:false,why:'',score:0};
-      el.addEventListener('click',()=>{if(!x.m||x.done||crTri.busy||x.m.err)return;const cur=x.man!=null?x.man:x.auto;x.man=!cur;if(x.man===x.auto)x.man=null;crPaint()});
+      el.addEventListener('click',()=>crToggle(x));
+      // clic droit (ou appui long) : la photo en grand, Espace pour garder / écarter, flèches pour passer à la suivante
+      el.addEventListener('contextmenu',e=>{e.preventDefault();const L=crTri.items.filter(y=>y.m&&!y.m.err);const k=L.indexOf(x);if(k<0)return;
+        vwOpenList(L.map(y=>({url:y.m.big||y.m.thumb,alt:'',tri:y})),k)});
       $('cr-tri-grid').append(el);return x});
     crTri.items.push(...news);crPaint();
     for(const x of news){if(crTri.run!==run)return;
