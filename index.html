@@ -172,6 +172,61 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .dl div{display:grid;grid-template-columns:120px 1fr;gap:16px;padding-block:16px;border-bottom:1px solid var(--line)}
 .dl dt,.dl dd{margin:0}
 
+/* Comptes rendus (public) */
+.cr-art{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.7fr);gap:clamp(24px,4vw,64px);align-items:start;padding-block:36px;border-top:1px solid var(--fg)}
+.cr-art+.cr-art{border-top-color:var(--line)}
+.cr-txt{display:grid;gap:14px;align-content:start}
+.cr-txt h3{font-size:clamp(26px,2.6vw,36px);line-height:1.05;letter-spacing:-.03em}
+.cr-recit{color:var(--muted);white-space:pre-line;max-width:46ch}
+.cr-th{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px;max-width:420px}
+.cr-th button{position:relative;padding:0;border:0;aspect-ratio:1;border-radius:2px;overflow:hidden;background:var(--tint);cursor:pointer;opacity:.62;transition:opacity .25s}
+.cr-th button:hover,.cr-th button[aria-current]{opacity:1}
+.cr-th button[aria-current]::after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 0 2px var(--fg)}
+.cr-th img{width:100%;height:100%;object-fit:cover;display:block}
+.cr-th .more{font:500 15px var(--sans);color:var(--fg);opacity:1;box-shadow:inset 0 0 0 1px var(--line);background:transparent}
+#cr-list>p.msg{grid-column:1/-1}
+.cr-car{position:relative;margin:0;aspect-ratio:3/2;overflow:hidden;border-radius:2px;background:var(--tint);touch-action:pan-y;user-select:none}
+.cr-car .sl{position:absolute;inset:0;opacity:0;transition:opacity 1.1s ease}
+.cr-car .sl.on{opacity:1}
+.cr-car .sl img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cr-car .sl.tall .bg{filter:blur(28px) brightness(.8);transform:scale(1.15)}
+.cr-car .sl.tall .fg{object-fit:contain}
+.cr-ctl{position:absolute;left:0;right:0;bottom:0;z-index:2;display:flex;align-items:center;gap:10px;padding:28px 14px 12px;background:linear-gradient(transparent,rgba(0,0,0,.45));color:#fff}
+.cr-ctl .arrow{width:38px;height:38px;color:#fff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.55);background:rgba(0,0,0,.15)}
+.cr-ctl .arrow:hover{box-shadow:inset 0 0 0 1px #fff}
+.cr-ctl .label{color:#fff;margin-left:auto;font-variant-numeric:tabular-nums}
+.cr-bar{position:absolute;left:0;right:0;top:0;height:2px;z-index:2;background:rgba(255,255,255,.25)}
+.cr-bar i{display:block;height:100%;background:#fff;transition:width .4s}
+@media (prefers-reduced-motion:reduce){.cr-car .sl{transition:opacity .3s}}
+@media (max-width:799px){.cr-art{grid-template-columns:minmax(0,1fr)}.cr-art{gap:12px}.cr-th{order:4;grid-template-columns:repeat(8,1fr);max-width:none;gap:4px;margin-top:0}.cr-txt{display:contents}.cr-art>.cr-car{order:3;margin-top:8px}.cr-txt>.label{order:0}.cr-txt>h3{order:1}.cr-recit{order:2}.cr-car{margin-inline:calc(-1 * var(--gut,20px));border-radius:0}.cr-car{aspect-ratio:4/3}}
+.ag-cr{display:inline-block;margin-top:8px;font-size:14px;color:var(--lake);text-decoration:none}
+.ag-cr:hover{text-decoration:underline}
+/* Comptes rendus (admin) */
+.cr-select{font:400 16px var(--sans);color:var(--fg);background:var(--bg);border:1px solid var(--field,var(--line));border-radius:8px;padding:10px 12px;width:100%;max-width:560px}
+#cr-ed{display:grid;gap:18px;margin-top:18px}
+#cr-ed[hidden]{display:none}
+.cr-info{display:grid;gap:4px;padding:14px 16px;border-radius:10px;background:var(--tint);font-size:14px}
+.cr-info b{font-size:17px}
+.cr-info span{color:var(--muted);white-space:pre-line}
+.cr-tri{display:grid;gap:14px;padding:16px;border:1px solid var(--line);border-radius:10px}
+.cr-tri-head{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}
+.cr-tri-sum{margin:0;font-size:14px}
+.cr-max{font-size:13px;color:var(--muted)}
+.cr-max select{font:500 13px var(--sans);color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:4px 6px}
+.cr-tri-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px}
+.cr-t{position:relative;padding:0;border:0;background:var(--tint);border-radius:4px;overflow:hidden;cursor:pointer;aspect-ratio:1;box-shadow:0 0 0 2px transparent}
+.cr-t img{width:100%;height:100%;object-fit:cover;display:block;transition:opacity .2s,filter .2s}
+.cr-t.keep{box-shadow:0 0 0 2px var(--lake)}
+.cr-t.out img{opacity:.35;filter:grayscale(1)}
+.cr-t b{position:absolute;left:4px;bottom:4px;right:4px;font:600 9px/1.2 var(--mono);text-transform:uppercase;letter-spacing:.03em;color:#fff;background:rgba(0,0,0,.62);padding:3px 5px;border-radius:999px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:max-content;max-width:calc(100% - 8px)}
+.cr-t.keep b{background:var(--lake)}
+.cr-t.wait b{background:rgba(0,0,0,.4)}
+.cr-t.done::after{content:"✓";position:absolute;right:5px;top:4px;color:#fff;font:700 14px var(--sans);text-shadow:0 1px 4px rgba(0,0,0,.6)}
+.cr-pub-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding-top:16px;border-top:1px solid var(--line)}
+.cr-state{font:600 11px/1 var(--mono);text-transform:uppercase;letter-spacing:.04em;padding:7px 10px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--line);color:var(--muted)}
+.cr-state.on{background:var(--lake);color:#fff;box-shadow:none}
+#cr-list:empty{display:none}
+
 /* Spot */
 .spot{position:relative;height:clamp(460px,62vw,820px);color:#fff;overflow:hidden;padding:0}
 .spot-car{position:absolute;inset:0;touch-action:pan-y}
@@ -559,8 +614,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=44"></script>
-<script src="js/backend.js?v=44"></script>
+<script src="js/config.js?v=45"></script>
+<script src="js/backend.js?v=45"></script>
 </head>
 <body>
 
@@ -612,6 +667,12 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   <div class="head"><h2>Agenda des sorties</h2><div class="who"><span class="label">Pour répondre</span><input id="who" autocomplete="given-name" placeholder="Prénom" aria-label="Prénom"><input id="who-nom" autocomplete="family-name" placeholder="Nom" aria-label="Nom"></div></div>
   <div class="ag" id="ag-next"><div class="ag-empty">Chargement de l'agenda…</div></div>
   <details class="past" id="ag-past-wrap" hidden><summary class="label">Sorties passées</summary><div class="ag" id="ag-past" style="margin-top:16px"></div></details>
+</div></section>
+
+<section id="cr" class="cr-sec" hidden><div class="wrap">
+  <div class="head"><h2>Comptes rendus</h2><span class="label">Retour sur les dernières sorties</span></div>
+  <div id="cr-pub"></div>
+  <details class="past" id="cr-old-wrap" hidden><summary class="label">Comptes rendus précédents</summary><div id="cr-old"></div></details>
 </div></section>
 
 <section id="programme" style="padding-top:0"><div class="wrap">
@@ -771,7 +832,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 
 <div class="admin" id="admin" hidden role="dialog" aria-modal="true" aria-labelledby="admin-title"><div class="wrap">
   <div class="admin-head"><h2 id="admin-title">Administration</h2><div style="display:flex;gap:8px"><button class="pill line small" id="logout" type="button" hidden>Se déconnecter</button><button class="pill line small" id="close-admin" type="button">Fermer</button></div>
-    <nav class="adm-nav" id="adm-nav" aria-label="Rubriques de l'administration"><button type="button" data-go="sec-visites">Visites</button><button type="button" data-go="sec-agenda">Agenda</button><button type="button" data-go="sec-contact">Reçus<b class="nav-n" id="ct-n" hidden></b></button><button type="button" data-go="sec-msg">Messages</button><button type="button" data-go="sec-membres">Membres</button><button type="button" data-go="sec-textes">Textes</button><button type="button" data-go="sec-photos">Photos</button><button type="button" data-go="sec-apero-ph">Photos apéro</button><button type="button" data-go="sec-admins">Administrateurs</button><button type="button" data-go="sec-seo">Référencement</button><button type="button" class="all" id="adm-all">Tout déplier</button></nav></div>
+    <nav class="adm-nav" id="adm-nav" aria-label="Rubriques de l'administration"><button type="button" data-go="sec-visites">Visites</button><button type="button" data-go="sec-agenda">Agenda</button><button type="button" data-go="sec-cr">Comptes rendus</button><button type="button" data-go="sec-contact">Reçus<b class="nav-n" id="ct-n" hidden></b></button><button type="button" data-go="sec-msg">Messages</button><button type="button" data-go="sec-membres">Membres</button><button type="button" data-go="sec-textes">Textes</button><button type="button" data-go="sec-photos">Photos</button><button type="button" data-go="sec-apero-ph">Photos apéro</button><button type="button" data-go="sec-admins">Administrateurs</button><button type="button" data-go="sec-seo">Référencement</button><button type="button" class="all" id="adm-all">Tout déplier</button></nav></div>
   <button class="pill ink small adm-top" id="adm-top" type="button">↑ Menu</button>
   <div class="gate" id="gate">
     <p class="msg" id="gate-msg">Vérification de l'accès…</p>
@@ -816,6 +877,29 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       <p class="label" style="margin:34px 0 0">Sorties à venir</p>
       <div id="ed-list"></div>
       <details id="ed-past-wrap" style="margin-top:18px"><summary class="label" style="cursor:pointer">Sorties passées</summary><div id="ed-past"></div></details>
+    </section>
+    <section class="adm-sec" id="sec-cr">
+      <h3>Comptes rendus des sorties</h3>
+      <p class="adm-intro">Choisissez une sortie passée : ses informations sont reprises de l'agenda. Déposez toutes les photos de la sortie en vrac : le site les analyse, regroupe les photos qui se ressemblent (rafales, même personne, même cadrage) pour ne garder que la meilleure de chaque groupe, écarte les floues, les trop sombres ou brûlées, et coche une sélection serrée. Touchez une photo pour la cocher ou la décocher. Rien n'apparaît sur le site tant que vous n'avez pas validé le compte rendu.</p>
+      <label class="f"><span class="label">Sortie</span><select id="cr-sel" class="cr-select"></select></label>
+      <div id="cr-ed" hidden>
+        <div class="cr-info" id="cr-info"></div>
+        <label class="f"><span class="label">Récit de la sortie (facultatif)</span><textarea id="cr-txt" rows="5" placeholder="Conditions, ambiance, progrès de chacun, l'apéro…"></textarea></label>
+        <div class="drop" id="cr-drop">
+          <label class="check"><input type="checkbox" id="cr-auto" checked> Retouche automatique</label>
+          <div class="bar" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><label class="pill ink small" style="cursor:pointer">Déposer les photos en vrac<input type="file" id="cr-file" accept="image/*,.heic,.heif" multiple hidden></label><span class="msg" id="cr-msg" role="status">ou glissez-les toutes ici, sans trier</span></div>
+        </div>
+        <div class="cr-tri" id="cr-tri" hidden>
+          <div class="cr-tri-head"><p class="cr-tri-sum" id="cr-tri-sum"></p>
+            <label class="cr-max">Garder au plus <select id="cr-max"><option value="20">20 photos</option><option value="30" selected>30 photos</option><option value="50">50 photos</option><option value="0">toutes les bonnes</option></select></label></div>
+          <p class="adm-intro" style="margin:0">Touchez une photo pour la garder ou l'écarter. Les photos écartées ne sont pas envoyées.</p>
+          <div class="cr-tri-grid" id="cr-tri-grid"></div>
+          <div class="bar" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button type="button" class="pill ink small" id="cr-tri-ok" disabled>Ajouter les photos gardées</button><button type="button" class="pill line small" id="cr-tri-x">Annuler</button><span class="msg" id="cr-tri-msg" role="status"></span></div>
+        </div>
+        <div class="ph-tools"><p class="label" style="margin:0">Photos du compte rendu <span id="cr-count"></span></p><div class="ph-arr" data-grid="cr-list"><button type="button" class="pill line small" data-o="chrono">Chronologique</button><button type="button" class="pill line small" data-o="smart">✦ Ordre intelligent</button><button type="button" class="pill line small" data-o="rnd">Mélanger</button><button type="button" class="pill line small ph-undo" data-o="undo" hidden>Annuler</button><span class="msg" role="status"></span></div><span class="ph-tools-r"><button type="button" class="pill line small ph-sort" data-grid="cr-list" aria-pressed="false">Réorganiser les photos</button></span></div>
+        <div class="ph-grid" id="cr-list"></div>
+        <div class="cr-pub-bar"><span class="cr-state" id="cr-state"></span><button type="button" class="pill line small" id="cr-save">Enregistrer le récit</button><button type="button" class="pill ink small" id="cr-go">Valider et publier</button><button type="button" class="pill line small" id="cr-off" hidden>Retirer du site</button><span class="msg" id="cr-pmsg" role="status"></span></div>
+      </div>
     </section>
     <section class="adm-sec" id="sec-contact">
       <h3>Messages reçus</h3>
@@ -936,15 +1020,16 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
         <aside class="ph-lib" aria-label="Photothèque">
           <div class="ph-lib-head"><h4 class="ph-mod-t">Photothèque <span class="ph-count" id="lib-count"></span></h4>
             <label class="check" style="font-size:13px"><input type="checkbox" id="lib-grey" checked> Griser les photos utilisées</label>
+            <div class="ph-mode" id="lib-bib"><button type="button" data-b="gen" aria-pressed="true">Générale</button><button type="button" data-b="cr" aria-pressed="false">Comptes rendus</button></div>
             <div class="ph-mode" id="lib-filter"><button type="button" data-f="all" aria-pressed="true">Toutes</button><button type="button" data-f="free" aria-pressed="false">Non utilisées</button></div></div>
           <div class="lib-grid" id="lib-list"></div>
           <div class="drop" id="lib-drop">
             <label class="check"><input type="checkbox" id="lib-auto" checked> Retouche automatique</label>
-            <div class="bar" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><label class="pill ink small" style="cursor:pointer">Ajouter à la photothèque<input type="file" id="lib-file" accept="image/*,.heic,.heif" multiple hidden></label><span class="msg" id="lib-msg" role="status">ou glissez-les ici</span></div>
+            <div class="bar" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><label class="pill ink small" style="cursor:pointer"><span id="lib-add-l">Ajouter à la photothèque</span><input type="file" id="lib-file" accept="image/*,.heic,.heif" multiple hidden></label><span class="msg" id="lib-msg" role="status">ou glissez-les ici</span></div>
           </div>
         </aside>
       </div>
-      <div class="sel-bar" id="sel-bar" hidden><span id="sel-n"></span><span class="sel-acts">Déplacer vers <button type="button" class="pill ink small" data-to="bandeau">Bandeau</button><button type="button" class="pill ink small" data-to="apero">Apéro</button><button type="button" class="pill ink small" data-to="spot">Lac</button><button type="button" class="pill line small" id="sel-ret">Retirer</button><button type="button" class="pill line small" id="sel-clear">Tout désélectionner</button></span></div>
+      <div class="sel-bar" id="sel-bar" hidden><span id="sel-n"></span><span class="sel-acts">Déplacer vers <button type="button" class="pill ink small" data-to="bandeau">Bandeau</button><button type="button" class="pill ink small" data-to="apero">Apéro</button><button type="button" class="pill ink small" data-to="spot">Lac</button><button type="button" class="pill line small" id="sel-ret">Retirer</button><button type="button" class="pill line small" id="sel-bib">Changer de bibliothèque</button><button type="button" class="pill line small" id="sel-clear">Tout désélectionner</button></span></div>
     </section>
     <dialog class="vw" id="vw" aria-label="Photo en grand"><img id="vw-img" alt=""><p id="vw-cap"></p><div class="vw-act" id="vw-act" hidden><span>Afficher dans</span><button type="button" data-to="bandeau">Bandeau</button><button type="button" data-to="apero">Apéro</button><button type="button" data-to="spot">Lac</button></div><button type="button" class="vw-b vw-p" id="vw-prev" aria-label="Photo précédente">←</button><button type="button" class="vw-b vw-n" id="vw-next" aria-label="Photo suivante">→</button><button type="button" class="vw-b vw-x" id="vw-close" aria-label="Fermer">✕</button></dialog>
     <section class="adm-sec" id="sec-admins">
@@ -1061,11 +1146,12 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 
   // ---------- Bande photos : contenu depuis la base ----------
   const phSrc=p=>p.url||p.src||'';
-  const zoneOf=p=>['apero','lib','spot'].includes(p.zone)?p.zone:'bandeau';
+  const zoneOf=p=>typeof p.zone==='string'&&p.zone.startsWith('cr:')?p.zone:['apero','lib','spot'].includes(p.zone)?p.zone:'bandeau';
+  const SITE_Z=['bandeau','apero','spot'];
   const phSorted=(z='bandeau',tout=false)=>{const seen=new Set();return (photos||[]).filter(p=>zoneOf(p)===z).sort((a,b)=>(a.ordre||0)-(b.ordre||0)||String(a.id).localeCompare(String(b.id)))
     .filter(p=>{const u=phSrc(p);if(z!=='lib'&&seen.has(u))return false;seen.add(u);return true}).filter(p=>tout||p.actif!==false)};
   // Doublons dans un même module (même fichier deux fois) : on garde la première occurrence
-  const phDupes=()=>{const out=[];['bandeau','apero','spot'].forEach(z=>{const seen=new Set();(photos||[]).filter(p=>zoneOf(p)===z).sort((a,b)=>(a.ordre||0)-(b.ordre||0)||String(a.id).localeCompare(String(b.id)))
+  const phDupes=()=>{const out=[];[...new Set((photos||[]).map(zoneOf))].filter(z=>z!=='lib').forEach(z=>{const seen=new Set();(photos||[]).filter(p=>zoneOf(p)===z).sort((a,b)=>(a.ordre||0)-(b.ordre||0)||String(a.id).localeCompare(String(b.id)))
     .forEach(p=>{const u=phSrc(p);if(seen.has(u))out.push(p);else seen.add(u)})});return out};
   // Carrousel de l'Apéro Pumpfoil : fondu toutes les 5 s, pause au survol
   const apCar=$('ap-car');let apI=0,apHover=false,apTimer=null,apSig='';
@@ -1216,6 +1302,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     const h=document.createElement('h3');h.textContent=s.titre||'Sortie';
     mid.append(h);
     if(s.description){const p=document.createElement('p');p.textContent=s.description;p.style.whiteSpace='pre-line';mid.append(p)}
+    if(!upcoming&&s.crStatut==='publie'&&phSorted('cr:'+s.id).length){const l=document.createElement('a');l.className='ag-cr';l.href='#cr-'+s.id;l.textContent='Voir le compte rendu et les photos →';mid.append(l)}
     const opts=parseOpts(s.options);
     if(upcoming&&opts.length){
       const mine=myAnswers(s.id);
@@ -1355,10 +1442,10 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     try{myId=user&&await user.currentId()}catch(e){}
     if(user&&user.onRecovery)user.onRecovery(showNewPass);
     db.doc('contenu/site').onSnapshot(s=>{contenu=s.exists?(s.data()||{}):{};applyTexts();fillTextForm();initGA(contenu.gaId!=null?contenu.gaId:GA_DEF)},()=>{initGA(GA_DEF)});
-    db.collection('sorties').onSnapshot(q=>{sorties=q.docs.map(d=>Object.assign({id:d.id},d.data()));renderAgenda();renderEditor()},()=>{renderAgenda()});
+    db.collection('sorties').onSnapshot(q=>{sorties=q.docs.map(d=>Object.assign({id:d.id},d.data()));renderAgenda();renderEditor();try{renderCrPublic();renderCr()}catch(e){}},()=>{renderAgenda()});
     db.collection('annonces').onSnapshot(q=>{annonces=q.docs.map(d=>Object.assign({id:d.id},d.data()));renderAnnonces();renderAnEditor()},()=>{});
     refreshCount();
-    db.collection('photos').onSnapshot(q=>{photos=q.docs.map(d=>Object.assign({id:d.id},d.data()));renderStrip();renderPhEditor();try{phCleanDupes()}catch(e){}},()=>{});
+    db.collection('photos').onSnapshot(q=>{photos=q.docs.map(d=>Object.assign({id:d.id},d.data()));renderStrip();renderPhEditor();try{renderCrPublic();renderAgenda()}catch(e){}try{phCleanDupes()}catch(e){}},()=>{});
     db.collection('presences').onSnapshot(q=>{presences=q.docs.map(d=>Object.assign({id:d.id},d.data()));renderAgenda();renderEditor()},()=>{});
   })();
 
@@ -1603,7 +1690,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       fm.append(sum,g,bar);det.append(fm);host.append(det);
       fm.addEventListener('submit',async e=>{e.preventDefault();const d={};fields.forEach(([k])=>{d[k]=fm.elements[k].value.trim()});d.options=parseOpts(d.options.replace(/\n/g,',')).join(', ');
         if(!d.date||!d.titre){say(m,'Date et titre requis.','err');return}
-        try{await db.doc('sorties/'+s.id).set(d);say(m,'Enregistré.','ok')}catch(err){say(m,'Refusé ('+(err&&err.code||'erreur')+').','err')}});
+        const keep=Object.assign({},s);delete keep.id; // garde les champs du compte rendu
+        try{await db.doc('sorties/'+s.id).set(Object.assign(keep,d));say(m,'Enregistré.','ok')}catch(err){say(m,'Refusé ('+(err&&err.code||'erreur')+').','err')}});
       let armed=false;
       del.addEventListener('click',async()=>{
         if(!armed){armed=true;del.textContent='Confirmer la suppression';setTimeout(()=>{armed=false;del.textContent='Supprimer'},4000);return}
@@ -1715,29 +1803,36 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   let phCleaning=false;
   async function phCleanDupes(){if(phCleaning||!isAdmin||!db)return;const d=phDupes();if(!d.length)return;phCleaning=true;
     try{for(const p of d)await db.doc('photos/'+p.id).delete()}catch(e){}phCleaning=false}
-  function renderPhEditor(){Object.keys(PH_Z).forEach(renderPhZone);renderLib();try{selPaint()}catch(e){}}
+  function renderPhEditor(){Object.keys(PH_Z).filter(k=>!k.startsWith('cr:')).forEach(renderPhZone);try{renderCr()}catch(e){}renderLib();try{selPaint()}catch(e){}}
   // ---------- Photothèque : toutes les photos (une par fichier), grisées si utilisées dans un module ----------
-  let libFilter='all';
+  let libFilter='all',libBib='gen';
+  // Deux bibliothèques : « Générale » (photos du site) et « Comptes rendus » (photos des sorties). Une photo passe de l'une à l'autre en un clic.
+  async function bibSwitch(urls,to){const ds=(photos||[]).filter(p=>urls.includes(phSrc(p)));
+    await Promise.all(ds.map(d=>db.doc('photos/'+d.id).update({bib:to==='cr'?'cr':null})))}
+  document.querySelectorAll('#lib-bib button').forEach(b=>b.addEventListener('click',()=>{libBib=b.dataset.b;document.querySelectorAll('#lib-bib button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
+    $('lib-add-l').textContent=libBib==='cr'?'Ajouter aux comptes rendus':'Ajouter à la photothèque';renderLib()}));
   {const g=$('lib-grey');try{if(localStorage.getItem('alr-lib-grey')==='0')g.checked=false}catch(e){}
    const ap=()=>$('lib-list').classList.toggle('nogrey',!g.checked);ap();g.addEventListener('change',()=>{ap();try{localStorage.setItem('alr-lib-grey',g.checked?'1':'0')}catch(e){}})}
   const libItems=()=>{const m=new Map();(photos||[]).forEach(p=>{const u=phSrc(p);if(!u)return;if(!m.has(u))m.set(u,{url:u,docs:[]});m.get(u).docs.push(p)});
-    return [...m.values()].map(it=>{it.uses=it.docs.filter(d=>zoneOf(d)!=='lib').map(d=>zoneOf(d));it.ref=it.docs.find(d=>zoneOf(d)==='lib')||it.docs[0];
+    return [...m.values()].map(it=>{it.uses=it.docs.filter(d=>zoneOf(d)!=='lib').map(d=>zoneOf(d));it.site=it.uses.filter(u=>SITE_Z.includes(u));it.bib=it.docs.some(d=>d.bib==='cr')?'cr':'gen';it.ref=it.docs.find(d=>zoneOf(d)==='lib')||it.docs[0];
       it.date=it.docs.map(d=>d.cree||'').sort().pop()||'';return it}).sort((a,b)=>b.date.localeCompare(a.date))};
   document.querySelectorAll('#lib-filter button').forEach(b=>b.addEventListener('click',()=>{libFilter=b.dataset.f;document.querySelectorAll('#lib-filter button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));renderLib()}));
   function renderLib(){
     if(admin.hidden||!isAdmin||phDragging)return;
-    const box=$('lib-list');box.textContent='';const items=libItems();
+    const box=$('lib-list');box.textContent='';const all=libItems(),items=all.filter(it=>it.bib===libBib);
     $('lib-count').textContent=items.length?'· '+items.length:'';
+    document.querySelectorAll('#lib-bib button').forEach(b=>{const n=all.filter(it=>it.bib===b.dataset.b).length;b.textContent=(b.dataset.b==='cr'?'Comptes rendus':'Générale')+(n?' · '+n:'')});
     const shown=items.filter(it=>libFilter==='all'||!it.uses.length);
-    if(!shown.length){const p=document.createElement('p');p.className='msg';p.textContent=items.length?'Toutes les photos sont utilisées.':'Aucune photo pour l’instant.';box.append(p)}
+    if(!shown.length){const p=document.createElement('p');p.className='msg';p.textContent=items.length?'Toutes les photos sont utilisées.':libBib==='cr'?'Les photos déposées dans les comptes rendus arrivent ici.':'Aucune photo pour l’instant.';box.append(p)}
     shown.forEach(it=>{
-      const c=document.createElement('div');c.className='lib-it'+(it.uses.length?' used':'');c.tabIndex=0;
+      const c=document.createElement('div');c.className='lib-it'+((libBib==='cr'?it.site:it.uses).length?' used':'');c.tabIndex=0;
       const im=document.createElement('img');im.src=it.url;im.alt='';im.loading='lazy';im.draggable=false;if(it.ref.pos)im.style.objectPosition=it.ref.pos;
       const tags=document.createElement('div');tags.className='lib-tags';
-      [...new Set(it.uses)].forEach(u=>{const t=document.createElement('span');t.textContent={bandeau:'Bandeau',apero:'Apéro',spot:'Lac'}[u];tags.append(t)});
+      [...new Set(it.uses.map(u=>u.startsWith('cr:')?'cr':u))].forEach(u=>{const t=document.createElement('span');t.textContent={bandeau:'Bandeau',apero:'Apéro',spot:'Lac',cr:'Compte rendu'}[u];tags.append(t)});
       const act=document.createElement('div');act.className='lib-act';
       const mk=(t,f)=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.addEventListener('click',e=>{e.stopPropagation();f(b)});act.append(b);return b};
       mk('+ Band.',()=>libAdd(it,'bandeau'));mk('+ Apéro',()=>libAdd(it,'apero'));mk('+ Lac',()=>libAdd(it,'spot'));
+      mk(it.bib==='cr'?'→ Générale':'→ C. rendus',()=>bibSwitch([it.url],it.bib==='cr'?'gen':'cr').catch(()=>say($('lib-msg'),'Changement refusé.','err'))).title=it.bib==='cr'?'Passer dans la bibliothèque générale':'Passer dans la bibliothèque des comptes rendus';
       let armed=false;mk('Supprimer',async b=>{if(!armed){armed=true;b.textContent=it.uses.length?'Supprimer partout ?':'Confirmer';setTimeout(()=>{armed=false;b.textContent='Supprimer'},4000);return}
         try{await Promise.all(it.docs.map(d=>db.doc('photos/'+d.id).delete()));if(assets)await Promise.all([...new Set(it.docs.map(d=>d.asset).filter(Boolean))].map(a=>assets.delete(a).catch(()=>{})))}catch(e){say($('lib-msg'),'Suppression refusée.','err')}});
       c.append(im,tags,act);
@@ -1756,7 +1851,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     const used=new Set(),news=[];
     items.forEach((it,n)=>{const free=it.docs.find(d=>zoneOf(d)==='lib'&&!used.has(d.id)),r=it.ref;if(free)used.add(free.id);
       const id=free?free.id:'ph-'+Date.now().toString(36)+n+Math.floor(Math.random()*1e4);
-      const data={asset:r.asset||null,url:r.url||r.src,alt:r.alt||'',prise:r.prise||null,tall:z==='bandeau'?!!r.tall:false,actif:true,zone:z,fixe:false,cree:r.cree||new Date().toISOString()};if(r.pos)data.pos=r.pos;
+      const data={asset:r.asset||null,url:r.url||r.src,alt:r.alt||'',prise:r.prise||null,tall:z==='bandeau'||z.startsWith('cr:')?!!r.tall:false,actif:true,zone:z,fixe:false,cree:r.cree||new Date().toISOString()};if(r.pos)data.pos=r.pos;if(it.bib==='cr')data.bib='cr';
       news.push({id,free:!!free,data})});
     const ids=list.map(p=>p.id);ids.splice(idx,0,...news.map(x=>x.id));
     try{
@@ -1773,7 +1868,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   const selUrls=()=>[...phSel].filter(k=>k[0]==='u').map(k=>k.slice(2));
   function selPaint(){document.querySelectorAll('[data-sel]').forEach(n=>n.classList.toggle('picked',phSel.has(n.dataset.sel)));
     const n=phSel.size,bar=$('sel-bar');bar.hidden=!n&&!selMode;$('sel-n').textContent=n?(n>1?n+' photos sélectionnées':'1 photo sélectionnée'):'Touchez les photos à sélectionner';
-    bar.querySelectorAll('[data-to],#sel-ret').forEach(b=>b.disabled=!n);$('sel-ret').hidden=!selDocs().length;
+    bar.querySelectorAll('[data-to],#sel-ret,#sel-bib').forEach(b=>b.disabled=!n);$('sel-ret').hidden=!selDocs().length;
     document.querySelectorAll('.ph-pick').forEach(b=>{b.setAttribute('aria-pressed',String(selMode));b.textContent=selMode?'Terminer la sélection':'Sélectionner'});
     $('sec-photos').classList.toggle('selecting',selMode)}
   function selToggle(k){phSel.has(k)?phSel.delete(k):phSel.add(k);selPaint()}
@@ -1791,7 +1886,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     renderPhEditor()}
   document.querySelectorAll('.ph-pick').forEach(b=>b.addEventListener('click',()=>{selMode=!selMode;if(!selMode)phSel.clear();selPaint()}));
   $('sel-bar').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
-    if(b.dataset.to)selApply({z:b.dataset.to});else if(b.id==='sel-ret')selApply({lib:true});else if(b.id==='sel-clear')selClear()});
+    if(b.dataset.to)selApply({z:b.dataset.to});else if(b.id==='sel-ret')selApply({lib:true});else if(b.id==='sel-bib'){const us=[...new Set(selUrls().concat(selDocs().map(phSrc)))],its=libItems().filter(i=>us.includes(i.url));
+      const to=its.every(i=>i.bib==='cr')?'gen':'cr';bibSwitch(us,to).then(()=>{selClear();say($('lib-msg'),us.length+(us.length>1?' photos passées':' photo passée')+' dans la bibliothèque '+(to==='cr'?'des comptes rendus.':'générale.'),'ok')}).catch(()=>say($('lib-msg'),'Changement refusé.','err'))}else if(b.id==='sel-clear')selClear()});
   // Clic : sélection (Cmd/Ctrl/Maj ou mode sélection), sinon rien. Renvoie true si le clic a servi à sélectionner.
   const selClick=(e,k)=>{if(selMode||e.metaKey||e.ctrlKey||e.shiftKey){e.preventDefault();selToggle(k);return true}return false};
   // ---------- Visionneuse (clic sur une photo en mode « Réorganiser ») ----------
@@ -1863,7 +1959,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       out.push(best);left.delete(best)}
     return out.map(i=>list[i])}
   document.querySelectorAll('.ph-arr').forEach(bar=>bar.addEventListener('click',async e=>{const b=e.target.closest('button[data-o]');if(!b)return;
-    const g=bar.dataset.grid,z={'ph-list':'bandeau','ap-list':'apero','sp-list':'spot'}[g],all=phSorted(z,true),m=bar.querySelector('.msg'),undo=bar.querySelector('.ph-undo');
+    if(!GRID_Z[bar.dataset.grid])return;const g=bar.dataset.grid,z=GRID_Z[g],all=phSorted(z,true),m=bar.querySelector('.msg'),undo=bar.querySelector('.ph-undo');
     if(all.length<2&&b.dataset.o!=='undo')return;
     let ids;
     try{
@@ -1886,7 +1982,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   function dropClear(){document.querySelectorAll('.drop-on').forEach(g=>g.classList.remove('drop-on'));document.querySelectorAll('.ins-b,.ins-a').forEach(n=>n.classList.remove('ins-b','ins-a'))}
   function dropTarget(x,y,skip){dropClear();const el=document.elementFromPoint(x,y);if(!el)return null;
     const lib=el.closest('.ph-lib');if(lib){lib.classList.add('drop-on');return {lib:true}}
-    const g=el.closest('#ph-list,#ap-list,#sp-list')||el.closest('.ph-mod')?.querySelector('.ph-grid');if(!g||g===skip)return null;g.classList.add('drop-on');
+    const g=el.closest('#ph-list,#ap-list,#sp-list,#cr-list')||el.closest('.ph-mod')?.querySelector('.ph-grid');if(!g||g===skip)return null;g.classList.add('drop-on');
     const card=el.closest('.ph');let before=null;
     if(card&&card.parentNode===g){const r=card.getBoundingClientRect(),after=x>r.left+r.width/2;card.classList.add(after?'ins-a':'ins-b');before=after?card.nextElementSibling?.dataset.id||null:card.dataset.id}
     return {z:GRID_Z[g.id],before}}
@@ -1941,7 +2037,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     const all=phSorted(z,true);
     if(!all.length){const p=document.createElement('p');p.className='msg';p.textContent=Z.vide;list.append(p)}
     all.forEach((p,i)=>{
-      const c=document.createElement('div');c.className='ph'+(p.tall&&z==='bandeau'?' tall':'')+(z==='apero'?' ap':'')+(z==='spot'?' sp':'')+(p.actif===false?' off':'');
+      const c=document.createElement('div');c.className='ph'+(p.tall&&z==='bandeau'?' tall':'')+(z==='apero'||z.startsWith('cr:')?' ap':'')+(z==='spot'?' sp':'')+(p.actif===false?' off':'');
       const im=document.createElement('img');im.src=phSrc(p);im.alt='';im.className='adj';im.draggable=false;im.title='Glissez la photo pour changer sa place';
       let fp=parsePos(p.pos);im.style.objectPosition=fp.x+'% '+fp.y+'%';
       focalDrag(im,im,()=>fp,v=>{fp=v},()=>db.doc('photos/'+p.id).update({pos:fp.x+'% '+fp.y+'%'}).catch(()=>{}),()=>c.classList.contains('framing'));
@@ -2135,7 +2231,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       const {blob,tall}=await encode(draw(pvw.bmp,2000,pvOpts(),pvw.crop));
       const res=await assets.upload(blob,{type:blob.type});const prise=await exifDate(f);
       const id='ph-'+Date.now().toString(36)+pvw.i;
-      await db.doc('photos/'+id).set(Object.assign({asset:res.id,url:res.url,alt:'',tall,ordre:++pvw.base,actif:true,cree:new Date().toISOString()},pvw.z!=='bandeau'?{zone:pvw.z}:{},(pvw.pos.x!==50||pvw.pos.y!==50)?{pos:pvw.pos.x+'% '+pvw.pos.y+'%'}:{},prise?{prise}:{}));
+      await db.doc('photos/'+id).set(Object.assign({asset:res.id,url:res.url,alt:'',tall,ordre:++pvw.base,actif:true,cree:new Date().toISOString()},pvw.z!=='bandeau'?{zone:pvw.z}:{},pvw.z==='lib'&&libBib==='cr'?{bib:'cr'}:{},(pvw.pos.x!==50||pvw.pos.y!==50)?{pos:pvw.pos.x+'% '+pvw.pos.y+'%'}:{},prise?{prise}:{}));
       pvw.ok++;say($(UP_Z[pvw.z].msg),f.name+' : '+Math.round(f.size/1024)+' Ko → '+Math.round(res.sizeBytes/1024)+' Ko','ok');
       pvw.busy=false;b.textContent='Charger la photo';pvNext();
     }catch(e){pvw.busy=false;b.disabled=false;b.textContent='Réessayer';say(m,f.name+' : '+errTxt(e),'err')}
@@ -2147,6 +2243,200 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     ['dragleave','drop'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.remove('over')}));
     drop.addEventListener('drop',e=>addPhotos(e.dataTransfer.files,z));
   });
+
+  // ---------- Comptes rendus des sorties ----------
+  // Photos rangées dans « photos » avec zone « cr:<id de la sortie> » et bib « cr ». Le compte rendu (récit, statut) est stocké sur la sortie.
+  const crDateLong=iso=>{const d=new Date((iso||'')+'T12:00:00');return isNaN(d)?'':d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})};
+  let crCars=[],crPubSig='';
+  function crPublished(){return (sorties||[]).filter(s=>s.crStatut==='publie').sort((a,b)=>(b.date||'').localeCompare(a.date||''))}
+  function renderCrPublic(){
+    const L=crPublished().map(s=>({s,ph:phSorted('cr:'+s.id)})).filter(x=>x.ph.length);
+    const sig=JSON.stringify(L.map(x=>[x.s.id,x.s.titre,x.s.date,x.s.lieu,x.s.crTexte,x.ph.map(p=>p.id+phSrc(p)+(p.pos||'')+(p.alt||''))]));
+    if(sig===crPubSig)return;crPubSig=sig;
+    $('cr').hidden=!L.length;crCars.forEach(c=>c());crCars=[];
+    const pub=$('cr-pub'),old=$('cr-old');pub.textContent='';old.textContent='';
+    L.forEach((x,i)=>(i<2?pub:old).append(crArticle(x.s,x.ph)));
+    $('cr-old-wrap').hidden=L.length<3;
+  }
+  function crArticle(s,ph){
+    const a=document.createElement('article');a.className='cr-art';a.id='cr-'+s.id;
+    const t=document.createElement('div');t.className='cr-txt';
+    const lb=document.createElement('span');lb.className='label';lb.textContent=[crDateLong(s.date),s.lieu].filter(Boolean).join(' · ');
+    const h=document.createElement('h3');h.textContent=s.titre||'Sortie';t.append(lb,h);
+    if(s.crTexte){const p=document.createElement('p');p.className='cr-recit';p.textContent=s.crTexte;t.append(p)}
+    // Planche-contact : un aperçu des photos, un clic affiche la photo dans le carrousel
+    const th=document.createElement('div');th.className='cr-th';const TH=ph.length>8?7:8;
+    ph.slice(0,TH).forEach((p,k)=>{const b=document.createElement('button');b.type='button';b.setAttribute('aria-label','Voir la photo '+(k+1));const im=document.createElement('img');im.src=phSrc(p);im.alt='';im.loading='lazy';im.decoding='async';b.append(im);
+      b.addEventListener('click',()=>{show(k);restart()});th.append(b)});
+    if(ph.length>TH){const b=document.createElement('button');b.type='button';b.className='more';b.textContent='+'+(ph.length-TH);b.setAttribute('aria-label','Photos suivantes');b.addEventListener('click',()=>{show(TH);restart()});th.append(b)}
+    if(ph.length>1)t.append(th);
+    const fig=document.createElement('figure');fig.className='cr-car';fig.setAttribute('aria-roledescription','carrousel');fig.setAttribute('aria-label','Photos de la sortie : '+(s.titre||''));
+    const alt0=(s.titre||'Sortie')+' · '+crDateLong(s.date);
+    const sls=ph.map(p=>{const sl=document.createElement('div');sl.className='sl'+(p.tall?' tall':'');const u=phSrc(p);
+      if(p.tall){const bg=document.createElement('img');bg.className='bg';bg.alt='';bg.setAttribute('aria-hidden','true');bg.dataset.src=u;sl.append(bg)}
+      const im=document.createElement('img');im.className='fg';im.alt=p.alt||alt0;im.decoding='async';im.dataset.src=u;if(p.pos&&!p.tall)im.style.objectPosition=p.pos;
+      im.addEventListener('error',()=>sl.classList.add('bad'));sl.append(im);fig.append(sl);return sl});
+    const bar=document.createElement('div');bar.className='cr-bar';const bi=document.createElement('i');bar.append(bi);
+    const ctl=document.createElement('div');ctl.className='cr-ctl';
+    const mkA=(txt,lab)=>{const b=document.createElement('button');b.type='button';b.className='arrow';b.textContent=txt;b.setAttribute('aria-label',lab);return b};
+    const prev=mkA('←','Photo précédente'),next=mkA('→','Photo suivante'),cnt=document.createElement('span');cnt.className='label';
+    ctl.append(prev,next,cnt);fig.append(bar,ctl);
+    if(ph.length<2){prev.hidden=next.hidden=bar.hidden=true}
+    let i=0,timer=null,hover=false,vis=false;
+    const load=k=>{const sl=sls[(k+sls.length)%sls.length];if(sl)sl.querySelectorAll('img[data-src]').forEach(im=>{im.src=im.dataset.src;im.removeAttribute('data-src')})};
+    const show=k=>{i=(k+sls.length)%sls.length;sls.forEach((sl,n)=>sl.classList.toggle('on',n===i));load(i);load(i+1);
+      cnt.textContent=String(i+1).padStart(2,'0')+' / '+String(sls.length).padStart(2,'0');th.querySelectorAll('button').forEach((b,k)=>b.toggleAttribute('aria-current',b.classList.contains('more')?i>=TH:k===i));bi.style.width=((i+1)/sls.length*100)+'%'};
+    const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const restart=()=>{clearInterval(timer);timer=null;if(sls.length<2||reduce||!vis)return;timer=setInterval(()=>{if(!document.hidden&&!hover)show(i+1)},4500)};
+    prev.addEventListener('click',()=>{show(i-1);restart()});next.addEventListener('click',()=>{show(i+1);restart()});
+    fig.addEventListener('mouseenter',()=>{hover=true});fig.addEventListener('mouseleave',()=>{hover=false});
+    {let sx=null,sy=0;fig.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY},{passive:true});
+     fig.addEventListener('touchend',e=>{if(sx===null)return;const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;sx=null;if(Math.abs(dx)>40&&Math.abs(dx)>Math.abs(dy)){show(i+(dx<0?1:-1));restart()}},{passive:true})}
+    fig.tabIndex=0;fig.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'){show(i-1);restart()}if(e.key==='ArrowRight'){show(i+1);restart()}});
+    let io=null;if('IntersectionObserver' in window){io=new IntersectionObserver(es=>{vis=es.some(e=>e.isIntersecting);restart()},{threshold:.35});io.observe(fig)}else{vis=true}
+    crCars.push(()=>{clearInterval(timer);io&&io.disconnect()});
+    show(0);restart();
+    a.append(t,fig);return a;
+  }
+  // Lien « Voir le compte rendu » depuis l'agenda (ouvre les comptes rendus précédents si besoin)
+  document.addEventListener('click',e=>{const l=e.target.closest('a.ag-cr');if(!l)return;const el=document.getElementById(l.getAttribute('href').slice(1));
+    if(el&&$('cr-old').contains(el))$('cr-old-wrap').open=true});
+
+  // --- Administration ---
+  let crId=null,crDirty=false;
+  const crPast=()=>{const t=today();return (sorties||[]).filter(s=>s.date&&s.date<=t).sort((a,b)=>b.date.localeCompare(a.date))};
+  function crSetZone(){Object.keys(PH_Z).filter(k=>k.startsWith('cr:')).forEach(k=>delete PH_Z[k]);delete GRID_Z['cr-list'];
+    if(crId){PH_Z['cr:'+crId]={list:'cr-list',drop:'cr-drop',msg:'cr-msg',auto:'cr-auto',file:'cr-file',vide:'Pas encore de photo : déposez-les en vrac ci-dessus.'};GRID_Z['cr-list']='cr:'+crId}}
+  function renderCr(){
+    if(admin.hidden||!isAdmin)return;
+    const sel=$('cr-sel'),L=crPast();
+    if(crId&&!L.some(s=>s.id===crId))crId=null;
+    if(!crId&&L.length)crId=L[0].id;
+    if(document.activeElement!==sel){sel.textContent='';sel.disabled=!L.length;
+      if(!L.length){const o=document.createElement('option');o.textContent='Aucune sortie passée pour l’instant';sel.append(o)}
+      L.forEach(s=>{const o=document.createElement('option');o.value=s.id;const n=phSorted('cr:'+s.id,true).length;
+        o.textContent=fmtDate(s.date)+' '+s.date.slice(0,4)+' · '+(s.titre||'Sortie')+'  —  '+(s.crStatut==='publie'?'publié':n?'brouillon, '+n+' photo'+(n>1?'s':''):'à faire');sel.append(o)});
+      if(crId)sel.value=crId}
+    crSetZone();$('cr-ed').hidden=!crId;if(!crId)return;
+    const s=L.find(x=>x.id===crId),z='cr:'+crId,all=phSorted(z,true);
+    const inf=$('cr-info');inf.textContent='';const b=document.createElement('b');b.textContent=s.titre||'Sortie';
+    const l1=document.createElement('span');l1.textContent=[crDateLong(s.date),s.heure,s.lieu].filter(Boolean).join(' · ');inf.append(b,l1);
+    if(s.description){const l2=document.createElement('span');l2.textContent=s.description;inf.append(l2)}
+    if(!crDirty&&document.activeElement!==$('cr-txt'))$('cr-txt').value=s.crTexte||'';
+    const pub=s.crStatut==='publie',st=$('cr-state');st.textContent=pub?'Publié sur le site':'Brouillon · non visible';st.classList.toggle('on',pub);
+    $('cr-go').textContent=pub?'Mettre à jour':'Valider et publier';$('cr-off').hidden=!pub;
+    const shown=all.filter(p=>p.actif!==false).length;$('cr-count').textContent=all.length?'· '+all.length+(shown<all.length?' ('+shown+' affichées)':''):'';
+    renderPhZone(z);
+  }
+  $('cr-sel').addEventListener('change',e=>{if(crTri.busy){e.target.value=crId;return}crId=e.target.value;crDirty=false;crTriReset();renderCr()});
+  $('cr-txt').addEventListener('input',()=>{crDirty=true});
+  async function crSave(extra,okTxt){const m=$('cr-pmsg');if(!crId)return;
+    try{await db.doc('sorties/'+crId).update(Object.assign({crTexte:$('cr-txt').value.trim()},extra||{}));crDirty=false;say(m,okTxt,'ok')}catch(e){say(m,'Enregistrement refusé ('+errTxt(e)+').','err')}}
+  $('cr-save').addEventListener('click',()=>crSave(null,'Récit enregistré.'));
+  $('cr-go').addEventListener('click',()=>{const n=phSorted('cr:'+crId).length;if(!n){say($('cr-pmsg'),'Ajoutez au moins une photo affichée avant de publier.','err');return}
+    const s=crPast().find(x=>x.id===crId)||{};crSave({crStatut:'publie',crPublieLe:s.crPublieLe||new Date().toISOString()},'Compte rendu publié sur le site.')});
+  $('cr-off').addEventListener('click',()=>crSave({crStatut:'brouillon'},'Compte rendu retiré du site (gardé en brouillon).'));
+
+  // --- Dépôt en vrac et tri automatique ---
+  // Pour chaque photo : netteté (Laplacien, sur la zone la plus nette de l'image), exposition, couleurs, empreinte visuelle (pour repérer les photos qui se ressemblent).
+  const crTri={items:[],busy:false};
+  async function crAnalyse(f){
+    const bmp=await decode(f),W=bmp.width,H=bmp.height;
+    const k=Math.min(1,1024/Math.max(W,H)),w=Math.max(16,Math.round(W*k)),h=Math.max(16,Math.round(H*k));
+    const cv=document.createElement('canvas');cv.width=w;cv.height=h;const x=cv.getContext('2d',{willReadFrequently:true});x.drawImage(bmp,0,0,w,h);if(bmp.close)bmp.close();
+    const d=x.getImageData(0,0,w,h).data,n=w*h,g=new Float32Array(n);let L=0,dk=0,bl=0,rg=0,yb=0,rg2=0,yb2=0;
+    for(let i=0,j=0;j<n;i+=4,j++){const r=d[i],gg=d[i+1],b=d[i+2],l=(.299*r+.587*gg+.114*b)/255;g[j]=l;L+=l;if(l<.05)dk++;else if(l>.97)bl++;
+      const a=r-gg,c=.5*(r+gg)-b;rg+=a;yb+=c;rg2+=a*a;yb2+=c*c}
+    L/=n;rg/=n;yb/=n;const col=(Math.sqrt(Math.max(0,rg2/n-rg*rg)+Math.max(0,yb2/n-yb*yb))+.3*Math.hypot(rg,yb))/255;
+    const G=4,S=new Float64Array(G*G),S2=new Float64Array(G*G),C=new Float64Array(G*G);
+    for(let y=1;y<h-1;y++){const cy=Math.floor(y*G/h)*G;for(let xx=1;xx<w-1;xx++){const o=y*w+xx,v=g[o-1]+g[o+1]+g[o-w]+g[o+w]-4*g[o],c=cy+Math.floor(xx*G/w);S[c]+=v;S2[c]+=v*v;C[c]++}}
+    const cells=[...S].map((s,c)=>C[c]?Math.sqrt(Math.max(0,S2[c]/C[c]-(s/C[c])**2)):0).sort((a,b)=>b-a);
+    const sharp=(cells[0]+cells[1]+cells[2])/3;
+    // empreinte 16x12 (niveaux de gris normalisés) : sert à mesurer la ressemblance entre deux photos
+    const HW=16,HH=12,fp=new Float32Array(HW*HH),fc=new Float32Array(HW*HH);
+    for(let y=0;y<h;y++){const by=Math.min(HH-1,Math.floor(y*HH/h))*HW;for(let xx=0;xx<w;xx++){const c=by+Math.min(HW-1,Math.floor(xx*HW/w));fp[c]+=g[y*w+xx];fc[c]++}}
+    let m=0;for(let c=0;c<fp.length;c++){fp[c]/=fc[c]||1;m+=fp[c]}m/=fp.length;let sd=0;for(let c=0;c<fp.length;c++){fp[c]-=m;sd+=fp[c]*fp[c]}sd=Math.sqrt(sd/fp.length)||1;for(let c=0;c<fp.length;c++)fp[c]/=sd;
+    const hu=new Float32Array(8);{for(let i=0;i<d.length;i+=16){const r=d[i],gg=d[i+1],b=d[i+2];hu[(r>127?4:0)+(gg>127?2:0)+(b>127?1:0)]++}const t=hu.reduce((a,b)=>a+b,0)||1;for(let c=0;c<8;c++)hu[c]/=t}
+    const tk=Math.min(1,260/Math.max(w,h)),tc=document.createElement('canvas');tc.width=Math.round(w*tk);tc.height=Math.round(h*tk);tc.getContext('2d').drawImage(cv,0,0,tc.width,tc.height);
+    const blob=await new Promise(r=>tc.toBlob(r,'image/jpeg',.72));
+    const prise=await exifDate(f);
+    return {w:W,h:H,L,dark:dk/n,blown:bl/n,col,sharp,fp,hu,tall:H>W*1.05,thumb:blob?URL.createObjectURL(blob):'',prise,t:prise?Date.parse(prise):(f.lastModified||0)}
+  }
+  // Ressemblance entre deux photos (0 = rien à voir, 1 = identiques) : corrélation des empreintes + histogrammes de couleurs
+  function crSim(a,b){if(a.tall!==b.tall)return 0;let c=0;for(let i=0;i<a.fp.length;i++)c+=a.fp[i]*b.fp[i];c/=a.fp.length;
+    let hi=0;for(let i=0;i<8;i++)hi+=Math.min(a.hu[i],b.hu[i]);return .7*Math.max(0,c)+.3*hi}
+  function crClassify(){
+    const it=crTri.items.filter(x=>x.m&&!x.m.err),bad=crTri.items.filter(x=>x.m&&x.m.err);
+    const med=a=>{const b=a.slice().sort((p,q)=>p-q);return b.length?b[b.length>>1]:0};
+    const Sv=it.map(x=>x.m.sharp),Cv=it.map(x=>x.m.col),ms=med(Sv);
+    const rank=(arr,v)=>arr.length<2?.5:arr.filter(a=>a<v).length/(arr.length-1);
+    bad.forEach(x=>{x.why='Illisible';x.auto=false});
+    it.forEach(x=>{const m=x.m;x.why='';x.dupOf=null;
+      if(Math.max(m.w,m.h)<700)x.why='Trop petite';
+      else if(m.L<.12||m.dark>.55)x.why='Trop sombre';
+      else if(m.blown>.3||m.L>.9)x.why='Brûlée';
+      else if(m.sharp<.012||(it.length>=4&&m.sharp<ms*.42))x.why='Floue';
+      x.score=.6*rank(Sv,m.sharp)+.22*(1-Math.min(1,Math.abs(m.L-.47)*2.2))+.18*rank(Cv,m.col)});
+    // Photos qui se ressemblent (même personne, même cadrage, rafale) : on garde la meilleure du groupe
+    const ok=it.filter(x=>!x.why).sort((a,b)=>b.score-a.score),kept=[];
+    ok.forEach(x=>{const d=kept.find(k=>{const s=crSim(k.m,x.m),dt=Math.abs(k.m.t-x.m.t)/1000;return s>.86||(dt<=30&&s>.7)||(dt<=8&&s>.55)});
+      if(d){x.why='Ressemble à une autre';x.dupOf=d}else kept.push(x)});
+    const max=+$('cr-max').value;if(max)kept.slice(max).forEach(x=>{x.why='Moins bonne'});
+    crTri.items.forEach(x=>{if(x.m)x.auto=!x.why});
+    crPaint();
+  }
+  function crPaint(){
+    const its=crTri.items,done=its.filter(x=>x.m),keep=its.filter(x=>x.m&&(x.man!=null?x.man:x.auto)&&!x.done);
+    its.forEach(x=>{const el=x.el,k=x.m&&(x.man!=null?x.man:x.auto);el.classList.toggle('keep',!!k&&!x.done);el.classList.toggle('out',!!x.m&&!k&&!x.done);el.classList.toggle('wait',!x.m);el.classList.toggle('done',!!x.done);
+      el.setAttribute('aria-pressed',String(!!k));
+      const stars=x.score>.7?'★★★':x.score>.4?'★★':'★';
+      el.querySelector('b').textContent=x.done?'Ajoutée':!x.m?'Analyse…':x.up?'Envoi…':k?(x.man===true&&!x.auto?'Reprise':stars+' gardée'):(x.man===false&&x.auto?'Écartée':x.why);
+      el.title=x.f.name+(x.m&&!x.m.err?'':'')});
+    const c=w=>its.filter(x=>x.m&&!(x.man!=null?x.man:x.auto)&&x.why===w).length;
+    const parts=[['Ressemble à une autre','en double (photos qui se ressemblent)','en double (photos qui se ressemblent)'],['Floue','floue','floues'],['Trop sombre','trop sombre','trop sombres'],['Brûlée','brûlée','brûlées'],['Moins bonne','moins bonne','moins bonnes'],['Trop petite','trop petite','trop petites'],['Illisible','illisible','illisibles']].map(([w,t1,t])=>{const n=c(w);return n?n+' '+(n>1?t:t1):''}).filter(Boolean);
+    $('cr-tri-sum').textContent=(done.length<its.length?'Analyse '+done.length+' / '+its.length+'… ':'')+keep.length+' photo'+(keep.length>1?'s':'')+' gardée'+(keep.length>1?'s':'')+' sur '+its.length+(parts.length?' · écartées : '+parts.join(', '):'');
+    const b=$('cr-tri-ok');b.disabled=crTri.busy||!keep.length||done.length<its.length;b.textContent=keep.length?'Ajouter les '+keep.length+' photo'+(keep.length>1?'s':'')+' gardée'+(keep.length>1?'s':''):'Ajouter les photos gardées';
+  }
+  function crTriReset(){crTri.items.forEach(x=>{if(x.m&&x.m.thumb)URL.revokeObjectURL(x.m.thumb)});crTri.items=[];crTri.run=(crTri.run||0)+1;$('cr-tri-grid').textContent='';$('cr-tri').hidden=true;say($('cr-tri-msg'),'')}
+  async function crIngest(files){
+    files=[...files].filter(f=>/^image\//.test(f.type)||/\.(jpe?g|png|webp|heic|heif)$/i.test(f.name));const m=$('cr-msg');
+    if(!files.length){say(m,'Aucune image reconnue.','err');return}
+    if(!assets){say(m,'Ajout de photos indisponible : reconnectez-vous à l\'admin.','err');return}
+    if(crTri.busy){say(m,'Un envoi est en cours, patientez.','err');return}
+    const have=new Set(crTri.items.map(x=>x.f.name+x.f.size));files=files.filter(f=>!have.has(f.name+f.size));
+    $('cr-tri').hidden=false;say(m,files.length+' photo'+(files.length>1?'s':'')+' à analyser…');
+    const run=crTri.run,news=files.map(f=>{const el=document.createElement('button');el.type='button';el.className='cr-t wait';const im=document.createElement('img');im.alt='';const b=document.createElement('b');el.append(im,b);
+      const x={f,el,m:null,man:null,auto:false,why:'',score:0};
+      el.addEventListener('click',()=>{if(!x.m||x.done||crTri.busy||x.m.err)return;const cur=x.man!=null?x.man:x.auto;x.man=!cur;if(x.man===x.auto)x.man=null;crPaint()});
+      $('cr-tri-grid').append(el);return x});
+    crTri.items.push(...news);crPaint();
+    for(const x of news){if(crTri.run!==run)return;
+      try{x.m=await crAnalyse(x.f);x.el.querySelector('img').src=x.m.thumb}catch(e){x.m={err:true}}
+      if(crTri.run!==run){if(x.m&&x.m.thumb)URL.revokeObjectURL(x.m.thumb);return}
+      crClassify()}
+    say(m,'Analyse terminée : vérifiez la sélection ci-dessous.','ok');
+  }
+  $('cr-max').addEventListener('change',()=>{if(crTri.items.length)crClassify()});
+  $('cr-tri-x').addEventListener('click',()=>{if(!crTri.busy){crTriReset();say($('cr-msg'),'')}});
+  $('cr-tri-ok').addEventListener('click',async()=>{if(crTri.busy||!crId)return;
+    const s=crPast().find(x=>x.id===crId)||{},z='cr:'+crId,m=$('cr-tri-msg');
+    const list=crTri.items.filter(x=>x.m&&!x.m.err&&!x.done&&(x.man!=null?x.man:x.auto)).sort((a,b)=>a.m.t-b.m.t||a.f.name.localeCompare(b.f.name));
+    if(!list.length)return;crTri.busy=true;crPaint();
+    let base=Math.max(0,...phSorted(z,true).map(p=>p.ordre||0)),ok=0,ko=0;const alt=(s.titre||'Sortie')+' · '+crDateLong(s.date);
+    for(const x of list){x.up=true;crPaint();say(m,'Envoi '+(ok+ko+1)+' / '+list.length+'…');
+      try{const bmp=await decode(x.f);const cv=draw(bmp,2000,$('cr-auto').checked?{auto:true}:null);if(bmp.close)bmp.close();
+        const {blob,tall}=await encode(cv);const res=await assets.upload(blob,{type:blob.type});
+        const id='ph-'+Date.now().toString(36)+Math.floor(Math.random()*1e4);
+        await db.doc('photos/'+id).set(Object.assign({asset:res.id,url:res.url,alt,tall,ordre:++base,actif:true,zone:z,bib:'cr',fixe:false,cree:new Date().toISOString()},x.m.prise?{prise:x.m.prise}:{}));
+        x.done=true;ok++}catch(e){ko++;x.err=errTxt(e)}
+      x.up=false;crPaint()}
+    crTri.busy=false;crPaint();
+    if(!ko){crTriReset();say($('cr-msg'),ok+' photo'+(ok>1?'s ajoutées':' ajoutée')+' au compte rendu. Vérifiez-les, puis « Valider et publier ».','ok')}
+    else say(m,ok+' envoyée'+(ok>1?'s':'')+', '+ko+' en échec ('+(list.find(x=>x.err)||{}).err+'). Cliquez à nouveau pour réessayer.','err');
+  });
+  $('cr-file').addEventListener('change',e=>{crIngest(e.target.files);e.target.value=''});
+  {const drop=$('cr-drop');['dragenter','dragover'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.add('over')}));
+   ['dragleave','drop'].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.remove('over')}));drop.addEventListener('drop',e=>crIngest(e.dataTransfer.files))}
 
   // ---------- Membres (admin) ----------
   let membres=[];
