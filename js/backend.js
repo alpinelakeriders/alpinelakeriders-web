@@ -63,6 +63,7 @@
       const {data}=await sb.rpc('is_admin');adminCache=!!data;return adminCache},
     async login(email,password){adminCache=null;const {error}=await sb.auth.signInWithPassword({email,password});if(error)throw fail(error)},
     async logout(){adminCache=null;await sb.auth.signOut()},
+    async token(){const s=await session();return s&&!s.user.is_anonymous?s.access_token:''},
     async email(){const s=await session();return s&&!s.user.is_anonymous?s.user.email:''},
     // Gestion des administrateurs
     async listAdmins(){const {data,error}=await sb.rpc('list_admins');if(error)throw fail(error);return (data||[]).map(r=>r.email)},

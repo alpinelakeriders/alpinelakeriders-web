@@ -256,6 +256,10 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .cr-ig summary small{color:var(--muted);font-size:13px}
 .cr-ig-body{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:22px;padding:0 16px 16px}
 @media (max-width:760px){.cr-ig-body{grid-template-columns:minmax(0,1fr)}}
+.cr-igc{grid-column:1/-1;display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:10px 14px;border-radius:10px;background:var(--tint);font-size:14px}
+.cr-igc .igc-b{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+.cr-igc.on #igc-t::before{content:"● ";color:#16a34a}
+.igp{background:linear-gradient(45deg,#f09433,#dc2743 50%,#bc1888);color:#fff}
 .cr-ig-pick{display:grid;gap:14px;align-content:start;min-width:0}
 .cr-ig-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:6px}
 .cr-ig-grid button{position:relative;padding:0;border:0;aspect-ratio:1;border-radius:4px;overflow:hidden;cursor:pointer;background:var(--tint);opacity:.55}
@@ -671,8 +675,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="js/config.js?v=49"></script>
-<script src="js/backend.js?v=49"></script>
+<script src="js/config.js?v=50"></script>
+<script src="js/backend.js?v=50"></script>
 </head>
 <body>
 
@@ -967,11 +971,12 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
         <details class="cr-ig" id="cr-ig">
           <summary><span>Post Instagram</span><small>3 meilleures photos présélectionnées, légende prête à copier</small></summary>
           <div class="cr-ig-body">
+            <div class="cr-igc" id="igc"><span id="igc-t">Compte Instagram : vérification…</span><span class="igc-b" id="igc-b"></span></div>
             <div class="cr-ig-pick"><p class="adm-intro" style="margin:0">Touchez les photos dans l'ordre voulu (10 au plus). Les numéros donnent l'ordre du carrousel Instagram.</p>
               <div class="cr-ig-grid" id="cr-ig-grid"></div>
               <div class="ph-mode" id="cr-ig-fmt"><button type="button" data-r="1.25" aria-pressed="true">Portrait 4:5</button><button type="button" data-r="1" aria-pressed="false">Carré 1:1</button></div>
               <label class="f"><span class="label">Légende</span><textarea id="cr-ig-cap" rows="10"></textarea></label>
-              <div class="bar" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button type="button" class="pill line small" id="cr-ig-gen">Proposer une autre légende</button><button type="button" class="pill line small" id="cr-ig-copy">Copier la légende</button><button type="button" class="pill ink small" id="cr-ig-dl">Télécharger les images</button><button type="button" class="pill ink small" id="cr-ig-share" hidden>Envoyer vers Instagram</button><span class="msg" id="cr-ig-msg" role="status"></span></div></div>
+              <div class="bar" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><button type="button" class="pill line small" id="cr-ig-gen">Proposer une autre légende</button><button type="button" class="pill line small" id="cr-ig-copy">Copier la légende</button><button type="button" class="pill ink small" id="cr-ig-dl">Télécharger les images</button><button type="button" class="pill ink small" id="cr-ig-share" hidden>Envoyer vers Instagram</button><button type="button" class="pill ink small igp" id="cr-ig-pub" hidden>Publier sur Instagram</button><span class="msg" id="cr-ig-msg" role="status"></span></div></div>
             <div class="cr-ig-mock" aria-label="Aperçu du post"><div class="igm-h"><img src="media/logo-alr-noir.svg" alt=""><b>alpinelakeriders</b></div><div class="igm-ph" id="cr-ig-ph"></div><div class="igm-dots" id="cr-ig-dots"></div><p class="igm-cap" id="cr-ig-prev"></p></div>
           </div>
         </details>
@@ -2633,7 +2638,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     all.forEach(p=>{const b=document.createElement('button');b.type='button';const k=ig.sel.indexOf(p.id);b.className=k>=0?'on':'';b.setAttribute('aria-pressed',String(k>=0));
       const im=document.createElement('img');im.src=phSrc(p);im.alt='';im.loading='lazy';b.append(im);if(k>=0){const n=document.createElement('i');n.textContent=k+1;b.append(n)}
       b.addEventListener('click',()=>{ig.touched=true;const j=ig.sel.indexOf(p.id);if(j>=0)ig.sel.splice(j,1);else if(ig.sel.length<10)ig.sel.push(p.id);else{say($('cr-ig-msg'),'10 photos au plus sur Instagram.','err');return}renderIg()});g.append(b)});
-    igPreview();
+    igPreview();try{if(igSt)igPaint()}catch(e){}
     $('cr-ig-share').hidden=!(navigator.canShare&&matchMedia('(hover:none)').matches)}
   $('cr-ig-cap').addEventListener('input',()=>{ig.capAuto=false;igPreview()});
   $('cr-ig-gen').addEventListener('click',()=>{ig.v++;igCaption(true)});
@@ -2654,6 +2659,55 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       if(!navigator.canShare({files:fs})){say(m,'Partage impossible sur cet appareil : utilisez « Télécharger ».','err');return}
       await navigator.share({files:fs,text:$('cr-ig-cap').value});say(m,'Choisissez Instagram. La légende est copiée : collez-la au moment de publier.','ok')}
     catch(e){if(!(e&&e.name==='AbortError'))say(m,'Partage impossible ('+(e&&e.message||'erreur')+').','err')}});
+
+  // --- Connexion directe au compte Instagram (fonctions Cloudflare /api/ig/*, jeton gardé côté serveur) ---
+  const igApi=async(path,body)=>{const t=user&&user.token?await user.token():'';
+    const r=await fetch('/api/ig/'+path,{method:body?'POST':'GET',headers:Object.assign({Authorization:'Bearer '+t},body?{'Content-Type':'application/json'}:{}),body:body?JSON.stringify(body):undefined});
+    let d={};try{d=await r.json()}catch(e){d={error:'service Instagram indisponible ('+r.status+')'}}
+    if(!r.ok||d.error)throw new Error(d.error||('erreur '+r.status));return d};
+  let igSt=null;
+  function igPaint(){const box=$('igc'),t=$('igc-t'),b=$('igc-b');b.textContent='';const st=igSt||{};
+    const mk=(txt,cls,f)=>{const x=document.createElement('button');x.type='button';x.className='pill small '+cls;x.textContent=txt;x.addEventListener('click',f);b.append(x);return x};
+    box.classList.toggle('on',!!st.connected);
+    if(st.error)t.textContent='Compte Instagram : '+st.error;
+    else if(!st.configured)t.textContent='Connexion directe à Instagram : à activer (réglages Meta et Cloudflare à faire une fois).';
+    else if(st.connected)t.textContent='Connecté à @'+(st.username||'instagram')+(st.expire?' · se renouvelle tout seul (prochaine échéance '+new Date(st.expire).toLocaleDateString('fr-FR')+')':'');
+    else t.textContent=st.expired?'La connexion Instagram a expiré : reconnectez le compte.':'Compte Instagram non connecté.';
+    if(st.configured&&!st.connected)mk('Connecter le compte Instagram','ink',igConnect);
+    if(st.connected){let armed=false;const d=mk('Déconnecter','line',async()=>{if(!armed){armed=true;d.textContent='Confirmer la déconnexion';setTimeout(()=>{armed=false;d.textContent='Déconnecter'},5000);return}
+      try{await igApi('disconnect',{});igSt=null;igStatus()}catch(e){say($('cr-ig-msg'),e.message,'err')}})}
+    $('cr-ig-pub').hidden=!st.connected;
+    const s=crId&&crPast().find(x=>x.id===crId);
+    const done=$('cr-ig-done');if(done)done.remove();
+    if(s&&s.crInsta&&s.crInsta.date){const p=document.createElement('span');p.id='cr-ig-done';p.className='msg ok';p.append('Déjà publié sur Instagram le '+new Date(s.crInsta.date).toLocaleDateString('fr-FR')+' ');
+      if(s.crInsta.lien){const a=document.createElement('a');a.href=s.crInsta.lien;a.target='_blank';a.rel='noopener';a.textContent='voir le post';p.append(a)}$('igc').append(p)}}
+  async function igStatus(){try{igSt=await igApi('status')}catch(e){igSt={error:/404|indisponible/.test(e.message)?'service pas encore en ligne.':e.message}}igPaint()}
+  async function igConnect(){const st=Math.random().toString(36).slice(2)+Date.now().toString(36);try{sessionStorage.setItem('alr-ig-state',st)}catch(e){}
+    try{const d=await igApi('start',{state:st});location.href=d.url}catch(e){say($('cr-ig-msg'),e.message,'err')}}
+  $('cr-ig').addEventListener('toggle',()=>{if($('cr-ig').open)igStatus()});
+  {let armed=false;$('cr-ig-pub').addEventListener('click',async()=>{const b=$('cr-ig-pub'),m=$('cr-ig-msg'),n=ig.sel.length;
+    if(!n){say(m,'Choisissez au moins une photo.','err');return}
+    if(!armed){armed=true;b.textContent='Confirmer : publier '+(n>1?n+' photos':'1 photo')+' sur @'+((igSt&&igSt.username)||'instagram');setTimeout(()=>{if(armed){armed=false;b.textContent='Publier sur Instagram'}},6000);return}
+    armed=false;b.disabled=true;b.textContent='Publication…';const tmp=[];
+    try{say(m,'Préparation des images…');const fs=await igFiles();const urls=[];
+      for(const f of fs){const r=await assets.upload(f,{type:'image/jpeg'});tmp.push(r.id);urls.push(r.url)}
+      say(m,'Envoi à Instagram… (jusqu\'à une minute)');
+      const d=await igApi('publish',{images:urls,caption:$('cr-ig-cap').value});
+      say(m,'Publié sur Instagram ✓','ok');
+      try{await db.doc('sorties/'+crId).update({crInsta:{date:new Date().toISOString(),lien:d.permalink||'',id:d.id||''}})}catch(e){}
+      if(d.permalink){const a=document.createElement('a');a.href=d.permalink;a.target='_blank';a.rel='noopener';a.textContent=' Voir le post';m.append(a)}
+    }catch(e){say(m,'Publication impossible : '+e.message,'err')}
+    // les JPEG temporaires ne servent plus une fois Instagram passé
+    setTimeout(()=>tmp.forEach(id=>assets&&assets.delete(id).catch(()=>{})),60000);
+    b.disabled=false;b.textContent='Publier sur Instagram';igPaint()})}
+  // Retour de la connexion Instagram (?ig_code=…) : on termine la connexion dans l'admin
+  {const q=new URLSearchParams(location.search),code=q.get('ig_code'),err=q.get('ig_error');
+   if(code||err){let ok=true;try{const st=sessionStorage.getItem('alr-ig-state');ok=!st||st===q.get('ig_state');sessionStorage.removeItem('alr-ig-state')}catch(e){}
+     ['ig_code','ig_error','ig_state'].forEach(k=>q.delete(k));history.replaceState(null,'',location.pathname+(q.toString()?'?'+q:'')+location.hash);
+     setTimeout(async()=>{$('open-admin').click();for(let i=0;i<40&&!isAdmin;i++)await new Promise(r=>setTimeout(r,250));if(!isAdmin)return;
+       secOpen($('sec-cr'),true);$('cr-ig').open=true;$('sec-cr').scrollIntoView({block:'start'});const m=$('cr-ig-msg');
+       if(err||!ok){say(m,'Connexion Instagram annulée'+(err?' : '+err:'.'),'err');igStatus();return}
+       say(m,'Connexion au compte Instagram…');try{const d=await igApi('connect',{code});say(m,'Compte @'+d.username+' connecté ✓','ok')}catch(e){say(m,'Connexion refusée : '+e.message,'err')}igStatus()},600)}}
 
   // ---------- Membres (admin) ----------
   let membres=[];
