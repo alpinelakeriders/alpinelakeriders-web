@@ -688,6 +688,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 	transition: stroke-dashoffset 0.3s ease-out, stroke-opacity 0.3s ease-in;
 }
 
+.leaflet-pane.dk{filter:invert(1) hue-rotate(180deg) brightness(.9) contrast(.9)}
 </style>
 <style>
 /* Mise en page : la vidéo de l'accueil en bandeau, puis une grande phrase, la carte (liste à gauche, carte à droite),
@@ -1292,15 +1293,15 @@ window.ALR_SPOTS_START=function(){
     m.attributionControl.addAttribution('Fond : Natural Earth');
     // Trois niveaux de fond quand on zoome (mode Auto) :
     //  - vue d'ensemble : pays et lacs dessinés (Natural Earth) ;
-    //  - zoom 6 à 12 : plan détaillé avec routes, villes et lacs (CARTO / OpenStreetMap) ;
+    //  - zoom 6 à 12 : plan détaillé avec routes, villes et lacs (OpenStreetMap) ;
     //  - zoom 13 et plus : satellite (Esri) avec les noms des lieux.
     // Les boutons Plan et Satellite forcent l'un ou l'autre.
     const ROAD=6,SAT=13;
     m.createPane('road');m.getPane('road').style.zIndex=190;
     m.createPane('sat');m.getPane('sat').style.zIndex=200;
     const dark=()=>document.documentElement.dataset.theme==='dark'||(document.documentElement.dataset.theme!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches);
-    const roadUrl=()=>'https://{s}.basemaps.cartocdn.com/rastertiles/'+(dark()?'dark_all':'voyager')+'/{z}/{x}/{y}{r}.png';
-    const road=L.tileLayer(roadUrl(),{pane:'road',subdomains:'abcd',maxNativeZoom:19,maxZoom:18,attribution:'© OpenStreetMap · © CARTO'});
+    // Plan OpenStreetMap (sans clé). En thème sombre, on assombrit les tuiles en CSS.
+    const road=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{pane:'road',maxNativeZoom:19,maxZoom:18,attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'});
     const sat=L.layerGroup([
       L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{pane:'sat',maxNativeZoom:18,maxZoom:18,attribution:'Imagerie © Esri, Maxar, Earthstar Geographics'}),
       L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',{pane:'sat',maxNativeZoom:18,maxZoom:18})
@@ -1308,7 +1309,7 @@ window.ALR_SPOTS_START=function(){
     let mode='auto',satOK=true,roadOK=true,errs=0,oks=0,rerrs=0,roks=0;
     sat.eachLayer(l=>{l.on('tileerror',()=>{errs++;if(!oks&&errs>=4&&satOK){satOK=false;applyView()}});l.on('tileload',()=>{oks++})});
     road.on('tileerror',()=>{rerrs++;if(!roks&&rerrs>=4&&roadOK){roadOK=false;applyView()}});road.on('tileload',()=>{roks++});
-    const reTheme=()=>road.setUrl(roadUrl());
+    const reTheme=()=>m.getPane('road').classList.toggle('dk',dark());reTheme();
     matchMedia('(prefers-color-scheme: dark)').addEventListener('change',reTheme);
     new MutationObserver(reTheme).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
     function applyView(){
