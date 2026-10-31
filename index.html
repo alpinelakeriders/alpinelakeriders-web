@@ -414,6 +414,16 @@ form{display:grid;gap:26px;align-content:start}
 .mt-h li.mt-past{opacity:.45}
 .mt-h li.mt-calme b{color:var(--lake)}
 .mt-h li.mt-vente b{color:var(--danger)}
+.mt-sat{display:grid;grid-template-columns:minmax(0,1fr);gap:12px 20px;margin-top:16px;align-items:start}
+@media (min-width:640px){.mt-sat{grid-template-columns:minmax(0,320px) minmax(0,1fr)}}
+.mt-map{position:relative;display:block;aspect-ratio:4/3;border-radius:8px;overflow:hidden;background:#111}
+.mt-map img{width:100%;height:100%;object-fit:cover}
+.mt-map .pt{position:absolute;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;border:2px solid #fff;background:var(--lake);box-shadow:0 0 0 2px rgba(0,0,0,.35)}
+.mt-map .vl{position:absolute;transform:translate(-50%,-50%);font:500 10px/1 var(--mono);letter-spacing:.03em;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.9);white-space:nowrap}
+.mt-map .vl::before{content:"";display:block;width:4px;height:4px;margin:0 auto 3px;border-radius:50%;background:#fff}
+.mt-sat .label{display:block;font-size:11px;margin-bottom:6px}
+.mt-sat b{display:block;font-weight:500;font-size:15px}
+.mt-sat small{display:block;font-size:13px;color:var(--muted);line-height:1.45}
 .mt-src{margin-top:10px;font-size:12px;color:var(--muted)}
 .af{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
 .af img{height:15px;width:auto;opacity:.88}
@@ -777,6 +787,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 </div></div>
 
 <div class="meteo" id="meteo" hidden><div class="wrap">
+  <div id="mt-prev" hidden>
   <div class="mt-head" aria-live="polite">
     <span class="label" id="mt-titre">Météo du jour · Lac de la Terrasse</span>
     <span class="mt-verdict" id="mt-verdict"><i aria-hidden="true"></i><span></span></span>
@@ -789,6 +800,11 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   </div>
   <button class="lt-btn" id="mt-btn" type="button" aria-expanded="false" aria-controls="mt-h">Heure par heure <span aria-hidden="true">↓</span></button>
   <ol class="mt-h" id="mt-h" hidden aria-label="Vent moyen en km/h, heure par heure"></ol>
+  </div>
+  <div class="mt-sat" id="mt-sat" hidden>
+    <a class="mt-map" id="mt-map" target="_blank" rel="noopener" aria-label="Image satellite des nuages autour du lac de la Terrasse, agrandir"><img id="mt-img" alt="Image satellite Meteosat des nuages autour du lac de la Terrasse" decoding="async"></a>
+    <div><span class="label">Nuages en direct · satellite</span><b id="mt-nua"></b><small id="mt-nua-m"></small></div>
+  </div>
   <p class="mt-src" id="mt-src"></p>
 </div></div>
 <script>
@@ -918,8 +934,35 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     });
     var btn=$('mt-btn');
     btn.onclick=function(){var o=ol.hidden;ol.hidden=!o;btn.setAttribute('aria-expanded',o?'true':'false');btn.querySelector('span').textContent=o?'↑':'↓'};
-    $('mt-src').textContent='Prévision AROME Météo-France (maille 1,3 km) via Open-Meteo · vent moyen à 10 m en km/h · plus le vent est faible, plus le plan d\'eau est lisse.';
-    $('meteo').hidden=false;
+    $('mt-src').textContent='Prévision AROME Météo-France (maille 1,3 km) via Open-Meteo · vent moyen à 10 m en km/h · plus le vent est faible, plus le plan d\'eau est lisse. Nuages en direct : satellites Meteosat (EUMETSAT).';
+    $('mt-prev').hidden=false;$('meteo').hidden=false;
+  }).catch(function(){});
+})();
+// Nuages en direct : image satellite EUMETSAT (MTG, couleurs réelles le jour, infrarouge la nuit, toutes les 10 min)
+// centrée sur le lac, et part du ciel couvert mesurée par /api/nuages (masque nuageux Meteosat, toutes les 15 min).
+(function(){
+  if(!window.fetch)return;
+  var LAT=45.319731,LON=5.947815,DX=.6,DY=.32,$=function(id){return document.getElementById(id)};
+  var VILLES=[['Grenoble',45.1885,5.7245],['Chambéry',45.5646,5.9178],['Lac',0,0]];
+  function wms(dx,dy,w,h){return 'https://view.eumetsat.int/geoserver/wms?service=WMS&version=1.3.0&request=GetMap&layers=mtg_fd:rgb_geocolour&styles=&crs=CRS:84&format=image/jpeg&bbox='+[LON-dx,LAT-dy,LON+dx,LAT+dy].join(',')+'&width='+w+'&height='+h+'&t='+Math.floor(Date.now()/6e5)}
+  var map=$('mt-map'),img=$('mt-img');
+  img.onload=function(){$('mt-sat').hidden=false;$('meteo').hidden=false;if(!$('mt-src').textContent)$('mt-src').textContent='Nuages en direct : satellites Meteosat (EUMETSAT).'};
+  img.src=wms(DX,DY,640,480);
+  map.href=wms(DX*2.5,DY*2.5,1600,1200);
+  VILLES.forEach(function(v){
+    var e=document.createElement('span');
+    if(v[0]==='Lac'){e.className='pt';e.style.left='50%';e.style.top='50%';e.title='Lac de la Terrasse'}
+    else{e.className='vl';e.textContent=v[0];e.style.left=(v[2]-LON+DX)/(2*DX)*100+'%';e.style.top=(LAT+DY-v[1])/(2*DY)*100+'%'}
+    map.append(e);
+  });
+  fetch('/api/nuages').then(function(r){return r.ok?r.json():null}).then(function(d){
+    if(!d||d.couverture==null){$('mt-nua').textContent='Image satellite en direct';$('mt-nua-m').textContent='Les nuages apparaissent en blanc, le point vert marque le lac.';return}
+    var c=d.couverture;
+    $('mt-nua').textContent=c<=10?'Ciel dégagé':c<=35?'Quelques nuages':c<=70?'Ciel partiellement couvert':c<95?'Ciel très nuageux':'Ciel couvert';
+    var m=c+' % de nuages autour du lac (carré de 20 km)';
+    if(d.auLac===0&&c>10)m+=', éclaircie au-dessus du lac';else if(d.auLac===1&&c<90)m+=', nuages au-dessus du lac';
+    if(d.heure){var t=new Date(d.heure);if(!isNaN(t))m+=' · image de '+t.toLocaleTimeString('fr-FR',{timeZone:'Europe/Paris',hour:'numeric',minute:'2-digit'}).replace(':','h')}
+    $('mt-nua-m').textContent=m+'.';
   }).catch(function(){});
 })();
 </script>
