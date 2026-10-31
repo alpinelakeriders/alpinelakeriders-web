@@ -869,6 +869,12 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .mk.on{transform:scale(1.6)}
 .mk.alr{width:30px;height:30px;background:var(--fg);box-shadow:0 0 0 3px var(--bg),0 2px 8px rgba(0,0,0,.35);display:grid;place-items:center;color:var(--bg);font:600 9px/1 var(--mono);letter-spacing:.02em}
 .mk.alr.on{transform:scale(1.25)}
+.mk.sub{width:10px;height:10px}
+#map .mk.ed{width:26px;height:26px;background:#e8572a!important;color:#fff;display:grid;place-items:center;font:600 12px/1 var(--mono);box-shadow:0 0 0 3px #fff,0 2px 8px rgba(0,0,0,.5)!important;cursor:grab}
+.editbar{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);z-index:600;background:var(--bg);color:var(--fg);border-radius:14px;box-shadow:0 0 0 1px var(--line),0 12px 30px -8px rgba(0,0,0,.35);padding:10px 12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;width:max-content;max-width:calc(100% - 24px);font-size:13px}
+.editbar b{font-weight:500}.editbar p{margin:0;width:100%;text-align:center;color:var(--muted);font-size:12px}
+.editbar .err{color:#c0392b}
+.map-box.editing .reset,.map-box.editing .legend{display:none}
 .cl{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--fg);color:var(--bg);font:500 13px/1 var(--mono);font-variant-numeric:tabular-nums;box-shadow:0 0 0 4px color-mix(in srgb,var(--fg) 18%,transparent)}
 .cl.big{width:46px;height:46px;font-size:14px}
 .me{width:18px;height:18px;border-radius:50%;background:#2f7de1;box-shadow:0 0 0 4px rgba(47,125,225,.25),0 0 0 2px #fff inset}
@@ -1022,6 +1028,7 @@ footer .legal{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap
       </div>
       <div class="reset"><span class="view" id="view" role="group" aria-label="Fond de carte"><button type="button" data-v="auto" aria-pressed="true" data-t="vAuto">Auto</button><button type="button" data-v="plan" aria-pressed="false" data-t="vPlan">Plan</button><button type="button" data-v="sat" aria-pressed="false" data-t="vSat">Satellite</button></span><button class="pill small" id="all" type="button" data-t="allEurope">Tout voir</button></div>
       <div class="satnote" id="satnote" hidden></div>
+      <div class="editbar" id="editbar" hidden></div>
     </div>
     <div class="list" id="list"><ol id="ol"></ol><div class="more" id="more" hidden><button class="pill line small" id="more-b" type="button"></button></div></div>
   </div>
@@ -1101,6 +1108,9 @@ footer .legal{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap
 window.ALR_SPOTS_START=function(){
   const $=id=>document.getElementById(id);
   const SPOTS=window.SPOTS;
+  // Positions corrigées par les admins (glisser-déposer), enregistrées dans la base : collection spots_pos.
+  function applyPos(s,pts){if(!pts||!pts.length)return;s.la=pts[0][0];s.lo=pts[0][1];s.pts=pts;s.ap=0}
+  let db=null,me='';
   const ALR_ID=6;
 
   // ---------- Langue ----------
@@ -1233,7 +1243,8 @@ window.ALR_SPOTS_START=function(){
     const row=(k,v)=>{if(!v)return;dl.append(el('dt',null,k),el('dd',null,v))};
     row(tr("Plan d'eau",'Water'),s.e);row(tr('Type','Type'),s.t);row(tr('Accès','Access'),s.a);row(tr('Géré par','Run by'),s.st);
     row(tr('Fréquentation','Crowd'),s.f);row(tr('Saison, horaires','Season, hours'),s.s);
-    if(s.la!=null)row('GPS',s.la.toFixed(4)+', '+s.lo.toFixed(4));
+    if(s.la!=null)row('GPS',s.la.toFixed(5)+', '+s.lo.toFixed(5));
+    if(s.pts&&s.pts.length>1)s.pts.slice(1).forEach((q,k)=>row(tr('Départ ','Start ')+(k+2),q[0].toFixed(5)+', '+q[1].toFixed(5)));
     f.append(dl);
     if(s.rm){const r=el('p','rm',s.rm);if(lang==='en')r.lang='fr';f.append(r)}
     const a=el('div','acts');
@@ -1241,6 +1252,7 @@ window.ALR_SPOTS_START=function(){
     if(s.li)a.append(link(s.li,tr('Site du spot','Spot website')));
     if(s.ph)a.append(link(s.ph,tr('Photos','Photos')));
     if(s.so&&s.so!==s.li)a.append(link(s.so,'Source'));
+    if(db){const b=el('button','pill line small',tr('Modifier la position','Edit position'));b.type='button';b.addEventListener('click',()=>editPos(s));a.append(b)}
     f.append(a);return f;
   }
   function render(){
@@ -1281,7 +1293,7 @@ window.ALR_SPOTS_START=function(){
     m.createPane('base');m.getPane('base').style.zIndex=150;
     const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
     const base={};
-    fetch('media/fond-carte.json').then(r=>r.json()).then(g=>{
+    fetch('media/fond-carte.json?v=2').then(r=>r.json()).then(g=>{
       const st1=()=>({pane:'base',color:css('--border'),weight:.8,fillColor:css('--land'),fillOpacity:1,interactive:false});
       const st2=()=>({pane:'base',color:css('--lake'),weight:.6,opacity:.5,fillColor:css('--lakefill'),fillOpacity:1,interactive:false});
       base.c=L.geoJSON({type:'GeometryCollection',geometries:g.c},{style:st1}).addTo(m);
@@ -1352,6 +1364,7 @@ window.ALR_SPOTS_START=function(){
     d.append(el('p',null,[s.v,pays(s.p)].filter(Boolean).join(' · ')+(s.d!=null&&isFinite(s.d)?' · '+fmtKm(s.d):'')));
     const a=el('div','acts');a.append(link(gmaps(s),tr('Itinéraire','Directions'),'pill ink small'));
     const b=el('button','pill line small',tr('Voir la fiche','Details'));b.type='button';b.addEventListener('click',()=>select(s.i,false,true));a.append(b);
+    if(db){const e=el('button','pill line small',tr('Modifier','Edit'));e.type='button';e.addEventListener('click',()=>editPos(s));a.append(e)}
     d.append(a);return d;
   }
   function drawMarkers(){
@@ -1365,7 +1378,10 @@ window.ALR_SPOTS_START=function(){
       const m=L.marker([s.la,s.lo],{icon:icon(s),title:s.n,zIndexOffset:s.i===ALR_ID?1000:0,keyboard:true});
       m.bindPopup(()=>popup(s),{closeButton:true,autoPanPadding:[30,30]});
       m.on('click',()=>{select(s.i,false,true,true)});
-      markers[s.i]=m;if(s.i===ALR_ID){alrLayer=m.addTo(map)}else cluster.addLayer(m)});
+      markers[s.i]=m;if(s.i===ALR_ID){alrLayer=m.addTo(map)}else cluster.addLayer(m);
+      // Départs supplémentaires du même spot
+      (s.pts||[]).slice(1).forEach(q=>{const x=L.marker(q,{icon:L.divIcon({className:'',html:'<div class="mk sub'+(s.ac==='libre'?' libre':'')+'"></div>',iconSize:[10,10],iconAnchor:[5,5]}),title:s.n,keyboard:false});
+        x.bindPopup(()=>popup(s),{closeButton:true,autoPanPadding:[30,30]});x.on('click',()=>select(s.i,false,true,true));cluster.addLayer(x)})});
     map.addLayer(cluster);
   }
   function fitTo(a){if(!map)return;const pts=a.filter(s=>s.la!=null).map(s=>[s.la,s.lo]);if(!pts.length)return;
@@ -1480,7 +1496,57 @@ window.ALR_SPOTS_START=function(){
     try{navigator.clipboard.writeText($('mail').textContent).then(done,sel)}catch(e){sel()}
   });
 
+  // ---------- Correction de position (admins) ----------
+  // Bouton « Modifier » : on glisse le ou les points de départ à leur place exacte, on peut en ajouter, puis « Valider » enregistre.
+  let ed=null;
+  function editPos(s){
+    if(!map||!db)return;if(ed)stopEdit();
+    map.closePopup();
+    const start=s.pts?s.pts.map(q=>q.slice()):s.la!=null?[[s.la,s.lo]]:[[map.getCenter().lat,map.getCenter().lng]];
+    ed={s,lay:L.layerGroup().addTo(map),pts:start,mk:[]};
+    if(cluster)map.removeLayer(cluster);if(alrLayer)map.removeLayer(alrLayer);
+    document.querySelector('.map-box').classList.add('editing');
+    map.setView(start[0],Math.max(map.getZoom(),17));
+    drawEd();
+    document.querySelector('.map-box').scrollIntoView({behavior:'smooth',block:'center'});
+  }
+  function drawEd(msg,err){
+    ed.lay.clearLayers();ed.mk=ed.pts.map((q,k)=>{
+      const m=L.marker(q,{draggable:true,autoPan:true,zIndexOffset:3000,title:tr('Départ ','Start ')+(k+1),icon:L.divIcon({className:'',html:'<div class="mk ed">'+(k+1)+'</div>',iconSize:[26,26],iconAnchor:[13,13]})});
+      m.on('dragend',()=>{const p=m.getLatLng();ed.pts[k]=[p.lat,p.lng]});
+      return m.addTo(ed.lay)});
+    const bar=$('editbar');bar.textContent='';bar.hidden=false;
+    bar.append(el('b',null,ed.s.n));
+    const btn=(t,fn,cls)=>{const b=el('button',cls||'pill line small',t);b.type='button';b.addEventListener('click',fn);bar.append(b);return b};
+    btn(tr('+ Ajouter un départ','+ Add a start'),()=>{const c=map.getCenter(),l=ed.pts[ed.pts.length-1],off=map.containerPointToLatLng(map.latLngToContainerPoint(l).add([40,0]));ed.pts.push([off.lat,off.lng]);drawEd()});
+    if(ed.pts.length>1)btn(tr('Retirer le départ ','Remove start ')+ed.pts.length,()=>{ed.pts.pop();drawEd()});
+    btn(tr('Annuler','Cancel'),stopEdit);
+    btn(tr('Valider','Save'),savePos,'pill ink small');
+    const p=el('p',err?'err':null,msg||tr('Glissez chaque point numéroté à l’endroit exact du départ.','Drag each numbered point to the exact start spot.'));bar.append(p);
+  }
+  async function savePos(){
+    const pts=ed.pts.map(q=>[+q[0].toFixed(6),+q[1].toFixed(6)]),s=ed.s;
+    drawEd(tr('Enregistrement…','Saving…'));
+    try{await db.doc('spots_pos/'+s.i).set({pts,par:me,le:new Date().toISOString()})}
+    catch(e){drawEd(tr('Pas enregistré, réessayez. ','Not saved, try again. ')+(e&&e.message||''),true);return}
+    applyPos(s,pts);stopEdit();render();
+    const sp=$('msg');sp.textContent=tr('Position enregistrée.','Position saved.');setTimeout(()=>{if(sp.textContent===tr('Position enregistrée.','Position saved.'))sp.textContent=''},4000);
+  }
+  function stopEdit(){
+    if(!ed)return;map.removeLayer(ed.lay);ed=null;$('editbar').hidden=true;
+    document.querySelector('.map-box').classList.remove('editing');
+    drawMarkers();
+  }
+
   applyLang();drawMarkers();fitTo(SPOTS);
+  // Charge les positions déjà corrigées
+  (async()=>{try{
+    db=window.claude&&await window.claude.use('db');if(!db)return;
+    try{const u=await window.claude.use('user');me=await u.email()}catch(e){}
+    const snap=await db.collection('spots_pos').get();
+    snap.docs.forEach(d=>{const s=SPOTS.find(x=>String(x.i)===d.id),v=d.data();if(s&&v&&Array.isArray(v.pts))applyPos(s,v.pts)});
+    render();drawMarkers();
+  }catch(e){}})();
 };
 </script>
 </body>
