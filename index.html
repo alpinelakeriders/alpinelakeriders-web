@@ -300,6 +300,27 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .lt-bar{height:3px;border-radius:2px;background:var(--line);overflow:hidden}
 .lt-bar i{display:block;height:100%;background:var(--lake);opacity:.7}
 @media (max-width:560px){.lt-hist li{grid-template-columns:96px 1fr 96px;gap:10px}}
+/* Lacs environnants */
+#lacs{padding-top:clamp(72px,9vw,128px)}
+#lacs .head{margin-bottom:28px}
+.lk-intro{color:var(--muted);max-width:60ch;margin-bottom:40px}
+.lk{border-top:1px solid var(--fg)}
+.lk-row{border-bottom:1px solid var(--line);padding-block:20px}
+.lk-main{display:grid;grid-template-columns:1fr auto;gap:6px 24px;align-items:baseline}
+@media (min-width:860px){.lk-main{grid-template-columns:minmax(0,1.4fr) 150px minmax(0,1.6fr) auto}}
+.lk-name h3{font-size:22px}
+.lk-name span{display:block;color:var(--muted);font-size:14px;margin-top:2px}
+.lk-t{font-size:clamp(28px,3vw,40px);font-weight:400;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums;text-align:right}
+@media (min-width:860px){.lk-t{text-align:left}}
+.lk-meta{color:var(--muted);font-size:14px}
+.lk-meta .ag-tag{margin-right:8px;vertical-align:1px}
+.lk-meta .ag-tag.live{background:var(--lake);color:#fff;box-shadow:none}
+@media (max-width:859px){.lk-meta{grid-column:1/-1}}
+.lk-row .lt-btn{flex-basis:auto;margin-top:0;justify-self:end}
+@media (max-width:859px){.lk-row .lt-btn{grid-column:1/-1;justify-self:start}}
+.lk-row .lt-hist{margin-top:14px}
+.lk-empty{color:var(--muted);font-size:14px}
+.lk-note{margin-top:28px;font-size:13px;color:var(--muted);max-width:80ch}
 .spot-dots button{width:26px;height:20px;padding:0;border:0;background:none;cursor:pointer;position:relative}
 .spot-dots button::before{content:"";position:absolute;left:0;right:0;top:9px;height:2px;background:rgba(255,255,255,.45)}
 .spot-dots button[aria-current="true"]::before{background:#fff}
@@ -696,7 +717,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 
 <nav class="topbar"><div class="wrap">
   <span class="label">Alpine Lake Riders Association</span>
-  <ul><li><a href="#asso">L'asso</a></li><li><a href="#agenda">Agenda</a></li><li><a href="#debuter">Débuter</a></li><li><a href="#apero">Apéros Pumpfoil</a></li><li><a href="#spot">Le spot</a></li><li><a href="#rejoindre">Rejoindre</a></li><li><a href="#contact">Contact</a></li></ul>
+  <ul><li><a href="#asso">L'asso</a></li><li><a href="#agenda">Agenda</a></li><li><a href="#debuter">Débuter</a></li><li><a href="#apero">Apéros Pumpfoil</a></li><li><a href="#spot">Le spot</a></li><li><a href="#lacs">Lacs</a></li><li><a href="#rejoindre">Rejoindre</a></li><li><a href="#contact">Contact</a></li></ul>
   <a class="pill ink" href="#rejoindre">Adhérer</a>
 </div></nav>
 <header class="hero" id="top">
@@ -823,7 +844,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   var MC=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
   var fmt=function(t){return t<0.5?'≈ 0 °C · glace':t.toFixed(1).replace('.',',')+' °C'};
   var $=function(id){return document.getElementById(id)};
-  fetch(c.url+'/rest/v1/lake_temperature?select=acquired_on,temp_c&order=acquired_on.desc&limit=60',{headers:{apikey:c.anonKey,Authorization:'Bearer '+c.anonKey}})
+  fetch(c.url+'/rest/v1/lake_temperature?select=acquired_on,temp_c&lake=eq.terrasse&order=acquired_on.desc&limit=60',{headers:{apikey:c.anonKey,Authorization:'Bearer '+c.anonKey}})
     .then(function(r){return r.ok?r.json():[]})
     .then(function(rows){
       rows=(rows||[]).map(function(r){return {t:Number(r.temp_c),d:new Date(r.acquired_on+'T12:00:00')}})
@@ -850,6 +871,75 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
         btn.querySelector('span').textContent=open?'↑':'↓';
       });
     }).catch(function(){});
+})();
+</script>
+
+<section id="lacs"><div class="wrap">
+  <div class="head"><h2>Lacs environnants</h2><span class="label">Température de l'eau</span></div>
+  <p class="lk-intro">La dernière température de surface mesurée sur les plans d'eau autour du lac de la Terrasse. Relevés automatiques à chaque passage satellite sans nuage, et sonde en direct au lac du Bourget quand elle transmet.</p>
+  <div class="lk" id="lk-list"><div class="ag-empty">Chargement des mesures…</div></div>
+  <p class="lk-note">Satellite : Landsat 8-9 via Copernicus, température de la pellicule de surface vers 10h30, ±2 °C ; moins précis sur les petits plans d'eau (Chartreuse, Lônes), où les berges influencent la mesure. Sonde : Grand Port d'Aix-les-Bains, 1,70 m sous le ponton (source lac-du-bourget.com).</p>
+</div></section>
+<script>
+// Lacs environnants : dernière mesure par lac (sonde si récente, sinon satellite) + historique 12 mois.
+(function(){
+  var c=window.ALR_CONFIG,box=document.getElementById('lk-list');if(!c||!window.fetch||!box)return;
+  var H={headers:{apikey:c.anonKey,Authorization:'Bearer '+c.anonKey}};
+  var MOIS=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  var MC=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+  var fmt=function(t){return t<0.5?'≈ 0 °C':t.toFixed(1).replace('.',',')+' °C'};
+  var since=new Date();since.setFullYear(since.getFullYear()-1);since.setDate(since.getDate()-7);
+  var iso=since.toISOString().slice(0,10);
+  var get=function(path){return fetch(c.url+'/rest/v1/'+path,H).then(function(r){return r.ok?r.json():[]})};
+  Promise.all([
+    get('lakes?select=slug,name,commune,ordre&slug=neq.terrasse&order=ordre'),
+    get('lake_temperature?select=lake,acquired_on,temp_c&lake=neq.terrasse&acquired_on=gte.'+iso+'&order=acquired_on.desc&limit=1000'),
+    get('lake_live?select=lake,measured_at,temp_c&order=measured_at.desc&limit=20')
+  ]).then(function(r){
+    var lakes=r[0]||[],sat=r[1]||[],live=r[2]||[];
+    box.textContent='';
+    if(!lakes.length){box.innerHTML='<div class="ag-empty">Mesures indisponibles pour le moment.</div>';return}
+    lakes.forEach(function(L){
+      var rows=sat.filter(function(x){return x.lake===L.slug}).map(function(x){return {t:Number(x.temp_c),d:new Date(x.acquired_on+'T12:00:00')}}).filter(function(x){return isFinite(x.t)});
+      var lv=live.filter(function(x){return x.lake===L.slug})[0];
+      var fresh=lv&&(Date.now()-new Date(lv.measured_at).getTime())<48*3600e3;
+      var row=document.createElement('article');row.className='lk-row';
+      var main=document.createElement('div');main.className='lk-main';
+      var nm=document.createElement('div');nm.className='lk-name';
+      var h=document.createElement('h3');h.textContent=L.name;var cm=document.createElement('span');cm.textContent=L.commune||'';nm.append(h,cm);
+      var t=document.createElement('div');t.className='lk-t';
+      var meta=document.createElement('div');meta.className='lk-meta';
+      var tag=document.createElement('span');tag.className='ag-tag';
+      if(fresh){
+        var md=new Date(lv.measured_at);
+        t.textContent=fmt(Number(lv.temp_c));tag.className+=' live';tag.textContent='Sonde';
+        meta.append(tag,document.createTextNode('Mesure directe du '+md.getDate()+' '+MOIS[md.getMonth()]+' à '+String(md.getHours()).padStart(2,'0')+'h'+String(md.getMinutes()).padStart(2,'0')));
+      }else if(rows.length){
+        t.textContent=fmt(rows[0].t);tag.textContent='Satellite';
+        meta.append(tag,document.createTextNode('Passage sans nuage du '+rows[0].d.getDate()+' '+MOIS[rows[0].d.getMonth()]));
+      }else{
+        t.textContent='–';meta.append(document.createTextNode('Pas encore de passage sans nuage.'));
+      }
+      main.append(nm,t,meta);
+      var hist=fresh?rows:rows.slice(1);
+      if(hist.length){
+        var btn=document.createElement('button');btn.type='button';btn.className='lt-btn';btn.setAttribute('aria-expanded','false');
+        btn.innerHTML='Historique <span aria-hidden="true">↓</span>';
+        var ol=document.createElement('ol');ol.className='lt-hist';ol.hidden=true;ol.setAttribute('aria-label','Mesures satellite des 12 derniers mois, '+L.name);
+        hist.forEach(function(x){
+          var li=document.createElement('li');
+          var d=document.createElement('span');d.textContent=x.d.getDate()+' '+MC[x.d.getMonth()]+' '+x.d.getFullYear();
+          var bar=document.createElement('span');bar.className='lt-bar';bar.setAttribute('aria-hidden','true');
+          var f=document.createElement('i');f.style.width=Math.max(3,Math.min(100,x.t/30*100))+'%';bar.append(f);
+          var v=document.createElement('b');v.textContent=x.t<0.5?'≈ 0 °C · glace':fmt(x.t);
+          li.append(d,bar,v);ol.append(li);
+        });
+        btn.addEventListener('click',function(){var o=ol.hidden;ol.hidden=!o;btn.setAttribute('aria-expanded',o?'true':'false');btn.querySelector('span').textContent=o?'↑':'↓'});
+        main.append(btn);row.append(main,ol);
+      }else{row.append(main)}
+      box.append(row);
+    });
+  }).catch(function(){box.innerHTML='<div class="ag-empty">Mesures indisponibles pour le moment.</div>'});
 })();
 </script>
 
