@@ -291,7 +291,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .lt-now{display:flex;align-items:baseline;gap:8px 16px;flex-wrap:wrap}
 .lake-temp b{font-weight:500;font-size:15px;font-variant-numeric:tabular-nums}
 .lake-temp small{font-size:13px;color:var(--muted)}
-.lt-btn{flex-basis:100%;text-align:left;margin-top:6px;background:none;border:0;padding:4px 0;font:500 11px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);cursor:pointer}
+.lt-btn{display:inline-block;text-decoration:none;flex-basis:100%;text-align:left;margin-top:6px;background:none;border:0;padding:4px 0;font:500 11px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);cursor:pointer}
 .lt-btn:hover{color:var(--fg)}
 .lt-btn span{display:inline-block;margin-left:4px}
 .lt-hist{list-style:none;margin:10px 0 2px;padding:0;display:grid;gap:2px;max-width:520px}
@@ -726,6 +726,14 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   <h1 class="mark"><img src="media/logo-alr-blanc.svg" alt="Alpine Lake Riders" width="2869" height="1699"></h1>
   <button class="vbtn" id="vb" type="button">Pause</button>
 </header>
+<div class="lake-temp" id="lake-temp-top" hidden><div class="wrap">
+  <div class="lt-now" aria-live="polite">
+    <span class="label">Température de l'eau · Lac de la Terrasse</span>
+    <b id="lake-temp-top-v"></b>
+    <small id="lake-temp-top-m"></small>
+    <a class="lt-btn" id="lake-temp-top-btn" href="#lake-temp" hidden>Historique <span aria-hidden="true">↓</span></a>
+  </div>
+</div></div>
 
 <main>
 <div class="wrap" id="infos"><div class="ann" id="ann" hidden aria-label="Infos du spot"></div></div>
@@ -854,6 +862,9 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       $('lake-temp-v').textContent=fmt(last.t);
       $('lake-temp-m').textContent='Mesure satellite du '+last.d.getDate()+' '+MOIS[last.d.getMonth()]+' (dernier passage sans nuage) · surface vers 10h30 · ±2 °C';
       $('lake-temp').hidden=false;
+      $('lake-temp-top-v').textContent=$('lake-temp-v').textContent;
+      $('lake-temp-top-m').textContent=$('lake-temp-m').textContent;
+      $('lake-temp-top').hidden=false;
       var since=new Date(last.d);since.setFullYear(since.getFullYear()-1);since.setDate(since.getDate()-7);
       var prev=rows.slice(1).filter(function(r){return r.d>=since});if(!prev.length)return;
       var list=$('lake-temp-h'),btn=$('lake-temp-btn');
@@ -866,6 +877,12 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
         li.append(d,bar,v);list.append(li);
       });
       btn.hidden=false;
+      var tb=$('lake-temp-top-btn');tb.hidden=false;
+      tb.addEventListener('click',function(e){
+        e.preventDefault();
+        if(list.hidden)btn.click();
+        $('lake-temp').scrollIntoView({behavior:'smooth',block:'start'});
+      });
       btn.addEventListener('click',function(){
         var open=list.hidden;list.hidden=!open;btn.setAttribute('aria-expanded',open?'true':'false');
         btn.querySelector('span').textContent=open?'↑':'↓';
