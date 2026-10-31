@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Météo des spots · Alpine Lake Riders</title>
+<title>Météo des spots de pumpfoil · Alpine Lake Riders</title>
 <meta name="description" content="Température de l'eau, prévision AROME Météo-France, nuages en direct par satellite des spots de pumpfoil autour du lac de la Terrasse.">
 <meta name="theme-color" content="#ffffff">
 <link rel="icon" href="media/logo-alr-noir.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="css/meteo.css?v=2">
+<link rel="stylesheet" href="css/meteo.css?v=3">
 <style>
 :root{
   --paper:#ffffff;
@@ -74,10 +74,10 @@ footer p+p{margin-top:8px}
 </style>
 </head>
 <body>
-<div class="top"><div class="wrap"><a href="/">← Alpine Lake Riders</a><span class="label">Météo des spots</span></div></div>
+<div class="top"><div class="wrap"><a href="/">← Alpine Lake Riders</a><span class="label">Météo des spots de pumpfoil</span></div></div>
 <main class="wrap">
 <header class="intro">
-  <h1>Température de l'eau et météo des spots</h1>
+  <h1>Météo des spots de pumpfoil</h1>
   <p>Pour chaque spot de pumpfoil : la dernière température de l'eau, la prévision du jour (modèle AROME de Météo-France), la meilleure heure pour rider, et les nuages en direct vus par satellite.</p>
   <nav class="nav" id="nav" aria-label="Aller à un spot"></nav>
 </header>
@@ -88,7 +88,7 @@ footer p+p{margin-top:8px}
   <p>La meilleure heure privilégie le vent faible (plan d'eau lisse), puis le soleil. Pastille verte : vent jusqu'à 8 km/h ; orange : jusqu'à 14 km/h ; rouge au-delà.</p>
 </div></footer>
 <script src="js/config.js?v=50"></script>
-<script src="js/meteo.js?v=2"></script>
+<script src="js/meteo.js?v=3"></script>
 <script>
 (function(){
   var c=window.ALR_CONFIG,M=window.ALR_METEO,box=document.getElementById('spots'),nav=document.getElementById('nav');

@@ -135,6 +135,7 @@
       bh.title='Vent prévu entre '+an.best.h+'h et '+(an.best.h+1)+'h : '+Math.round(an.best.v)+' km/h, rafales '+Math.round(an.best.g)+' km/h';bh.hidden=false;
       var dt=new Date(an.day+'T12:00:00');
       det.append(el('p','label mt-titre','Météo '+(an.demain?'de demain':'du jour')+' · '+o.name+' · '+JOURS[dt.getDay()]+' '+dt.getDate()+' '+MOIS[dt.getMonth()]));
+      var sun=el('p','mt-sun');sun.append(el('span',null,'🌅 Lever du soleil '),el('b',null,hm(an.sr)),el('span',null,' · 🌇 Coucher '),el('b',null,hm(an.ss)));det.append(sun);
       det.append(grille(an));
       var hb=arrowBtn('lt-btn','Heure par heure'),ol=heures(an);ol.hidden=!o.hourOpen;
       if(o.hourOpen){hb.setAttribute('aria-expanded','true');hb.querySelector('[aria-hidden]').textContent='↑'}

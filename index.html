@@ -28,7 +28,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="css/meteo.css?v=2">
+<link rel="stylesheet" href="css/meteo.css?v=3">
 <style>
 /* Layout : vidéo 16:9 sous une barre blanche, puis peu de blocs et beaucoup d'air.
    Une seule famille de caractères, noir et blanc, le vert du lac en touche. */
@@ -741,7 +741,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script src="js/config.js?v=50"></script>
 <script src="js/backend.js?v=51"></script>
-<script src="js/meteo.js?v=2"></script>
+<script src="js/meteo.js?v=3"></script>
 </head>
 <body>
 
@@ -774,7 +774,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 // Météo du jour au lac de la Terrasse (AROME + nuages satellite), voir js/meteo.js
 (function(){
   var M=window.ALR_METEO,box=document.getElementById('mt-terrasse');if(!M||!window.fetch||!box)return;
-  var P={name:'Lac de la Terrasse',lat:45.319731,lon:5.947815,terrasse:true,nuages:true};
+  var P={name:'Lac de la Terrasse',lat:45.319731,lon:5.947815,terrasse:true,nuages:true,hourOpen:true};
   M.forecast([P]).then(function(d){return M.analyse(d[0])}).catch(function(){return null}).then(function(an){P.an=an;box.append(M.bloc(P))});
 })();
 </script>
