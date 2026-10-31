@@ -811,6 +811,11 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script src="js/config.js?v=50"></script>
 <script src="js/backend.js?v=52"></script>
+<script>
+// Lien « Spots » (annuaire des spots, page en préparation) : visible seulement pour un administrateur connecté
+(function(){function go(){if(!window.claude)return;window.claude.use('user').then(u=>u&&u.canEdit()).then(ok=>{if(ok)document.querySelectorAll('[data-admin-only]').forEach(e=>e.hidden=false)}).catch(()=>{})}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',go);else go()})();
+</script>
 <script src="js/i18n.js?v=2"></script>
 <script src="js/meteo.js?v=5"></script>
 </head>
@@ -819,7 +824,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 
 <nav class="topbar"><div class="wrap">
   <span class="label">Alpine Lake Riders Association</span>
-  <ul><li><a href="#asso">L'asso</a></li><li><a href="#agenda">Agenda</a></li><li><a href="#debuter">Débuter</a></li><li><a href="#apero">Apéros Pumpfoil</a></li><li><a href="#spot">Le spot</a></li><li><a href="#lacs">Lacs</a></li><li><a href="#avis">Avis</a></li><li><a href="#rejoindre">Rejoindre</a></li><li><a href="#contact">Contact</a></li></ul>
+  <ul><li><a href="#asso">L'asso</a></li><li><a href="#agenda">Agenda</a></li><li><a href="#debuter">Débuter</a></li><li><a href="#apero">Apéros Pumpfoil</a></li><li><a href="#spot">Le spot</a></li><li><a href="#lacs">Lacs</a></li><li data-admin-only hidden><a href="spots-pumpfoil.html">Spots</a></li><li><a href="#avis">Avis</a></li><li><a href="#rejoindre">Rejoindre</a></li><li><a href="#contact">Contact</a></li></ul>
   <button class="a2hs-top" type="button" data-a2hs hidden><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="6" y="2.5" width="12" height="19" rx="2.6"/><path d="M12 8.5v6M9 11.5h6"/></svg></button>
   <a class="pill ink" href="#rejoindre">Adhérer</a>
 </div></nav>
