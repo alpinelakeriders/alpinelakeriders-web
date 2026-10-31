@@ -6,6 +6,14 @@ const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZi
 const SKIP = new Set(['inscrits']);
 const esc = v => String(v).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); // calculé par le site lui-même
 
+// Textes de référencement de la version anglaise (équivalents de la description française)
+const EN = {
+  title: 'Alpine Lake Riders · Pumpfoil at Lac de la Terrasse',
+  desc: 'Alpine Lake Riders, the association for pumpfoil riders on the Alpine lakes: Isère, Savoie, Haute-Savoie. Sessions, Apéros Pumpfoil and beginner sessions at Lac de la Terrasse.',
+  share: 'Pump, fly, repeat. The pumpfoil association of the Alpine lakes.',
+  alt: 'A pumpfoil rider on Lac de la Terrasse, Alpine Lake Riders logo',
+};
+
 const BOTS = /bot|crawl|spider|slurp|facebookexternalhit|whatsapp|telegram|preview|headless|lighthouse|curl|wget|python|monitor|uptime/i;
 
 function logVisite(request, url) {
@@ -36,6 +44,8 @@ export async function onRequest(context) {
   const res = await next();
   if (request.method !== 'GET' || !(res.headers.get('content-type') || '').includes('text/html')) return res;
   try { const p = logVisite(request, url); if (p) context.waitUntil(p); } catch (e) {}
+  // Version anglaise (?lang=en) : balises de référencement et de partage en anglais, le texte de la page est traduit par js/i18n.js
+  const en = url.searchParams.get('lang') === 'en';
   const crId = (url.searchParams.get('cr') || '').slice(0, 80);
   const sid = crId || (url.searchParams.get('sortie') || '').slice(0, 80);
   let c = null, so = null, crImg = '';
@@ -68,7 +78,7 @@ export async function onRequest(context) {
     });
     if (r.ok) { const j = await r.json(); c = j && j[0] && j[0].data; }
   } catch (e) { /* en cas de souci, on sert la page telle quelle */ }
-  if ((!c || typeof c !== 'object') && !so) return res;
+  if ((!c || typeof c !== 'object') && !so && !en) return res;
   c = (c && typeof c === 'object') ? c : {};
   try {
     const txt = k => (typeof c[k] === 'string' && c[k].trim()) ? c[k].trim() : '';
@@ -76,15 +86,15 @@ export async function onRequest(context) {
     const setContent = v => ({ element(e) { e.setAttribute('content', v); } });
     let rw = new HTMLRewriter();
     if (so && typeof so === 'object') {
-      const MOIS = ['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
-      const JOURS = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+      const MOIS = en ? ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'] : ['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+      const JOURS = en ? ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'] : ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
       const d = new Date((so.date || '') + 'T12:00:00Z');
       const quand = isNaN(d) ? '' : JOURS[d.getUTCDay()] + ' ' + d.getUTCDate() + ' ' + MOIS[d.getUTCMonth()];
-      const title = (crId ? 'Compte rendu · ' : '') + (so.titre || 'Sortie') + (quand ? ' · ' + quand : '');
+      const title = (crId ? (en ? 'Session report · ' : 'Compte rendu · ') : '') + (so.titre || (en ? 'Session' : 'Sortie')) + (quand ? ' · ' + quand : '');
       const recit = typeof so.crTexte === 'string' ? so.crTexte.trim().replace(/\s+/g, ' ') : '';
-      const desc = crId ? (recit ? (recit.length > 180 ? recit.slice(0, 180).replace(/\s+\S*$/, '') + '…' : recit) : 'Le compte rendu et les photos de la sortie, sur le site d\'Alpine Lake Riders.')
-                        : [[so.heure, so.lieu].filter(Boolean).join(' · '), 'Inscris-toi sur le site d\'Alpine Lake Riders.'].filter(Boolean).join('. ');
-      const u = 'https://alpinelakeriders.com/?' + (crId ? 'cr=' : 'sortie=') + encodeURIComponent(sid);
+      const desc = crId ? (recit ? (recit.length > 180 ? recit.slice(0, 180).replace(/\s+\S*$/, '') + '…' : recit) : (en ? 'The session report and photos, on the Alpine Lake Riders website.' : 'Le compte rendu et les photos de la sortie, sur le site d\'Alpine Lake Riders.'))
+                        : [[so.heure, so.lieu].filter(Boolean).join(' · '), en ? 'Sign up on the Alpine Lake Riders website.' : 'Inscris-toi sur le site d\'Alpine Lake Riders.'].filter(Boolean).join('. ');
+      const u = 'https://alpinelakeriders.com/?' + (crId ? 'cr=' : 'sortie=') + encodeURIComponent(sid) + (en ? '&lang=en' : '');
       rw = rw.on('meta[property="og:title"]', setContent(title))
              .on('meta[name="twitter:title"]', setContent(title))
              .on('meta[property="og:description"]', setContent(desc))
@@ -93,22 +103,35 @@ export async function onRequest(context) {
       if (crImg) rw = rw.on('meta[property="og:image"]', setContent(crImg)).on('meta[name="twitter:image"]', setContent(crImg))
              .on('meta[property="og:image:width"]', { element(e) { e.remove(); } }).on('meta[property="og:image:height"]', { element(e) { e.remove(); } })
              .on('meta[property="og:image:alt"]', setContent(so.titre || 'Sortie Alpine Lake Riders'));
+    } else if (en) {
+      rw = rw.on('meta[property="og:description"]', setContent(EN.share))
+             .on('meta[name="twitter:description"]', setContent(EN.share));
     } else if (share) {
       rw = rw.on('meta[property="og:description"]', setContent(share))
              .on('meta[name="twitter:description"]', setContent(share));
     }
     // Référencement réglé dans l'admin (rubrique « Référencement »)
+    if (en) {
+      rw = rw.on('html', { element(e) { e.setAttribute('lang', 'en'); } })
+             .on('meta[name="description"]', setContent(EN.desc))
+             .on('title', { element(e) { e.setInnerContent(EN.title); } })
+             .on('meta[property="og:locale"]', setContent('en_GB'))
+             .on('meta[property="og:image:alt"]', setContent(EN.alt));
+      if (!so) rw = rw.on('link[rel="canonical"]', { element(e) { e.setAttribute('href', 'https://alpinelakeriders.com/?lang=en'); } })
+                      .on('meta[property="og:url"]', setContent('https://alpinelakeriders.com/?lang=en'));
+    } else {
     const desc = txt('seoDesc') || txt('partage');
     if (desc) rw = rw.on('meta[name="description"]', setContent(desc));
-    if (txt('seoKeywords')) rw = rw.on('meta[name="keywords"]', setContent(txt('seoKeywords')));
     if (txt('seoTitle')) rw = rw.on('title', { element(e) { e.setInnerContent(txt('seoTitle')); } });
+    }
+    if (txt('seoKeywords')) rw = rw.on('meta[name="keywords"]', setContent(txt('seoKeywords')));
     if (txt('siteName')) rw = rw.on('meta[property="og:site_name"]', setContent(txt('siteName')));
     if (!so && txt('shareTitle')) rw = rw.on('meta[property="og:title"]', setContent(txt('shareTitle'))).on('meta[name="twitter:title"]', setContent(txt('shareTitle')));
     if (!crImg && /^https:\/\/[^\s"<>]+$/.test(txt('shareImage'))) {
       rw = rw.on('meta[property="og:image"]', setContent(txt('shareImage'))).on('meta[name="twitter:image"]', setContent(txt('shareImage')))
              .on('meta[property="og:image:width"]', { element(e) { e.remove(); } }).on('meta[property="og:image:height"]', { element(e) { e.remove(); } });
     }
-    if (!crImg && txt('shareAlt')) rw = rw.on('meta[property="og:image:alt"]', setContent(txt('shareAlt')));
+    if (!crImg && !en && txt('shareAlt')) rw = rw.on('meta[property="og:image:alt"]', setContent(txt('shareAlt')));
     if (/^[\w-]{10,100}$/.test(txt('gsc'))) rw = rw.on('meta[name="google-site-verification"]', setContent(txt('gsc')));
     rw = rw.on('[data-k]', { element(e) {
       const k = e.getAttribute('data-k');

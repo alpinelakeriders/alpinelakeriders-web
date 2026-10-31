@@ -3,11 +3,15 @@
 // Le vent compte le plus (plan d'eau lisse = bon pump), le soleil départage.
 (function(){
   var TZ='Europe/Paris';
+  // Version anglaise (?lang=en, voir js/i18n.js)
+  var EN=window.ALR_LANG==='en',L=function(fr,en){return EN?en:fr};
   var MODELS=['meteofrance_arome_france_hd','meteofrance_arome_france','meteofrance_seamless'];
   var VARS='wind_speed_10m,wind_gusts_10m,wind_direction_10m,cloud_cover,sunshine_duration,precipitation,temperature_2m';
-  var JOURS=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
-  var MOIS=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
-  var DIR=['nord','nord-est','est','sud-est','sud','sud-ouest','ouest','nord-ouest'];
+  var JOURS=EN?['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']:['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+  var MOIS=EN?['January','February','March','April','May','June','July','August','September','October','November','December']:['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  var DIR=EN?['north','north-east','east','south-east','south','south-west','west','north-west']:['nord','nord-est','est','sud-est','sud','sud-ouest','ouest','nord-ouest'];
+  // Heure affichée : 15h en français, 3pm en anglais
+  function hh(h){return EN?(h%12||12)+(h%24<12?'am':'pm'):h+'h'}
   // Repères affichés sur l'image satellite quand ils tombent dans le cadre
   var VILLES=[['Grenoble',45.1885,5.7245],['Chambéry',45.5646,5.9178],['Annecy',45.8992,6.1294],['Aix-les-Bains',45.6885,5.9153],['Albertville',45.6755,6.3925],
     ['Voiron',45.3646,5.5888],['Lyon',45.764,4.8357],['Genève',46.2044,6.1432],['Lausanne',46.5197,6.6323],['Thonon',46.3705,6.4793],['Chamonix',45.9237,6.8694],
@@ -82,12 +86,19 @@
     var best=pick(cand),sess=cand.filter(function(x){return x.h>=15&&x.h<=18}),bestS=sess.length?pick(sess):null;
     var pluie=cand.filter(function(x){return x.pr>=.3}).length>=Math.max(3,cand.length/2);
     var cls,txt,court;
+    if(EN){
+      if(best.v<=8&&best.g<=20){cls='';court=demain?'Tomorrow: good riding':'Good riding';txt=demain?'Tomorrow: good riding conditions':'Good riding conditions today'}
+      else if(best.v<=14){cls='moyen';court=(demain?'Tomorrow: ':'')+'Light chop';txt=(demain?'Tomorrow':'Today')+': rideable, with a little chop'}
+      else{cls='bof';court=(demain?'Tomorrow: ':'')+'Too windy';txt=(demain?'Tomorrow':'Today')+': too windy for good pumping'}
+      if(pluie)txt+=' · rain forecast';
+    }else{
     if(best.v<=8&&best.g<=20){cls='';court=demain?'Demain : ça ride bien':'Ça va bien rider';txt=demain?'Demain, ça va bien rider':'Ça va bien rider aujourd\'hui'}
     else if(best.v<=14){cls='moyen';court=(demain?'Demain : ':'')+'Petit clapot';txt=(demain?'Demain':'Aujourd\'hui')+' : ça ride, avec un peu de clapot'}
     else{cls='bof';court=(demain?'Demain : ':'')+'Trop de vent';txt=(demain?'Demain':'Aujourd\'hui')+' : trop de vent pour un bon pump'}
     if(pluie)txt+=' · pluie annoncée';
+    }
     var sfm=cand.reduce(function(a,x){return a+x.sf},0)/cand.length;
-    var prev=pluie?['🌧','pluie']:sfm>=.6?['☀️','beau temps']:sfm>=.25?['⛅','soleil et nuages']:['☁️','nuageux'];
+    var prev=pluie?['🌧',L('pluie','rain')]:sfm>=.6?['☀️',L('beau temps','fine weather')]:sfm>=.25?['⛅',L('soleil et nuages','sun and clouds')]:['☁️',L('nuageux','cloudy')];
     return {day:day,demain:demain,sr:sr,ss:ss,hrs:hrs,jourH:jourH,cand:cand,best:best,bestS:bestS,cls:cls,txt:txt,court:court,prev:prev};
   }
 
@@ -99,19 +110,19 @@
   function icSat(c,an){
     var hp=+new Date().toLocaleString('fr-FR',{timeZone:TZ,hour:'numeric',hourCycle:'h23'});
     var so=an?[an.sr,an.ss]:[7.5,17.5],nuit=hp<Math.floor(so[0])||hp>=Math.ceil(so[1]);
-    return c<=20?[nuit?'🌙':'☀️','ciel dégagé']:c<=60?[nuit?'☁️':'⛅','nuages épars']:['☁️','ciel couvert'];
+    return c<=20?[nuit?'🌙':'☀️',L('ciel dégagé','clear sky')]:c<=60?[nuit?'☁️':'⛅',L('nuages épars','scattered clouds')]:['☁️',L('ciel couvert','overcast')];
   }
   function satUrl(lat,lon,dx,dy,w,h){return 'https://view.eumetsat.int/geoserver/wms?service=WMS&version=1.3.0&request=GetMap&layers=mtg_fd:rgb_geocolour&styles=&crs=CRS:84&format=image/jpeg&bbox='+[lon-dx,lat-dy,lon+dx,lat+dy].join(',')+'&width='+w+'&height='+h+'&t='+Math.floor(Date.now()/6e5)}
 
-  function hm(x){var h=Math.floor(x),m=Math.round((x-h)*60);if(m===60){h++;m=0}return h+'h'+(m?String(m).padStart(2,'0'):'')}
-  function dur(sec){var m=Math.round(sec/60/10)*10;if(m<10)return 'pas de soleil';var h=Math.floor(m/60);m=m%60;return (h?h+' h':'')+(m?(h?' ':'')+m+' min':'')+' de soleil'}
+  function hm(x){var h=Math.floor(x),m=Math.round((x-h)*60);if(m===60){h++;m=0}if(EN)return (h%12||12)+(m?':'+String(m).padStart(2,'0'):'')+(h<12?'am':'pm');return h+'h'+(m?String(m).padStart(2,'0'):'')}
+  function dur(sec){var m=Math.round(sec/60/10)*10;if(m<10)return L('pas de soleil','no sun');var h=Math.floor(m/60);m=m%60;return (h?h+' h':'')+(m?(h?' ':'')+m+' min':'')+L(' de soleil',' of sun')}
   function toggle(btn,box,cb){btn.addEventListener('click',function(){var o=box.hidden;box.hidden=!o;btn.setAttribute('aria-expanded',o?'true':'false');btn.querySelector('[aria-hidden]').textContent=o?'↑':'↓';if(cb)cb(o)})}
   function arrowBtn(cls,label,shortLabel){
     var b=el('button',cls);b.type='button';b.setAttribute('aria-expanded','false');
     if(shortLabel!=null){b.setAttribute('aria-label',label);b.append(el('span','mt-mt',label+' '))}else b.append(document.createTextNode(label+' '));
     var a=el('span',null,'↓');a.setAttribute('aria-hidden','true');b.append(a);return b;
   }
-  function pourquoi(x){var r=[Math.round(x.v)+' km/h'];r.push(x.sf>=.6?'ensoleillé':x.sf>=.25?'quelques éclaircies':'couvert');if(x.pr>=.3)r.push('averses');if(x.t!=null)r.push(Math.round(x.t)+' °C');return r.join(', ')}
+  function pourquoi(x){var r=[Math.round(x.v)+' km/h'];r.push(x.sf>=.6?L('ensoleillé','sunny'):x.sf>=.25?L('quelques éclaircies','some sunny spells'):L('couvert','overcast'));if(x.pr>=.3)r.push(L('averses','showers'));if(x.t!=null)r.push(Math.round(x.t)+' °C');return r.join(', ')}
 
   // Bloc complet d'un spot : ligne résumée + détails (prévision, heure par heure, satellite).
   // o = {name, lat, lon, an (analyse ou null), open (détails dépliés), hourOpen, nuages (true pour charger le direct)}
@@ -120,8 +131,8 @@
     line.setAttribute('aria-live','polite');
     var an=o.an,vb=el('span','mt-verdict'),ip=el('span','mt-ic'),is=el('span','mt-ic'),bh=el('span','mt-bh');
     ip.hidden=is.hidden=bh.hidden=vb.hidden=true;
-    ip.append(el('span','mt-e'),el('small',null,'Prévu'));is.append(el('span','mt-e'),el('small',null,'En direct'));
-    var more=arrowBtn('mt-more','Détails','');
+    ip.append(el('span','mt-e'),el('small',null,L('Prévu','Forecast')));is.append(el('span','mt-e'),el('small',null,L('En direct','Live')));
+    var more=arrowBtn('mt-more',L('Détails','Details'),'');
     line.append(vb,ip,is,bh,more);
     det.hidden=!o.open;more.setAttribute('aria-expanded',o.open?'true':'false');more.querySelector('[aria-hidden]').textContent=o.open?'↑':'↓';
     toggle(more,det);
@@ -130,23 +141,23 @@
     if(an){
       var dot=el('i');dot.setAttribute('aria-hidden','true');var vs=el('span');vs.append(el('span','mt-l',an.txt),el('span','mt-s',an.court));
       vb.className='mt-verdict'+(an.cls?' '+an.cls:'');vb.append(dot,vs);vb.hidden=false;
-      setIc(ip,an.prev,'Prévision');
-      bh.append(el('small','mt-l','Meilleure heure'),el('b','mt-l',an.best.h+'h–'+(an.best.h+1)+'h'),el('b','mt-s',an.best.h+'h'),el('span','mt-bw',Math.round(an.best.v)+' km/h'));
-      bh.title='Vent prévu entre '+an.best.h+'h et '+(an.best.h+1)+'h : '+Math.round(an.best.v)+' km/h, rafales '+Math.round(an.best.g)+' km/h';bh.hidden=false;
+      setIc(ip,an.prev,L('Prévision','Forecast'));
+      bh.append(el('small','mt-l',L('Meilleure heure','Best time')),el('b','mt-l',hh(an.best.h)+'–'+hh(an.best.h+1)),el('b','mt-s',hh(an.best.h)),el('span','mt-bw',Math.round(an.best.v)+' km/h'));
+      bh.title=L('Vent prévu entre '+an.best.h+'h et '+(an.best.h+1)+'h : '+Math.round(an.best.v)+' km/h, rafales '+Math.round(an.best.g)+' km/h','Wind forecast between '+hh(an.best.h)+' and '+hh(an.best.h+1)+': '+Math.round(an.best.v)+' km/h, gusts '+Math.round(an.best.g)+' km/h');bh.hidden=false;
       var dt=new Date(an.day+'T12:00:00');
-      det.append(el('p','label mt-titre','Météo '+(an.demain?'de demain':'du jour')+' · '+o.name+' · '+JOURS[dt.getDay()]+' '+dt.getDate()+' '+MOIS[dt.getMonth()]));
-      var sun=el('p','mt-sun');sun.append(el('span',null,'🌅 Lever du soleil '),el('b',null,hm(an.sr)),el('span',null,' · 🌇 Coucher '),el('b',null,hm(an.ss)));det.append(sun);
+      det.append(el('p','label mt-titre',L('Météo '+(an.demain?'de demain':'du jour'),(an.demain?'Tomorrow\'s':'Today\'s')+' weather')+' · '+o.name+' · '+JOURS[dt.getDay()]+' '+dt.getDate()+' '+MOIS[dt.getMonth()]));
+      var sun=el('p','mt-sun');sun.append(el('span',null,L('🌅 Lever du soleil ','🌅 Sunrise ')),el('b',null,hm(an.sr)),el('span',null,L(' · 🌇 Coucher ',' · 🌇 Sunset ')),el('b',null,hm(an.ss)));det.append(sun);
       det.append(grille(an));
-      var hb=arrowBtn('lt-btn','Heure par heure : vent et température'),ol=heures(an);ol.hidden=!o.hourOpen;
+      var hb=arrowBtn('lt-btn',L('Heure par heure : vent et température','Hour by hour: wind and temperature')),ol=heures(an);ol.hidden=!o.hourOpen;
       if(o.hourOpen){hb.setAttribute('aria-expanded','true');hb.querySelector('[aria-hidden]').textContent='↑'}
       toggle(hb,ol);det.append(hb,ol);
-      src.textContent='Prévision AROME Météo-France (maille 1,3 km) via Open-Meteo · vent moyen à 10 m en km/h · plus le vent est faible, plus le plan d\'eau est lisse. Nuages en direct : satellites Meteosat (EUMETSAT).';
-    }else src.textContent='Nuages en direct : satellites Meteosat (EUMETSAT).';
+      src.textContent=L('Prévision AROME Météo-France (maille 1,3 km) via Open-Meteo · vent moyen à 10 m en km/h · plus le vent est faible, plus le plan d\'eau est lisse. Nuages en direct : satellites Meteosat (EUMETSAT).','AROME Météo-France forecast (1.3 km grid) via Open-Meteo · average wind at 10 m in km/h · the lighter the wind, the smoother the water. Live clouds: Meteosat satellites (EUMETSAT).');
+    }else src.textContent=L('Nuages en direct : satellites Meteosat (EUMETSAT).','Live clouds: Meteosat satellites (EUMETSAT).');
     // Satellite
     var sat=el('div','mt-sat');sat.hidden=true;
     var DX=.6,DY=.32,map=el('a','mt-map');map.target='_blank';map.rel='noopener';map.href=satUrl(o.lat,o.lon,DX*2.5,DY*2.5,1600,1200);
-    map.setAttribute('aria-label','Image satellite des nuages autour de '+o.name+', agrandir');
-    var img=el('img');img.alt='Image satellite Meteosat des nuages autour de '+o.name;img.decoding='async';img.loading='lazy';
+    map.setAttribute('aria-label',L('Image satellite des nuages autour de '+o.name+', agrandir','Satellite image of the clouds around '+o.name+', enlarge'));
+    var img=el('img');img.alt=L('Image satellite Meteosat des nuages autour de ','Meteosat satellite image of the clouds around ')+o.name;img.decoding='async';img.loading='lazy';
     map.append(img);
     VILLES.forEach(function(v){
       var x=(v[2]-o.lon+DX)/(2*DX),y=(o.lat+DY-v[1])/(2*DY);
@@ -154,24 +165,24 @@
       var e=el('span','vl',v[0]);e.style.left=x*100+'%';e.style.top=y*100+'%';map.append(e);
     });
     var pt=el('span','pt');pt.style.left='50%';pt.style.top='50%';pt.title=o.name;map.append(pt);
-    var sb=el('b',null,'Image satellite en direct'),sm=el('small',null,'Les nuages apparaissent en blanc, le point vert marque le spot.');
-    var st=el('div');st.append(el('span','label','Nuages en direct · satellite'),sb,sm);
+    var sb=el('b',null,L('Image satellite en direct','Live satellite image')),sm=el('small',null,L('Les nuages apparaissent en blanc, le point vert marque le spot.','Clouds appear in white; the green dot marks the spot.'));
+    var st=el('div');st.append(el('span','label',L('Nuages en direct · satellite','Live clouds · satellite')),sb,sm);
     sat.append(map,st);det.append(sat,src);
     img.onload=function(){sat.hidden=false};
     img.src=satUrl(o.lat,o.lon,DX,DY,640,480);
     root.liveSat=function(d){
       if(!d)return;var c=d.couverture;
-      setIc(is,icSat(c,an),'En direct (satellite)',c+' % de nuages');
-      sb.textContent=c<=10?'Ciel dégagé':c<=35?'Quelques nuages':c<=70?'Ciel partiellement couvert':c<95?'Ciel très nuageux':'Ciel couvert';
-      var m=c+' % de nuages autour du spot';
-      if(d.auLac===0&&c>10)m+=', éclaircie juste au-dessus';else if(d.auLac===1&&c<90)m+=', nuages juste au-dessus';
-      if(d.heure){var t=new Date(d.heure);if(!isNaN(t))m+=' · image de '+t.toLocaleTimeString('fr-FR',{timeZone:TZ,hour:'numeric',minute:'2-digit'}).replace(':','h')}
+      setIc(is,icSat(c,an),L('En direct (satellite)','Live (satellite)'),c+L(' % de nuages','% cloud cover'));
+      sb.textContent=EN?(c<=10?'Clear sky':c<=35?'A few clouds':c<=70?'Partly cloudy':c<95?'Very cloudy':'Overcast'):(c<=10?'Ciel dégagé':c<=35?'Quelques nuages':c<=70?'Ciel partiellement couvert':c<95?'Ciel très nuageux':'Ciel couvert');
+      var m=c+L(' % de nuages autour du spot','% cloud cover around the spot');
+      if(d.auLac===0&&c>10)m+=L(', éclaircie juste au-dessus',', clear right overhead');else if(d.auLac===1&&c<90)m+=L(', nuages juste au-dessus',', clouds right overhead');
+      if(d.heure){var t=new Date(d.heure);if(!isNaN(t))m+=EN?' · image from '+t.toLocaleTimeString('en-GB',{timeZone:TZ,hour:'numeric',minute:'2-digit',hour12:true}).replace(/\s/g,''):' · image de '+t.toLocaleTimeString('fr-FR',{timeZone:TZ,hour:'numeric',minute:'2-digit'}).replace(':','h')}
       sm.textContent=m+'.';
     };
     if(o.nuages)nuages(o.terrasse?null:o.lat,o.lon).then(root.liveSat);
     return root;
   }
-  function setIc(span,ic,quoi,plus){span.firstChild.textContent=ic[0];span.title=quoi+' : '+ic[1]+(plus?', '+plus:'');span.setAttribute('aria-label',span.title);span.hidden=false}
+  function setIc(span,ic,quoi,plus){span.firstChild.textContent=ic[0];span.title=quoi+L(' : ',': ')+ic[1]+(plus?', '+plus:'');span.setAttribute('aria-label',span.title);span.hidden=false}
 
   function grille(an){
     var jourH=an.jourH,hrs=an.hrs,g=el('div','mt-grid');
@@ -181,31 +192,31 @@
       return {min:Math.round(Math.min.apply(0,vs)),max:Math.round(Math.max.apply(0,vs)),g:Math.round(Math.max.apply(0,gs))}}
     var am=plage(0,12),pm=plage(12,24);
     function txtV(p){return p.min===p.max?p.min+' km/h':p.min+'–'+p.max+' km/h'}
-    var vm=[];if(am&&pm)vm.push('Matin '+txtV(am));
-    var gm=Math.max(am?am.g:0,pm?pm.g:0);if(gm>0)vm.push('rafales jusqu\'à '+gm+' km/h');
+    var vm=[];if(am&&pm)vm.push(L('Matin ','Morning ')+txtV(am));
+    var gm=Math.max(am?am.g:0,pm?pm.g:0);if(gm>0)vm.push(L('rafales jusqu\'à ','gusts up to ')+gm+' km/h');
     var dirs=an.cand.filter(function(x){return x.dir!=null});
-    if(dirs.length){var dm=dirs.reduce(function(a,b){return b.v>a.v?b:a}).dir;if(Math.max(am?am.max:0,pm?pm.max:0)>=6)vm.push('vent de '+DIR[Math.round(dm/45)%8])}
-    cell('Vent',pm?'Après-midi '+txtV(pm):'Matin '+txtV(am),vm.join(' · '));
+    if(dirs.length){var dm=dirs.reduce(function(a,b){return b.v>a.v?b:a}).dir;if(Math.max(am?am.max:0,pm?pm.max:0)>=6)vm.push(L('vent de ','wind from the ')+DIR[Math.round(dm/45)%8])}
+    cell(L('Vent','Wind'),pm?L('Après-midi ','Afternoon ')+txtV(pm):L('Matin ','Morning ')+txtV(am),vm.join(' · '));
     var best=an.best,bS=an.bestS,bm=pourquoi(best);
-    if(bS&&bS.h!==best.h)bm+='. Sur le créneau 15h–18h30 : '+bS.h+'h ('+Math.round(bS.v)+' km/h'+(bS.sf>=.6?', soleil':'')+')';
-    cell('Meilleure heure',best.h+'h – '+(best.h+1)+'h',bm,'mt-top');
+    if(bS&&bS.h!==best.h)bm+=L('. Sur le créneau 15h–18h30 : ','. In the 3pm–6:30pm slot: ')+hh(bS.h)+' ('+Math.round(bS.v)+' km/h'+(bS.sf>=.6?L(', soleil',', sun'):'')+')';
+    cell(L('Meilleure heure','Best time'),hh(best.h)+' – '+hh(best.h+1),bm,'mt-top');
     function sol(a,b){var s=0,ok=false,j=0,c=0,n=0;jourH.concat(hrs.filter(function(x){return jourH.indexOf(x)<0&&x.jour>0})).forEach(function(x){if(x.h>=a&&x.h<b){j+=x.jour;if(x.sun!=null){s+=x.sun;ok=true}if(x.cc!=null){c+=x.cc;n++}}});
       return {s:s,ok:ok,j:j,cc:n?c/n:null}}
-    function cielTxt(o){var f=o.ok&&o.j?o.s/3600/o.j:(o.cc!=null?1-o.cc/100:0);return f>=.7?'Grand soleil':f>=.4?'Soleil et nuages':f>=.15?'Rares éclaircies':'Ciel couvert'}
+    function cielTxt(o){var f=o.ok&&o.j?o.s/3600/o.j:(o.cc!=null?1-o.cc/100:0);return EN?(f>=.7?'Full sun':f>=.4?'Sun and clouds':f>=.15?'Rare sunny spells':'Overcast'):(f>=.7?'Grand soleil':f>=.4?'Soleil et nuages':f>=.15?'Rares éclaircies':'Ciel couvert')}
     var sa=sol(0,12),sp=sol(12,24);
-    cell('Soleil le matin',cielTxt(sa),(sa.ok?dur(sa.s)+' · ':'')+'lever '+hm(an.sr));
-    cell('Soleil l\'après-midi',cielTxt(sp),(sp.ok?dur(sp.s)+' · ':'')+'coucher '+hm(an.ss));
+    cell(L('Soleil le matin','Morning sun'),cielTxt(sa),(sa.ok?dur(sa.s)+' · ':'')+L('lever ','sunrise ')+hm(an.sr));
+    cell(L('Soleil l\'après-midi','Afternoon sun'),cielTxt(sp),(sp.ok?dur(sp.s)+' · ':'')+L('coucher ','sunset ')+hm(an.ss));
     return g;
   }
   // Heure par heure (de jour seulement, 6 colonnes sur mobile : pas de défilement horizontal)
   function heures(an){
-    var ol=el('ol','mt-h');ol.setAttribute('aria-label','Vent moyen en km/h, heure par heure');
+    var ol=el('ol','mt-h');ol.setAttribute('aria-label',L('Vent moyen en km/h, heure par heure','Average wind in km/h, hour by hour'));
     an.jourH.forEach(function(x){
       var li=el('li',(x===an.best?'mt-best ':'')+(!x.futur?'mt-past ':'')+(x.v<=8?'mt-calme':x.v>14?'mt-vente':''));
       var c=el('span','mt-pic',x.pr>=.3?'🌧️':x.sf>=.6?'☀️':x.sf>=.4?'🌤️':x.sf>=.15?'⛅':'☁️');c.setAttribute('aria-hidden','true');
-      li.title=x.h+'h : vent '+Math.round(x.v)+' km/h, rafales '+Math.round(x.g)+' km/h'+(x.t!=null?', '+Math.round(x.t)+' °C':'');li.setAttribute('aria-label',li.title);
+      li.title=hh(x.h)+L(' : vent ',': wind ')+Math.round(x.v)+L(' km/h, rafales ',' km/h, gusts ')+Math.round(x.g)+' km/h'+(x.t!=null?', '+Math.round(x.t)+' °C':'');li.setAttribute('aria-label',li.title);
       var w=el('b',null,Math.round(x.v));w.append(el('small','mt-u',' km/h'));
-      li.append(el('span',null,x.h+'h'),w,c,el('span','mt-tp',x.t!=null?Math.round(x.t)+' °C':''));ol.append(li);
+      li.append(el('span',null,hh(x.h)),w,c,el('span','mt-tp',x.t!=null?Math.round(x.t)+' °C':''));ol.append(li);
     });
     return ol;
   }
