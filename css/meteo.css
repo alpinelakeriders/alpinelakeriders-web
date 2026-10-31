@@ -44,3 +44,5 @@
 .mt-h .mt-pic{font-size:16px;line-height:1.1}
 .mt-sun{margin-top:6px;font-size:13px;color:var(--muted)}
 .mt-sun b{font-weight:500;color:var(--fg);font-variant-numeric:tabular-nums}
+.mt-h .mt-u{display:block;font-size:10px;font-weight:400;color:var(--muted);line-height:1}
+.mt-h .mt-tp{font-size:11px}
