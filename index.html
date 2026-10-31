@@ -10,6 +10,9 @@
 <meta name="google-site-verification" content="IsKzfpN8INwAeJAcFQTSVf19hSqw8YAn_95OqQUgroE">
 <meta name="keywords" content="pumpfoil, pump foil, Alpine Lake Riders, association pumpfoil, lac de la Terrasse, Isère, Savoie, Haute-Savoie, Grésivaudan, Grenoble, Chambéry, dockstart, foil, apéro pumpfoil, initiation pumpfoil">
 <link rel="canonical" href="https://alpinelakeriders.com/">
+<link rel="alternate" hreflang="fr" href="https://alpinelakeriders.com/">
+<link rel="alternate" hreflang="en" href="https://alpinelakeriders.com/?lang=en">
+<link rel="alternate" hreflang="x-default" href="https://alpinelakeriders.com/">
 <meta property="og:url" content="https://alpinelakeriders.com/">
 <meta property="og:site_name" content="Alpine Lake Riders">
 <meta property="og:locale" content="fr_FR">
@@ -763,7 +766,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script src="js/config.js?v=50"></script>
 <script src="js/backend.js?v=51"></script>
-<script src="js/meteo.js?v=4"></script>
+<script src="js/i18n.js?v=1"></script>
+<script src="js/meteo.js?v=5"></script>
 </head>
 <body>
 
@@ -1501,6 +1505,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 <script>
 (function(){
   const $=id=>document.getElementById(id);
+  const L=window.ALR_L||((fr,en)=>fr); // version anglaise : voir js/i18n.js
   const MOIS=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
   const JOURS=['dim.','lun.','mar.','mer.','jeu.','ven.','sam.'];
   const TEXT_KEYS=['slogan','accroche','partage','mission','p1','p2','p3','prog1','prog2','prog3','debIntro','deb1','deb2','deb3','deb4','deb5','deb6','debLien','contactEmail','contactTel','seoTitle','seoDesc','seoKeywords','siteName','gsc','shareTitle','shareImage','shareAlt','inscrits','nbAperos','ride','apero','dernier','prochain','spot','prixRider','prixFamille','prixDecouverte','gaId','socInsta','socFb','socWa'];
@@ -1704,7 +1709,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     const em=$('ct-mail').textContent.trim(),tl=$('ct-tel').textContent.trim();
     if(/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em))$('ct-mail').href='mailto:'+em;
     let d=tl.replace(/[^\d+]/g,'');if(d.startsWith('+'))d=d.slice(1);else if(d.startsWith('00'))d=d.slice(2);else if(d.startsWith('0'))d='33'+d.slice(1);
-    if(d.length>=9){$('ct-wa').href='https://wa.me/'+d+'?text='+encodeURIComponent('Bonjour Alpine Lake Riders, ')}
+    if(d.length>=9){$('ct-wa').href='https://wa.me/'+d+'?text='+encodeURIComponent(L('Bonjour Alpine Lake Riders, ','Hello Alpine Lake Riders, '))}
   }
   async function refreshCount(){
     try{const n=db&&db.countMembers&&await db.countMembers();if(n>0){autoCount=String(n);applyTexts()}}catch(e){}
@@ -1834,15 +1839,16 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   // ---------- Partage d'une sortie ----------
   const focusId=(()=>{try{return new URLSearchParams(location.search).get('sortie')||''}catch(e){return ''}})();
   let focusDone=false;
-  function sortieUrl(s){return location.origin+'/?sortie='+encodeURIComponent(s.id)}
+  function sortieUrl(s){return location.origin+'/?sortie='+encodeURIComponent(s.id)+L('','&lang=en')}
   function sortieText(s){
     const d=new Date((s.date||'')+'T12:00:00');
     const quand=isNaN(d)?'':JOURS[d.getDay()].replace('.','')+' '+d.getDate()+' '+MOIS[d.getMonth()];
-    return [(s.titre||'Sortie')+(quand?' · '+quand:''),[s.heure,s.lieu].filter(Boolean).join(' · '),'Inscris-toi ici :'].filter(Boolean).join('\n');
+    const T=window.ALR_I18N&&ALR_I18N.t||(x=>x);
+    return [T((s.titre||'Sortie')+(quand?' · '+quand:'')),T([s.heure,s.lieu].filter(Boolean).join(' · ')),L('Inscris-toi ici :','Sign up here:')].filter(Boolean).join('\n');
   }
   async function shareSortie(s){
     const url=sortieUrl(s),text=sortieText(s);
-    if(navigator.share){try{await navigator.share({title:s.titre||'Sortie Alpine Lake Riders',text,url});return}catch(e){if(e&&e.name==='AbortError')return}}
+    if(navigator.share){try{await navigator.share({title:s.titre||L('Sortie Alpine Lake Riders','Alpine Lake Riders session'),text,url});return}catch(e){if(e&&e.name==='AbortError')return}}
     window.open('https://wa.me/?text='+encodeURIComponent(text+' '+url),'_blank','noopener');
   }
   function renderAgenda(){
@@ -2776,7 +2782,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   // J'aime + partage. Le visiteur est un identifiant aléatoire gardé dans son navigateur (aucune donnée personnelle).
   const crVid=()=>{try{let v=localStorage.getItem('alr-vid');if(!v){v=(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2)).replace(/-/g,'');localStorage.setItem('alr-vid',v)}return v}catch(e){return ''}};
   const crLiked=()=>{try{return JSON.parse(localStorage.getItem('alr-likes')||'[]')||[]}catch(e){return []}};
-  const crUrl=s=>location.origin+'/?cr='+encodeURIComponent(s.id);
+  const crUrl=s=>location.origin+'/?cr='+encodeURIComponent(s.id)+L('','&lang=en');
   function crSocial(s,ph){
     const w=document.createElement('div');w.className='cr-soc';
     const msg=document.createElement('span');msg.className='msg';msg.setAttribute('role','status');
@@ -2788,7 +2794,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       try{n=await db.like(s.id,v,want);let L=crLiked().filter(x=>x!==s.id);if(want)L.push(s.id);try{localStorage.setItem('alr-likes',JSON.stringify(L))}catch(e){}}
       catch(e){on=!want;n=Math.max(0,n+(want?-1:1));msg.textContent='Impossible pour le moment, réessayez plus tard.'}
       like.disabled=false;paint()});
-    const txt=(s.titre||'Sortie')+' · '+crDateLong(s.date)+' : le compte rendu et les photos d\'Alpine Lake Riders';
+    const txt=L((s.titre||'Sortie')+' · '+crDateLong(s.date)+' : le compte rendu et les photos d\'Alpine Lake Riders',(window.ALR_I18N?ALR_I18N.t((s.titre||'Sortie')+' · '+crDateLong(s.date)):s.titre)+': the Alpine Lake Riders session report and photos');
     mk('WhatsApp','Partager sur WhatsApp').addEventListener('click',()=>window.open('https://wa.me/?text='+encodeURIComponent(txt+' '+crUrl(s)),'_blank','noopener'));
     mk('Facebook','Partager sur Facebook').addEventListener('click',()=>window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(crUrl(s)),'_blank','noopener,width=640,height=560'));
     // Instagram n'a pas de lien de partage web : sur téléphone, on passe par le partage du téléphone avec la photo ; sinon on copie le lien
