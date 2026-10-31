@@ -439,6 +439,11 @@ form{display:grid;gap:26px;align-content:start}
 .stars input:checked~label,.stars label:hover,.stars label:hover~label{color:var(--lake)}
 .stars input:focus-visible+label{outline:2px solid var(--lake);outline-offset:2px;border-radius:4px}
 .check{display:flex;gap:10px;align-items:flex-start}
+.av-sug{display:grid;gap:8px;margin-top:-14px}
+.av-sug .label{text-transform:none;letter-spacing:0;font-size:12px}
+#av-sug-l{display:flex;flex-wrap:wrap;gap:6px}
+#av-sug-l button{height:32px;padding:0 12px;border-radius:999px;border:0;box-shadow:inset 0 0 0 1px var(--line);background:transparent;color:var(--fg);font:400 13px var(--sans);cursor:pointer}
+#av-sug-l button[aria-pressed="true"]{background:var(--lake);color:#fff;box-shadow:none}
 .av-mic-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:-14px}
 .av-mic[aria-pressed="true"]{background:var(--danger);color:#fff;box-shadow:none}
 .av-card .av-nt{font-size:13px;color:var(--muted)}
@@ -452,6 +457,8 @@ form{display:grid;gap:26px;align-content:start}
 .av-it .av-n{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted)}
 .av-tag{display:inline-block;font:500 11px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;padding:4px 8px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--line);color:var(--muted)}
 .av-tag.on{background:var(--lake);color:#fff;box-shadow:none}
+.av-rel summary{display:inline-flex!important;align-items:center;list-style:none;cursor:pointer;width:max-content;margin-top:8px}
+.av-rel summary::-webkit-details-marker{display:none}
 .av-imp{border-left:3px solid var(--lake);padding-left:12px}
 /* Partenaire */
 .partner{padding-block:clamp(56px,7vw,96px);border-top:1px solid var(--line)}
@@ -814,7 +821,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script src="js/config.js?v=50"></script>
 <script src="js/backend.js?v=52"></script>
-<script src="js/i18n.js?v=3"></script>
+<script src="js/i18n.js?v=4"></script>
 <script src="js/meteo.js?v=5"></script>
 </head>
 <body>
@@ -1151,6 +1158,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       </div>
       <div id="av-notes-x" style="margin-top:10px"></div></div>
     <label class="f"><span class="label">Votre avis en quelques mots (facultatif, mais ça compte beaucoup ; peut être publié sur le site)</span><textarea id="av-texte" rows="4" maxlength="1500" placeholder="Ce que vous avez aimé…"></textarea></label>
+    <div class="av-sug" id="av-sug" aria-label="Idées de phrases"><span class="label">Besoin d'une idée&nbsp;? Touchez une phrase, puis modifiez-la à votre goût</span><div class="ev-chips" id="av-sug-l"></div></div>
     <div class="av-mic-row" hidden><button type="button" class="pill line small av-mic" data-for="av-texte" aria-pressed="false">🎤 Dicter mon avis</button><span class="msg" role="status"></span></div>
     <label class="f"><span class="label">Qu'est-ce qu'on pourrait améliorer&nbsp;? (lu uniquement par le bureau, jamais publié)</span><textarea id="av-amel" rows="3" maxlength="2000"></textarea></label>
     <div class="av-mic-row" hidden><button type="button" class="pill line small av-mic" data-for="av-amel" aria-pressed="false">🎤 Dicter</button><span class="msg" role="status"></span></div>
@@ -1835,6 +1843,14 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
        rec.onerror=e=>{say(m,e.error==='not-allowed'?'Autorisez le micro pour ce site.':'Dictée interrompue.','err');stop()};
        rec.onend=()=>{if(cur&&cur.b===b){try{rec.start()}catch(e){stop()}}};
        try{rec.start();cur={b,rec,stop};b.setAttribute('aria-pressed','true');b.textContent='■ Arrêter la dictée';say(m,'Parlez, le texte s’écrit tout seul.')}catch(e){say(m,'Impossible de démarrer le micro.','err')}})})}
+  // Idées de phrases : la personne choisit, puis modifie si elle veut (jamais d'avis écrit à sa place)
+  const AV_SUG=['Super ambiance !','Accueil au top, on se sent tout de suite à l’aise.','Spot magnifique face aux montagnes.','Super initiative pour faire découvrir le pumpfoil.','Une asso dynamique et bienveillante.','J’ai progressé grâce aux conseils des riders.','Les apéros pumpfoil sont un vrai moment de partage.','Merci pour le prêt du matériel à l’initiation !','Il faut absolument garder ce spot ouvert !'];
+  (()=>{const box=$('av-sug-l'),ta=$('av-texte');
+    AV_SUG.forEach(t=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.setAttribute('aria-pressed','false');
+      b.addEventListener('click',()=>{const v=ta.value;if(v.includes(t)){ta.value=v.replace(t,'').replace(/\s{2,}/g,' ').trim();b.setAttribute('aria-pressed','false')}
+        else{ta.value=(v.trim()?v.trim()+' ':'')+t;b.setAttribute('aria-pressed','true')}});box.append(b)});
+    ta.addEventListener('input',()=>box.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',ta.value.includes(b.textContent)?'true':'false')))})();
+  let avNudged=false;
   const avT0=Date.now();
   avForm.addEventListener('submit',async e=>{e.preventDefault();const out=$('av-out'),b=$('av-send');
     const val=n=>{const el=avForm.querySelector('input[name="'+n+'"]:checked');return el?el.value:''};
@@ -1843,6 +1859,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       prenom:$('av-prenom').value.trim(),commune:$('av-commune').value.trim(),accord:$('av-accord').checked,src:avSrc||'site'};
     if(!notes.asso){say(out,"Donnez au moins une note à l'association (question 1).",'err');$('av-asso-5').focus();return}
     if(a.prenom.length<2){say(out,'Indiquez votre prénom.','err');$('av-prenom').focus();return}
+    if(!a.texte&&!avNudged){avNudged=true;say(out,'Un petit mot compte beaucoup auprès des communes ! Touchez une phrase ou dictez-la, puis renvoyez. Sinon, cliquez à nouveau pour envoyer sans texte.','err');$('av-sug').scrollIntoView({behavior:'smooth',block:'center'});return}
     const piege=$('av-site').value;
     if(piege||Date.now()-avT0<3000){say(out,'Merci, avis envoyé.','ok');return}
     b.disabled=true;say(out,'Envoi…');
@@ -2130,6 +2147,23 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   const VS_PER=[[7,'7 jours'],[30,'30 jours'],[90,'3 mois'],[365,'1 an']];
   function renderVsPer(){const b=$('vs-per');b.textContent='';VS_PER.forEach(([d,l])=>{const c=document.createElement('button');c.type='button';c.className='chip';c.textContent=l;c.setAttribute('aria-pressed',d===vsDays?'true':'false');c.addEventListener('click',()=>{vsDays=d;loadStats()});b.append(c)})}
   const paysNom=(()=>{let dn=null;try{dn=new Intl.DisplayNames(['fr'],{type:'region'})}catch(e){}return k=>{if(!k||k==='??'||k==='XX'||k==='T1')return 'Inconnu';const f=String.fromCodePoint(...[...k].map(c=>127397+c.charCodeAt(0)));let n=k;try{n=dn?dn.of(k):k}catch(e){}return f+' '+n}})();
+  // Relance d'un avis sans texte : membres qui portent ce prénom, avec un message prêt (WhatsApp ou e-mail). Damien envoie lui-même.
+  const AV_RELANCE='Bonjour {p}, merci beaucoup pour ton avis sur Alpine Lake Riders ! 🙏 Si tu as 30 secondes, ajoute un petit mot (une phrase suffit, tu peux aussi la dicter avec le micro) : ce sont les commentaires écrits qui pèsent le plus auprès des communes pour garder nos spots ouverts. 👉 https://alpinelakeriders.com/?avis=relance Merci ! Damien';
+  const waNum=t=>{let d=String(t||'').replace(/[^\d+]/g,'');if(d.startsWith('+'))d=d.slice(1);else if(d.startsWith('00'))d=d.slice(2);else if(/^0\d{9}$/.test(d))d='33'+d.slice(1);return /^\d{8,15}$/.test(d)?d:''};
+  function avRelance(a){const w=document.createElement('details');w.className='av-rel';
+    const s=document.createElement('summary');s.className='pill line small';s.textContent='Relancer pour un petit mot';w.append(s);
+    const box=document.createElement('div');box.style.cssText='display:grid;gap:8px;margin-top:10px';w.append(box);
+    w.addEventListener('toggle',()=>{if(!w.open)return;box.textContent='';
+      const p1=norm((a.prenom||'').split(/\s+/)[0]),com=norm(a.commune);
+      const c=membres.filter(m=>norm(m.prenom).split(/[\s-]+/)[0]===p1).sort((x,y)=>(norm(y.ville)===com)-(norm(x.ville)===com));
+      const h=document.createElement('p');h.className='msg';h.textContent=c.length?'Membres prénommés « '+a.prenom.split(/\s+/)[0]+' » : choisissez la bonne personne.':'Aucun membre avec ce prénom dans la liste.';box.append(h);
+      c.slice(0,6).forEach(m=>{const r=document.createElement('div');r.style.cssText='display:flex;gap:8px;flex-wrap:wrap;align-items:center';
+        const n=document.createElement('span');n.textContent=[cap(m.prenom),cap(m.nom),m.ville?'('+cap(m.ville)+')':''].filter(Boolean).join(' ');r.append(n);
+        const txt=AV_RELANCE.replace('{p}',cap(m.prenom).split(' ')[0]);const num=waNum(m.tel);
+        if(num){const l=document.createElement('a');l.className='pill ink small';l.target='_blank';l.rel='noopener';l.textContent='WhatsApp';l.href='https://wa.me/'+num+'?text='+encodeURIComponent(txt);r.append(l)}
+        if(m.email){const l=document.createElement('a');l.className='pill line small';l.textContent='E-mail';l.href='mailto:'+encodeURIComponent(m.email)+'?subject='+encodeURIComponent('Un petit mot pour Alpine Lake Riders ?')+'&body='+encodeURIComponent(txt);r.append(l)}
+        box.append(r)})});
+    return w}
   // Avis des membres (admin)
   async function loadAvis(){const box=$('av-adm');
     let list;try{const q=await db.collection('avis').get();list=q.docs.map(d=>Object.assign({id:d.id},d.data())).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')))}
@@ -2180,7 +2214,9 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       pub.addEventListener('click',async()=>{pub.disabled=true;try{await db.doc('avis/'+a.id).update({publie:!a.publie,lu:true});await loadAvis();loadAvisPub()}catch(e){pub.disabled=false}});
       const del=document.createElement('button');del.type='button';del.className='pill line small';del.textContent='Supprimer';let armed=false;
       del.addEventListener('click',async()=>{if(!armed){armed=true;del.textContent='Confirmer';setTimeout(()=>{armed=false;del.textContent='Supprimer'},4000);return}try{await db.doc('avis/'+a.id).delete();await loadAvis();loadAvisPub()}catch(e){}});
-      bb.append(pub,del);body.append(bb);el.append(sm,body);
+      bb.append(pub,del);body.append(bb);
+      if(!a.texte)body.append(avRelance(a));
+      el.append(sm,body);
       el.addEventListener('toggle',()=>{if(el.open&&!a.lu){a.lu=true;el.classList.remove('new');db.doc('avis/'+a.id).update({lu:true}).catch(()=>{});const k=+$('av-n').textContent-1;$('av-n').textContent=k;$('av-n').hidden=k<1}});
       wrap.append(el)})}
   async function loadContacts(){const box=$('ct-adm');
