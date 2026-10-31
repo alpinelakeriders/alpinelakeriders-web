@@ -570,6 +570,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 .admin:has(#admin-body[hidden]) .adm-nav{display:none}
 .adm-nav button{font:500 13px var(--sans);padding:7px 12px;border-radius:999px;border:0;background:var(--bg);box-shadow:inset 0 0 0 1px var(--line);color:var(--fg);cursor:pointer}
 .adm-nav button:hover{box-shadow:inset 0 0 0 1px var(--fg)}
+.adm-nav .go-spots{font:500 13px var(--sans);padding:7px 12px;border-radius:999px;background:var(--fg);color:var(--bg)}
 .adm-sec,.admin .gate{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:clamp(18px,3vw,28px);scroll-margin-top:130px;min-width:0;max-width:none}
 .admin h3{font-size:22px;margin-bottom:6px}
 .adm-intro{font-size:14px;color:var(--muted);margin:0 0 18px;max-width:70ch}
@@ -1345,7 +1346,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
 
 <div class="admin" id="admin" hidden role="dialog" aria-modal="true" aria-labelledby="admin-title"><div class="wrap">
   <div class="admin-head"><h2 id="admin-title">Administration</h2><div style="display:flex;gap:8px"><button class="pill line small" id="logout" type="button" hidden>Se déconnecter</button><button class="pill line small" id="close-admin" type="button">Fermer</button></div>
-    <nav class="adm-nav" id="adm-nav" aria-label="Rubriques de l'administration"><button type="button" data-go="sec-visites">Visites</button><button type="button" data-go="sec-agenda">Agenda</button><button type="button" data-go="sec-cr">Comptes rendus</button><button type="button" data-go="sec-contact">Reçus<b class="nav-n" id="ct-n" hidden></b></button><button type="button" data-go="sec-avis">Avis<b class="nav-n" id="av-n" hidden></b></button><button type="button" data-go="sec-msg">Messages</button><button type="button" data-go="sec-membres">Membres</button><button type="button" data-go="sec-textes">Textes</button><button type="button" data-go="sec-photos">Photos</button><button type="button" data-go="sec-apero-ph">Photos apéro</button><button type="button" data-go="sec-lacs">Lacs</button><button type="button" data-go="sec-admins">Administrateurs</button><button type="button" data-go="sec-seo">Référencement</button><button type="button" class="all" id="adm-all">Tout déplier</button></nav></div>
+    <nav class="adm-nav" id="adm-nav" aria-label="Rubriques de l'administration"><button type="button" data-go="sec-visites">Visites</button><button type="button" data-go="sec-agenda">Agenda</button><button type="button" data-go="sec-cr">Comptes rendus</button><button type="button" data-go="sec-contact">Reçus<b class="nav-n" id="ct-n" hidden></b></button><button type="button" data-go="sec-avis">Avis<b class="nav-n" id="av-n" hidden></b></button><button type="button" data-go="sec-msg">Messages</button><button type="button" data-go="sec-membres">Membres</button><button type="button" data-go="sec-textes">Textes</button><button type="button" data-go="sec-photos">Photos</button><button type="button" data-go="sec-apero-ph">Photos apéro</button><button type="button" data-go="sec-lacs">Lacs</button><button type="button" data-go="sec-admins">Administrateurs</button><a class="go-spots" href="spots-pumpfoil.html">Annuaire des spots ↗</a><button type="button" data-go="sec-seo">Référencement</button><button type="button" class="all" id="adm-all">Tout déplier</button></nav></div>
   <button class="pill ink small adm-top" id="adm-top" type="button">↑ Menu</button>
   <div class="gate" id="gate">
     <p class="msg" id="gate-msg">Vérification de l'accès…</p>
@@ -2100,6 +2101,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
       $('gate').hidden=false;$('login').hidden=false;$('admin-body').hidden=true;$('logout').hidden=true;return;
     }
     $('gate').hidden=true;$('admin-body').hidden=false;$('logout').hidden=false;
+    document.querySelectorAll('[data-admin-only]').forEach(e=>e.hidden=false);
     fillTextForm();renderEditor();renderAnEditor();loadInscriptions();loadContacts();loadAvis();loadAdmins();loadStats();loadLakes();
     try{assets=window.claude&&await window.claude.use('assets')}catch(e){}
     renderPhEditor();phCleanDupes();
