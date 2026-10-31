@@ -393,8 +393,18 @@ form{display:grid;gap:26px;align-content:start}
 .partner{padding-block:clamp(56px,7vw,96px);border-top:1px solid var(--line)}
 .partner .wrap{display:flex;justify-content:space-between;align-items:center;gap:28px;flex-wrap:wrap}
 /* Météo du jour (AROME) sous la vidéo */
-.meteo .wrap{padding-block:18px 16px;border-bottom:1px solid var(--line)}
-.mt-head{display:flex;align-items:baseline;gap:8px 16px;flex-wrap:wrap}
+.meteo .wrap{border-bottom:1px solid var(--line)}
+.meteo .wrap{padding-block:12px}
+.mt-line{display:flex;align-items:center;gap:6px 18px;flex-wrap:wrap;min-height:30px}
+.mt-ic{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--muted)}
+.mt-e{font-size:18px;line-height:1}
+.mt-bh{display:inline-flex;align-items:baseline;gap:6px;font-size:12px;color:var(--muted)}
+.mt-bh b{font-weight:500;font-size:15px;color:var(--lake);font-variant-numeric:tabular-nums}
+.mt-more{margin-left:auto;background:none;border:0;padding:4px 0;font:500 11px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);cursor:pointer}
+.mt-more:hover{color:var(--fg)}
+.mt-titre{margin:14px 0 0}
+.mt-s{display:none}
+@media (max-width:560px){.mt-line{gap:6px 12px}.mt-l{display:none}.mt-s{display:inline}.mt-ic small,.mt-more .mt-mt{display:none}}
 .mt-verdict{display:inline-flex;align-items:center;gap:8px;font-weight:500;font-size:15px}
 .mt-verdict i{width:9px;height:9px;border-radius:50%;background:var(--lake);flex:none;transform:translateY(-1px)}
 .mt-verdict.moyen i{background:#d29a1e}
@@ -787,11 +797,16 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 </div></div>
 
 <div class="meteo" id="meteo" hidden><div class="wrap">
-  <div id="mt-prev" hidden>
-  <div class="mt-head" aria-live="polite">
-    <span class="label" id="mt-titre">Météo du jour · Lac de la Terrasse</span>
-    <span class="mt-verdict" id="mt-verdict"><i aria-hidden="true"></i><span></span></span>
+  <div class="mt-line" aria-live="polite">
+    <span class="mt-verdict" id="mt-verdict" hidden><i aria-hidden="true"></i><span></span></span>
+    <span class="mt-ic" id="mt-ic-prev" hidden><span class="mt-e" aria-hidden="true"></span><small>Prévu</small></span>
+    <span class="mt-ic" id="mt-ic-sat" hidden><span class="mt-e" aria-hidden="true"></span><small>En direct</small></span>
+    <span class="mt-bh" id="mt-bh" hidden><small class="mt-l">Meilleure heure</small><small class="mt-s">Idéal</small><b></b></span>
+    <button class="mt-more" id="mt-more" type="button" aria-expanded="false" aria-controls="mt-det" aria-label="Détails de la météo"><span class="mt-mt">Détails </span><span aria-hidden="true">↓</span></button>
   </div>
+  <div id="mt-det" hidden>
+  <p class="label mt-titre" id="mt-titre">Météo du jour · Lac de la Terrasse</p>
+  <div id="mt-prev" hidden>
   <div class="mt-grid">
     <div><span class="label">Vent</span><b id="mt-vent"></b><small id="mt-vent-m"></small></div>
     <div class="mt-top"><span class="label">Meilleure heure</span><b id="mt-best"></b><small id="mt-best-m"></small></div>
@@ -806,6 +821,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     <div><span class="label">Nuages en direct · satellite</span><b id="mt-nua"></b><small id="mt-nua-m"></small></div>
   </div>
   <p class="mt-src" id="mt-src"></p>
+  </div>
 </div></div>
 <script>
 // Météo du jour au lac de la Terrasse : modèle AROME de Météo-France (1,3 km), via Open-Meteo (gratuit, sans clé).
@@ -882,15 +898,21 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     var bestS=sess.length?sess.reduce(function(a,b){return b.score>a.score+1e-9?b:a}):null;
 
     // Verdict sur le meilleur moment
-    var cls,txt;
-    if(best.v<=8&&best.g<=20){cls='';txt=demain?'Demain, ça va bien rider':'Ça va bien rider aujourd\'hui'}
-    else if(best.v<=14){cls='moyen';txt=(demain?'Demain':'Aujourd\'hui')+' : ça ride, avec un peu de clapot'}
-    else{cls='bof';txt=(demain?'Demain':'Aujourd\'hui')+' : trop de vent pour un bon pump'}
+    var cls,txt,court;
+    if(best.v<=8&&best.g<=20){cls='';court=demain?'Demain : ça ride bien':'Ça va bien rider';txt=demain?'Demain, ça va bien rider':'Ça va bien rider aujourd\'hui'}
+    else if(best.v<=14){cls='moyen';court=(demain?'Demain : ':'')+'Petit clapot';txt=(demain?'Demain':'Aujourd\'hui')+' : ça ride, avec un peu de clapot'}
+    else{cls='bof';court=(demain?'Demain : ':'')+'Trop de vent';txt=(demain?'Demain':'Aujourd\'hui')+' : trop de vent pour un bon pump'}
     var pluie=cand.filter(function(x){return x.pr>=.3}).length;
     if(pluie>=Math.max(3,cand.length/2))txt+=' · pluie annoncée';
     var dt=new Date(day+'T12:00:00');
     $('mt-titre').textContent='Météo '+(demain?'de demain':'du jour')+' · Lac de la Terrasse · '+JOURS[dt.getDay()]+' '+dt.getDate()+' '+MOIS[dt.getMonth()];
-    var vb=$('mt-verdict');vb.className='mt-verdict'+(cls?' '+cls:'');vb.querySelector('span').textContent=txt;
+    var vb=$('mt-verdict');vb.className='mt-verdict'+(cls?' '+cls:'');var vs=vb.querySelector('span');vs.textContent='';var l1=document.createElement('span');l1.className='mt-l';l1.textContent=txt;var l2=document.createElement('span');l2.className='mt-s';l2.textContent=court;vs.append(l1,l2);vb.hidden=false;
+    // Icône prévision : ciel moyen sur les heures de jour restantes
+    var sfm=cand.reduce(function(a,x){return a+x.sf},0)/cand.length,ip=$('mt-ic-prev');
+    var ipe=pluie>=Math.max(3,cand.length/2)?['🌧','pluie']:sfm>=.6?['☀️','beau temps']:sfm>=.25?['⛅','soleil et nuages']:['☁️','nuageux'];
+    ip.firstChild.textContent=ipe[0];ip.title='Prévision : '+ipe[1];ip.setAttribute('aria-label',ip.title);ip.hidden=false;
+    window.ALR_SOLEIL=[sr,ss];
+    var bh=$('mt-bh');bh.querySelector('b').textContent=best.h+'h–'+(best.h+1)+'h';bh.hidden=false;
 
     // Vent : matin / après-midi
     function plage(a,b){var l=jourH.filter(function(x){return x.h>=a&&x.h<b});if(!l.length)return null;
@@ -955,9 +977,13 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     else{e.className='vl';e.textContent=v[0];e.style.left=(v[2]-LON+DX)/(2*DX)*100+'%';e.style.top=(LAT+DY-v[1])/(2*DY)*100+'%'}
     map.append(e);
   });
+  var mb=$('mt-more');mb.onclick=function(){var det=$('mt-det'),o=det.hidden;det.hidden=!o;mb.setAttribute('aria-expanded',o?'true':'false');mb.querySelector('[aria-hidden]').textContent=o?'↑':'↓'};
   fetch('/api/nuages').then(function(r){return r.ok?r.json():null}).then(function(d){
     if(!d||d.couverture==null){$('mt-nua').textContent='Image satellite en direct';$('mt-nua-m').textContent='Les nuages apparaissent en blanc, le point vert marque le lac.';return}
-    var c=d.couverture;
+    var c=d.couverture,is=$('mt-ic-sat'),hp=new Date().toLocaleString('fr-FR',{timeZone:'Europe/Paris',hour:'numeric',hourCycle:'h23'});
+    var so=window.ALR_SOLEIL||[7.5,17.5],nuit=+hp<Math.floor(so[0])||+hp>=Math.ceil(so[1]);
+    var ise=c<=20?[nuit?'🌙':'☀️','ciel dégagé']:c<=60?[nuit?'☁️':'⛅','nuages épars']:['☁️','ciel couvert'];
+    is.firstChild.textContent=ise[0];is.title='En direct (satellite) : '+ise[1]+', '+c+' % de nuages';is.setAttribute('aria-label',is.title);is.hidden=false;
     $('mt-nua').textContent=c<=10?'Ciel dégagé':c<=35?'Quelques nuages':c<=70?'Ciel partiellement couvert':c<95?'Ciel très nuageux':'Ciel couvert';
     var m=c+' % de nuages autour du lac (carré de 20 km)';
     if(d.auLac===0&&c>10)m+=', éclaircie au-dessus du lac';else if(d.auLac===1&&c<90)m+=', nuages au-dessus du lac';
