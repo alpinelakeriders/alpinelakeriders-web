@@ -1,0 +1,43 @@
+/* Météo des spots (prévision AROME + nuages satellite), partagé par index.html et lacs.html */
+.mt-line{display:flex;align-items:center;gap:6px 18px;flex-wrap:wrap;min-height:30px}
+.mt-ic{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--muted)}
+.mt-e{font-size:18px;line-height:1}
+.mt-bh{display:inline-flex;align-items:baseline;gap:6px;font-size:12px;color:var(--muted)}
+.mt-bh b{font-weight:500;font-size:15px;color:var(--lake);font-variant-numeric:tabular-nums}
+.mt-more{margin-left:auto;background:none;border:0;padding:4px 0;font:500 11px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);cursor:pointer}
+.mt-more:hover{color:var(--fg)}
+.mt-titre{margin:14px 0 0}
+.mt-s{display:none}
+@media (max-width:560px){.mt-line{gap:6px 11px}.mt-bh .mt-bw::before{content:""}.mt-e{font-size:16px}.mt-l{display:none}.mt-s{display:inline}.mt-ic small,.mt-more .mt-mt{display:none}}
+.mt-verdict{display:inline-flex;align-items:center;gap:8px;font-weight:500;font-size:15px}
+.mt-verdict i{width:9px;height:9px;border-radius:50%;background:var(--lake);flex:none;transform:translateY(-1px)}
+.mt-verdict.moyen i{background:#d29a1e}
+.mt-verdict.bof i{background:var(--danger)}
+.mt-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 20px;margin-top:14px}
+@media (min-width:860px){.mt-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.mt-grid > div{min-width:0}
+.mt-grid .label{display:block;font-size:11px;margin-bottom:6px}
+.mt-grid b{display:block;font-weight:500;font-size:15px;font-variant-numeric:tabular-nums}
+.mt-grid small{display:block;font-size:13px;color:var(--muted);line-height:1.45}
+.mt-top b{color:var(--lake)}
+.mt-h{list-style:none;margin:12px 0 2px;padding:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px}
+@media (min-width:860px){.mt-h{grid-template-columns:repeat(12,minmax(0,1fr));max-width:900px}}
+.mt-h li{display:grid;gap:3px;justify-items:center;padding:7px 2px;border-radius:6px;background:var(--tint);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;min-width:0}
+.mt-h li b{font-size:14px;font-weight:500;color:var(--fg)}
+.mt-h li.mt-best{outline:1.5px solid var(--lake);outline-offset:-1.5px}
+.mt-h li.mt-past{opacity:.45}
+.mt-h li.mt-calme b{color:var(--lake)}
+.mt-h li.mt-vente b{color:var(--danger)}
+.mt-sat{display:grid;grid-template-columns:minmax(0,1fr);gap:12px 20px;margin-top:16px;align-items:start}
+@media (min-width:640px){.mt-sat{grid-template-columns:minmax(0,320px) minmax(0,1fr)}}
+.mt-map{position:relative;display:block;aspect-ratio:4/3;border-radius:8px;overflow:hidden;background:#111}
+.mt-map img{width:100%;height:100%;object-fit:cover}
+.mt-map .pt{position:absolute;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;border:2px solid #fff;background:var(--lake);box-shadow:0 0 0 2px rgba(0,0,0,.35)}
+.mt-map .vl{position:absolute;transform:translate(-50%,-50%);font:500 10px/1 var(--mono);letter-spacing:.03em;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.9);white-space:nowrap}
+.mt-map .vl::before{content:"";display:block;width:4px;height:4px;margin:0 auto 3px;border-radius:50%;background:#fff}
+.mt-sat .label{display:block;font-size:11px;margin-bottom:6px}
+.mt-sat b{display:block;font-weight:500;font-size:15px}
+.mt-sat small{display:block;font-size:13px;color:var(--muted);line-height:1.45}
+.mt-src{margin-top:10px;font-size:12px;color:var(--muted)}
+.mt-bh .mt-bw{font-size:13px;color:var(--fg);font-variant-numeric:tabular-nums}
+.mt-bh .mt-bw::before{content:"· ";color:var(--muted)}
