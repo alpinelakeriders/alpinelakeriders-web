@@ -1,0 +1,16 @@
+{
+  "name": "Alpine Lake Riders",
+  "short_name": "Lake Riders",
+  "description": "L'association de pumpfoil des lacs alpins : agenda, météo du lac de la Terrasse, Apéros Pumpfoil.",
+  "lang": "fr",
+  "start_url": "/?source=appli",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    { "src": "/media/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/media/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/media/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

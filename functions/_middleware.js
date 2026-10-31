@@ -17,6 +17,7 @@ function logVisite(request, url) {
   const appareil = /iPad|Tablet|Android(?!.*Mobile)/i.test(ua) ? 'tablette' : /Mobi|iPhone|Android/i.test(ua) ? 'mobile' : 'ordinateur';
   let source = '';
   try { const r = new URL(request.headers.get('referer') || ''); if (!r.hostname.endsWith('alpinelakeriders.com')) source = r.hostname.replace(/^www\./, ''); } catch (e) {}
+  if (!source && url.searchParams.get('source') === 'appli') source = 'icône écran d\'accueil';
   const body = { p_pays: request.headers.get('cf-ipcountry') || '', p_appareil: appareil, p_source: source, p_sortie: url.searchParams.get('sortie') || '' };
   return fetch(SB + '/rest/v1/rpc/log_visite', {
     method: 'POST',
