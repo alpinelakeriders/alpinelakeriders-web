@@ -852,7 +852,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   var MC=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
   var fmt=function(t){return t<0.5?'≈ 0 °C · glace':t.toFixed(1).replace('.',',')+' °C'};
   var $=function(id){return document.getElementById(id)};
-  fetch(c.url+'/rest/v1/lake_temperature?select=acquired_on,temp_c&lake=eq.terrasse&order=acquired_on.desc&limit=60',{headers:{apikey:c.anonKey,Authorization:'Bearer '+c.anonKey}})
+  fetch(c.url+'/rest/v1/lake_temperature?select=acquired_on,temp_c&lake=eq.terrasse&rejected=is.false&order=acquired_on.desc&limit=60',{headers:{apikey:c.anonKey,Authorization:'Bearer '+c.anonKey}})
     .then(function(r){return r.ok?r.json():[]})
     .then(function(rows){
       rows=(rows||[]).map(function(r){return {t:Number(r.temp_c),d:new Date(r.acquired_on+'T12:00:00')}})
@@ -910,7 +910,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   var get=function(path){return fetch(c.url+'/rest/v1/'+path,H).then(function(r){return r.ok?r.json():[]})};
   Promise.all([
     get('lakes?select=slug,name,commune,ordre&slug=neq.terrasse&order=ordre'),
-    get('lake_temperature?select=lake,acquired_on,temp_c&lake=neq.terrasse&acquired_on=gte.'+iso+'&order=acquired_on.desc&limit=1000'),
+    get('lake_temperature?select=lake,acquired_on,temp_c&lake=neq.terrasse&rejected=is.false&acquired_on=gte.'+iso+'&order=acquired_on.desc&limit=1000'),
     get('lake_live?select=lake,measured_at,temp_c&order=measured_at.desc&limit=20')
   ]).then(function(r){
     var lakes=r[0]||[],sat=r[1]||[],live=r[2]||[];

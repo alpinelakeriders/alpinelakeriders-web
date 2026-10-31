@@ -40,3 +40,10 @@ create or replace view public.lake_temperature_latest with (security_invoker = t
 -- Ajouter un lac : insert into public.lakes (slug, name, commune, lat, lon, half_m, ordre)
 --   values ('monlac', 'Lac de …', 'Commune (38)', 45.0, 5.0, 100, 8);
 -- puis lancer la fonction avec ?days=400&lake=monlac pour récupérer un an d'historique.
+
+-- Filtre des valeurs aberrantes (activé par lac via lakes.outlier_c, ex. 3 °C pour la mer à Carnon) :
+-- une mesure est marquée rejected si elle s'écarte de plus de outlier_c de la médiane des ±16 jours
+-- et qu'aucune mesure à ±2 jours ne la confirme. Fonction public.flag_lake_outliers(), lancée par
+-- pg_cron (job « filtre-valeurs-aberrantes ») 10 min après chaque relevé. Le site ignore rejected = true.
+alter table public.lake_temperature add column rejected boolean not null default false;
+alter table public.lakes add column outlier_c numeric;
