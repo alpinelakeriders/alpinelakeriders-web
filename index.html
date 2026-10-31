@@ -439,6 +439,9 @@ form{display:grid;gap:26px;align-content:start}
 .stars input:checked~label,.stars label:hover,.stars label:hover~label{color:var(--lake)}
 .stars input:focus-visible+label{outline:2px solid var(--lake);outline-offset:2px;border-radius:4px}
 .check{display:flex;gap:10px;align-items:flex-start}
+.av-mic-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:-14px}
+.av-mic[aria-pressed="true"]{background:var(--danger);color:#fff;box-shadow:none}
+.av-card .av-nt{font-size:13px;color:var(--muted)}
 .check input{margin-top:5px;accent-color:var(--lake)}
 /* Admin : avis */
 .av-adm-kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:14px}
@@ -811,7 +814,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script src="js/config.js?v=50"></script>
 <script src="js/backend.js?v=52"></script>
-<script src="js/i18n.js?v=2"></script>
+<script src="js/i18n.js?v=3"></script>
 <script src="js/meteo.js?v=5"></script>
 </head>
 <body>
@@ -1147,8 +1150,10 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
         <label><input type="radio" name="av-meteovu" value="pasvu"><span>Non, je ne l'avais pas vue</span></label>
       </div>
       <div id="av-notes-x" style="margin-top:10px"></div></div>
-    <label class="f"><span class="label">Votre avis en quelques mots (peut être publié sur le site)</span><textarea id="av-texte" rows="4" maxlength="1500" placeholder="Ce que vous avez aimé…"></textarea></label>
+    <label class="f"><span class="label">Votre avis en quelques mots (facultatif, mais ça compte beaucoup ; peut être publié sur le site)</span><textarea id="av-texte" rows="4" maxlength="1500" placeholder="Ce que vous avez aimé…"></textarea></label>
+    <div class="av-mic-row" hidden><button type="button" class="pill line small av-mic" data-for="av-texte" aria-pressed="false">🎤 Dicter mon avis</button><span class="msg" role="status"></span></div>
     <label class="f"><span class="label">Qu'est-ce qu'on pourrait améliorer&nbsp;? (lu uniquement par le bureau, jamais publié)</span><textarea id="av-amel" rows="3" maxlength="2000"></textarea></label>
+    <div class="av-mic-row" hidden><button type="button" class="pill line small av-mic" data-for="av-amel" aria-pressed="false">🎤 Dicter</button><span class="msg" role="status"></span></div>
     <div class="row2">
       <label class="f"><span class="label">Prénom et initiale du nom</span><input id="av-prenom" autocomplete="off" maxlength="60" placeholder="Julie M."></label>
       <label class="f"><span class="label">Votre commune</span><input id="av-commune" autocomplete="address-level2" maxlength="80" placeholder="Crolles"></label>
@@ -1817,6 +1822,19 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   avFill();avOpen(false);
   avOpenBtn.addEventListener('click',()=>{const on=avForm.hidden;avOpen(on);if(on)avForm.scrollIntoView({behavior:'smooth',block:'start'})});
   if(avSrc){avOpen(true);setTimeout(()=>{$('avis').scrollIntoView({behavior:'smooth',block:'start'})},400)}
+  // Dictée vocale (navigateur, gratuit) sur les champs de texte
+  {const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let cur=null;
+   document.querySelectorAll('.av-mic').forEach(b=>{const row=b.parentNode,m=row.querySelector('.msg'),ta=$(b.dataset.for),lab=b.textContent;
+     if(!SR)return;row.hidden=false;
+     const stop=()=>{if(cur&&cur.b===b){const r=cur.rec;cur=null;try{r.stop()}catch(e){}}b.setAttribute('aria-pressed','false');b.textContent=lab};
+     b.addEventListener('click',()=>{if(cur&&cur.b===b){stop();return}if(cur)cur.stop();
+       const rec=new SR();rec.lang=(window.ALR_LANG==='en')?'en-GB':'fr-FR';rec.continuous=true;rec.interimResults=true;
+       const base=ta.value.trim();let fin='';
+       rec.onresult=e=>{let tmp='';for(let i=e.resultIndex;i<e.results.length;i++){const t=e.results[i][0].transcript;if(e.results[i].isFinal)fin+=t.trim()+' ';else tmp+=t}
+         const txt=(fin+tmp).trim();ta.value=(base?base+' ':'')+(txt?txt.charAt(0).toUpperCase()+txt.slice(1):'')};
+       rec.onerror=e=>{say(m,e.error==='not-allowed'?'Autorisez le micro pour ce site.':'Dictée interrompue.','err');stop()};
+       rec.onend=()=>{if(cur&&cur.b===b){try{rec.start()}catch(e){stop()}}};
+       try{rec.start();cur={b,rec,stop};b.setAttribute('aria-pressed','true');b.textContent='■ Arrêter la dictée';say(m,'Parlez, le texte s’écrit tout seul.')}catch(e){say(m,'Impossible de démarrer le micro.','err')}})})}
   const avT0=Date.now();
   avForm.addEventListener('submit',async e=>{e.preventDefault();const out=$('av-out'),b=$('av-send');
     const val=n=>{const el=avForm.querySelector('input[name="'+n+'"]:checked');return el?el.value:''};
@@ -1848,9 +1866,11 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     const items=r.liste||[];list.textContent='';
     items.forEach((x,i)=>{const c=document.createElement('article');c.className='av-card';if(i>=6)c.hidden=true;
       const st=document.createElement('span');st.className='av-st';st.textContent=avStars(avMoy(x.notes));st.setAttribute('aria-label',avNum(avMoy(x.notes))+' sur 5');
-      const p=document.createElement('p');p.textContent='« '+x.texte+' »';
+      c.append(st);
+      if(x.texte){const p=document.createElement('p');p.textContent='« '+x.texte+' »';c.append(p)}
+      else{const nt=document.createElement('span');nt.className='av-nt';nt.textContent=AV_Q.filter(([k])=>(x.notes||{})[k]).map(([k])=>AV_COURT[k]+' '+x.notes[k]+'/5').join(' · ');c.append(nt)}
       const sm=document.createElement('small');sm.textContent=[x.prenom,x.commune,AV_PROFIL[x.profil],avDate(x.date)].filter(Boolean).join(' · ');
-      c.append(st,p,sm);list.append(c)});
+      c.append(sm);list.append(c)});
     list.hidden=!items.length;all.hidden=items.length<=6}
   $('av-all').addEventListener('click',e=>{$('av-list').querySelectorAll('.av-card[hidden]').forEach(c=>c.hidden=false);e.currentTarget.hidden=true});
   function applyTexts(){
@@ -2152,11 +2172,11 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       if(a.ameliorer){const p=document.createElement('p');p.className='av-imp';p.textContent='À améliorer (privé) : '+a.ameliorer;body.append(p)}
       const tag=document.createElement('p');const t=document.createElement('span');t.className='av-tag'+(a.publie?' on':'');t.textContent=a.publie?'Publié sur le site':'Non publié';tag.append(t);
       if(!a.accord){const w=document.createElement('span');w.className='msg';w.style.marginLeft='10px';w.textContent='La personne n’a pas accepté la publication.';tag.append(w)}
-      else if(!a.texte){const w=document.createElement('span');w.className='msg';w.style.marginLeft='10px';w.textContent='Pas de texte : seules ses notes comptent dans les moyennes.';tag.append(w)}
+      else if(!a.texte){const w=document.createElement('span');w.className='msg';w.style.marginLeft='10px';w.textContent='Sans texte : s’il est publié, seules ses étoiles s’affichent.';tag.append(w)}
       body.append(tag);
       const bb=document.createElement('div');bb.className='bar';bb.style.cssText='display:flex;gap:8px;flex-wrap:wrap';
       const pub=document.createElement('button');pub.type='button';pub.className='pill '+(a.publie?'line':'ink')+' small';pub.textContent=a.publie?'Masquer du site':'Publier sur le site';
-      pub.disabled=!a.publie&&(!a.accord||!a.texte);
+      pub.disabled=!a.publie&&!a.accord;
       pub.addEventListener('click',async()=>{pub.disabled=true;try{await db.doc('avis/'+a.id).update({publie:!a.publie,lu:true});await loadAvis();loadAvisPub()}catch(e){pub.disabled=false}});
       const del=document.createElement('button');del.type='button';del.className='pill line small';del.textContent='Supprimer';let armed=false;
       del.addEventListener('click',async()=>{if(!armed){armed=true;del.textContent='Confirmer';setTimeout(()=>{armed=false;del.textContent='Supprimer'},4000);return}try{await db.doc('avis/'+a.id).delete();await loadAvis();loadAvisPub()}catch(e){}});

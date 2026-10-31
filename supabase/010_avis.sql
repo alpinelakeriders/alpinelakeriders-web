@@ -54,7 +54,7 @@ returns jsonb language sql stable security definer set search_path = public as $
     'reco', (select round(100.0*count(*) filter (where d->>'reco'='oui') / nullif(count(*) filter (where d ? 'reco'),0)) from a),
     'liste', coalesce((select jsonb_agg(jsonb_strip_nulls(jsonb_build_object('prenom', d->>'prenom', 'commune', d->>'commune',
         'profil', d->>'profil', 'notes', d->'notes', 'texte', d->>'texte', 'date', d->>'date')) order by d->>'date' desc)
-      from a where d->>'publie' = 'true' and d->>'accord' = 'true' and d ? 'texte'), '[]'::jsonb));
+      from a where d->>'publie' = 'true' and d->>'accord' = 'true'), '[]'::jsonb));
 $$;
 revoke all on function public.avis_publics() from public;
 grant execute on function public.avis_publics() to anon, authenticated;
