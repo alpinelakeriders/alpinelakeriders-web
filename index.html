@@ -405,6 +405,51 @@ form{display:grid;gap:26px;align-content:start}
 .msg.ok{color:var(--lake)} .msg.err{color:var(--danger)}
 .wa{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-top:26px;border-top:1px solid var(--line)}
 
+/* Avis des riders */
+#avis{border-top:1px solid var(--line)}
+.av-head{display:grid;gap:40px}
+@media (min-width:980px){.av-head{grid-template-columns:1fr 1fr;gap:112px;align-items:end}}
+.av-head h2{font-size:clamp(44px,6.4vw,96px);line-height:.95}
+.av-intro{margin-top:20px;font-size:clamp(18px,1.8vw,22px);line-height:1.4;color:var(--muted);max-width:40ch;letter-spacing:-.015em}
+.av-sum{display:grid;gap:18px}
+.av-big{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.av-big b{font-size:clamp(56px,7vw,96px);font-weight:500;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
+.av-big span{color:var(--muted)}
+.av-st{color:var(--lake);letter-spacing:.08em;white-space:nowrap}
+.av-bars{display:grid;gap:10px;border-top:1px solid var(--line);padding-top:18px}
+.av-bar{display:grid;grid-template-columns:minmax(0,1fr) 120px 36px;gap:12px;align-items:center;font-size:14px}
+.av-bar i{display:block;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.av-bar i::before{content:"";display:block;height:100%;width:var(--w,0);background:var(--lake)}
+.av-bar em{font-style:normal;font-variant-numeric:tabular-nums;text-align:right}
+.av-list{display:grid;gap:16px;margin-top:clamp(40px,5vw,72px)}
+@media (min-width:800px){.av-list{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.av-card{border:1px solid var(--line);border-radius:12px;padding:22px;display:grid;gap:12px;align-content:start;min-width:0}
+.av-card p{font-size:17px;line-height:1.45;letter-spacing:-.01em;overflow-wrap:anywhere}
+.av-card small{color:var(--muted);font-size:13px}
+.av-more{margin-top:16px}
+.av-cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:clamp(32px,4vw,56px)}
+#avf{margin-top:clamp(32px,4vw,56px);border-top:1px solid var(--fg);padding-top:clamp(28px,3vw,40px);display:grid;gap:28px;max-width:760px}
+#avf[hidden]{display:none}
+.av-q{display:grid;gap:8px;min-width:0}
+.av-q>span:first-child{font-size:17px;letter-spacing:-.01em}
+.av-q small{color:var(--muted);font-size:13px}
+.stars{display:inline-flex;flex-direction:row-reverse;justify-content:flex-end;gap:4px}
+.stars input{position:absolute;opacity:0;width:1px;height:1px}
+.stars label{font-size:34px;line-height:1;color:var(--line);cursor:pointer;padding:2px;transition:color .15s}
+.stars input:checked~label,.stars label:hover,.stars label:hover~label{color:var(--lake)}
+.stars input:focus-visible+label{outline:2px solid var(--lake);outline-offset:2px;border-radius:4px}
+.check{display:flex;gap:10px;align-items:flex-start}
+.check input{margin-top:5px;accent-color:var(--lake)}
+/* Admin : avis */
+.av-adm-kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:14px}
+.av-adm-kpi div{border:1px solid var(--line);border-radius:10px;padding:12px;display:grid;gap:2px}
+.av-adm-kpi b{font-size:24px;font-weight:500;font-variant-numeric:tabular-nums}
+.av-adm-kpi span{font-size:12px;color:var(--muted)}
+.av-it .ct-body p{overflow-wrap:anywhere}
+.av-it .av-n{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted)}
+.av-tag{display:inline-block;font:500 11px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;padding:4px 8px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--line);color:var(--muted)}
+.av-tag.on{background:var(--lake);color:#fff;box-shadow:none}
+.av-imp{border-left:3px solid var(--lake);padding-left:12px}
 /* Partenaire */
 .partner{padding-block:clamp(56px,7vw,96px);border-top:1px solid var(--line)}
 .partner .wrap{display:flex;justify-content:space-between;align-items:center;gap:28px;flex-wrap:wrap}
@@ -765,16 +810,21 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script src="js/config.js?v=50"></script>
+<<<<<<< Updated upstream
 <script src="js/backend.js?v=51"></script>
 <script src="js/i18n.js?v=1"></script>
 <script src="js/meteo.js?v=5"></script>
+=======
+<script src="js/backend.js?v=52"></script>
+<script src="js/meteo.js?v=4"></script>
+>>>>>>> Stashed changes
 </head>
 <body>
 
 
 <nav class="topbar"><div class="wrap">
   <span class="label">Alpine Lake Riders Association</span>
-  <ul><li><a href="#asso">L'asso</a></li><li><a href="#agenda">Agenda</a></li><li><a href="#debuter">Débuter</a></li><li><a href="#apero">Apéros Pumpfoil</a></li><li><a href="#spot">Le spot</a></li><li><a href="#lacs">Lacs</a></li><li><a href="#rejoindre">Rejoindre</a></li><li><a href="#contact">Contact</a></li></ul>
+  <ul><li><a href="#asso">L'asso</a></li><li><a href="#agenda">Agenda</a></li><li><a href="#debuter">Débuter</a></li><li><a href="#apero">Apéros Pumpfoil</a></li><li><a href="#spot">Le spot</a></li><li><a href="#lacs">Lacs</a></li><li><a href="#avis">Avis</a></li><li><a href="#rejoindre">Rejoindre</a></li><li><a href="#contact">Contact</a></li></ul>
   <button class="a2hs-top" type="button" data-a2hs hidden><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="6" y="2.5" width="12" height="19" rx="2.6"/><path d="M12 8.5v6M9 11.5h6"/></svg></button>
   <a class="pill ink" href="#rejoindre">Adhérer</a>
 </div></nav>
@@ -1073,6 +1123,54 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 })();
 </script>
 
+<section id="avis"><div class="wrap">
+  <div class="av-head">
+    <div>
+      <p class="label" style="margin-bottom:24px">Avis des riders</p>
+      <h2>Ce qu'en disent les riders</h2>
+      <p class="av-intro" id="av-intro">Vous avez ridé avec nous&nbsp;? Donnez votre avis en 2 minutes. Plus nous serons nombreux, plus nous pèserons auprès des communes, de la communauté de communes et de la Région pour garder nos spots ouverts&nbsp;: cet hiver encore, le ponton de la Terrasse est fermé plusieurs semaines.</p>
+    </div>
+    <div class="av-sum" id="av-sum" hidden></div>
+  </div>
+  <div class="av-list" id="av-list" hidden></div>
+  <div class="av-more"><button type="button" class="pill line small" id="av-all" hidden>Voir tous les avis</button></div>
+  <div class="av-cta"><button type="button" class="pill ink" id="av-open" aria-expanded="false" aria-controls="avf">Donner mon avis</button></div>
+  <form id="avf" novalidate hidden>
+    <div><p class="label" style="margin-bottom:12px">Questionnaire · 2 minutes</p><p style="font-size:20px;letter-spacing:-.02em">Notez de 1 à 5 étoiles. Seule la première note est obligatoire.</p></div>
+    <div id="av-notes" style="display:grid;gap:22px"></div>
+    <div class="av-q"><span>Recommanderiez-vous Alpine Lake Riders à un ami&nbsp;?</span>
+      <div class="seg" role="radiogroup" aria-label="Recommandation">
+        <label><input type="radio" name="av-reco" value="oui"><span>Oui</span></label>
+        <label><input type="radio" name="av-reco" value="peutetre"><span>Peut-être</span></label>
+        <label><input type="radio" name="av-reco" value="non"><span>Non</span></label>
+      </div></div>
+    <div class="av-q av-new"><p class="label" style="color:var(--lake)">Nouveau sur le site</p><span>La météo des spots : prévisions heure par heure, température des lacs et meilleur moment pour rider (<a href="lacs.html" target="_blank" rel="noopener" style="text-decoration:underline">voir la page</a>).</span>
+      <span style="font-size:15px;color:var(--muted)">L'avez-vous vue ou déjà utilisée&nbsp;?</span>
+      <div class="seg" role="radiogroup" aria-label="Météo des spots déjà vue ou utilisée">
+        <label><input type="radio" name="av-meteovu" value="utilise"><span>Oui, je l'utilise</span></label>
+        <label><input type="radio" name="av-meteovu" value="vu"><span>Vue, pas encore utilisée</span></label>
+        <label><input type="radio" name="av-meteovu" value="pasvu"><span>Non, je ne l'avais pas vue</span></label>
+      </div>
+      <div id="av-notes-x" style="margin-top:10px"></div></div>
+    <label class="f"><span class="label">Votre avis en quelques mots (peut être publié sur le site)</span><textarea id="av-texte" rows="4" maxlength="1500" placeholder="Ce que vous avez aimé…"></textarea></label>
+    <label class="f"><span class="label">Qu'est-ce qu'on pourrait améliorer&nbsp;? (lu uniquement par le bureau, jamais publié)</span><textarea id="av-amel" rows="3" maxlength="2000"></textarea></label>
+    <div class="row2">
+      <label class="f"><span class="label">Prénom et initiale du nom</span><input id="av-prenom" autocomplete="off" maxlength="60" placeholder="Julie M."></label>
+      <label class="f"><span class="label">Votre commune</span><input id="av-commune" autocomplete="address-level2" maxlength="80" placeholder="Crolles"></label>
+    </div>
+    <div class="av-q"><span>Vous êtes</span>
+      <div class="seg" role="radiogroup" aria-label="Profil">
+        <label><input type="radio" name="av-profil" value="confirme"><span>Rider confirmé</span></label>
+        <label><input type="radio" name="av-profil" value="debutant"><span>Débutant</span></label>
+        <label><input type="radio" name="av-profil" value="initiation"><span>Venu pour l'initiation</span></label>
+        <label><input type="radio" name="av-profil" value="accompagnant"><span>Parent ou accompagnant</span></label>
+      </div></div>
+    <label class="check"><input type="checkbox" id="av-accord" checked><span>J'accepte que mon avis (prénom, initiale, commune, notes et texte ci-dessus) soit publié sur alpinelakeriders.com. Les remarques « à améliorer » ne sont jamais publiées.</span></label>
+    <label class="ct-hp" aria-hidden="true">Site web<input id="av-site" tabindex="-1" autocomplete="off"></label>
+    <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap"><button class="pill ink" id="av-send" type="submit">Envoyer mon avis</button><span class="msg" id="av-out" role="status"></span></div>
+  </form>
+</div></section>
+
 <section id="rejoindre"><div class="wrap">
   <div class="join">
     <div>
@@ -1229,7 +1327,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 
 <div class="admin" id="admin" hidden role="dialog" aria-modal="true" aria-labelledby="admin-title"><div class="wrap">
   <div class="admin-head"><h2 id="admin-title">Administration</h2><div style="display:flex;gap:8px"><button class="pill line small" id="logout" type="button" hidden>Se déconnecter</button><button class="pill line small" id="close-admin" type="button">Fermer</button></div>
-    <nav class="adm-nav" id="adm-nav" aria-label="Rubriques de l'administration"><button type="button" data-go="sec-visites">Visites</button><button type="button" data-go="sec-agenda">Agenda</button><button type="button" data-go="sec-cr">Comptes rendus</button><button type="button" data-go="sec-contact">Reçus<b class="nav-n" id="ct-n" hidden></b></button><button type="button" data-go="sec-msg">Messages</button><button type="button" data-go="sec-membres">Membres</button><button type="button" data-go="sec-textes">Textes</button><button type="button" data-go="sec-photos">Photos</button><button type="button" data-go="sec-apero-ph">Photos apéro</button><button type="button" data-go="sec-lacs">Lacs</button><button type="button" data-go="sec-admins">Administrateurs</button><button type="button" data-go="sec-seo">Référencement</button><button type="button" class="all" id="adm-all">Tout déplier</button></nav></div>
+    <nav class="adm-nav" id="adm-nav" aria-label="Rubriques de l'administration"><button type="button" data-go="sec-visites">Visites</button><button type="button" data-go="sec-agenda">Agenda</button><button type="button" data-go="sec-cr">Comptes rendus</button><button type="button" data-go="sec-contact">Reçus<b class="nav-n" id="ct-n" hidden></b></button><button type="button" data-go="sec-avis">Avis<b class="nav-n" id="av-n" hidden></b></button><button type="button" data-go="sec-msg">Messages</button><button type="button" data-go="sec-membres">Membres</button><button type="button" data-go="sec-textes">Textes</button><button type="button" data-go="sec-photos">Photos</button><button type="button" data-go="sec-apero-ph">Photos apéro</button><button type="button" data-go="sec-lacs">Lacs</button><button type="button" data-go="sec-admins">Administrateurs</button><button type="button" data-go="sec-seo">Référencement</button><button type="button" class="all" id="adm-all">Tout déplier</button></nav></div>
   <button class="pill ink small adm-top" id="adm-top" type="button">↑ Menu</button>
   <div class="gate" id="gate">
     <p class="msg" id="gate-msg">Vérification de l'accès…</p>
@@ -1315,6 +1413,11 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       <h3>Messages reçus</h3>
       <p class="adm-intro">Messages envoyés depuis le formulaire « Nous contacter ». « Répondre » ouvre votre messagerie.</p>
       <div class="ct-adm" id="ct-adm"><p class="msg">Chargement…</p></div>
+    </section>
+    <section class="adm-sec" id="sec-avis">
+      <h3>Avis des membres</h3>
+      <p class="adm-intro">Réponses au questionnaire « Donner mon avis ». Rien n'est publié sans votre clic sur « Publier » (et seulement si la personne l'a accepté). Les remarques « à améliorer » restent privées. Les moyennes affichées sur le site portent sur tous les avis reçus.</p>
+      <div id="av-adm"><p class="msg">Chargement…</p></div>
     </section>
     <section class="adm-sec" id="sec-msg">
       <h3>Messages et consignes</h3>
@@ -1688,6 +1791,73 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     try{if(!db||!db.contact)throw new Error('indispo');await db.contact({nom,email,tel,message:msg,piege});say(out,'Merci, message envoyé. On vous répond vite.','ok');e.target.reset()}
     catch(err){const m=String(err&&err.message||'');say(out,/trop|54000/.test(m)?'Trop de messages en ce moment, réessayez dans quelques minutes.':'Envoi impossible pour le moment. Écrivez-nous directement à '+$('ct-mail').textContent.trim()+'.','err')}
     b.disabled=false});
+  // ---------- Avis des riders (questionnaire public + avis validés) ----------
+  const AV_Q=[['asso',"Votre avis général sur l'association"],['sortie',"Votre dernière sortie avec nous s'est-elle bien passée ?"],['installations','Les installations','Ponton, accès au lac, stationnement, matériel prêté'],['ambiance',"L'ambiance dans le groupe"],['spot','Le spot','Le lac de la Terrasse']];
+  const AV_X=[['meteo','Cette nouveauté vous semble-t-elle utile ?']];
+  const AV_METEO={utilise:'L’utilise',vu:'Vue, pas utilisée',pasvu:'Pas vue'};
+  const AV_COURT={meteo:'Météo des spots',asso:"L'association",sortie:'Dernière sortie',installations:'Installations',ambiance:'Ambiance',spot:'Le spot'};
+  const AV_PROFIL={confirme:'Rider confirmé',debutant:'Débutant',initiation:'Initiation',accompagnant:'Accompagnant'};
+  const AV_RECO={oui:'Oui',peutetre:'Peut-être',non:'Non'};
+  const AV_MIN=3; // moyennes affichées sur le site à partir de 3 avis
+  const avStars=n=>{const r=Math.max(0,Math.min(5,Math.round(n||0)));return '★'.repeat(r)+'☆'.repeat(5-r)};
+  const avNum=n=>Number(n||0).toLocaleString('fr-FR',{minimumFractionDigits:1,maximumFractionDigits:1});
+  const avMoy=o=>{const v=Object.entries(o||{}).filter(([k])=>k!=='meteo').map(([,x])=>Number(x)).filter(x=>x>0);return v.length?v.reduce((a,b)=>a+b,0)/v.length:0};
+  const avDate=d=>{try{return new Date(d).toLocaleDateString('fr-FR',{month:'long',year:'numeric'})}catch(e){return ''}};
+  const avSrc=(()=>{try{const q=new URLSearchParams(location.search);return q.has('avis')?(q.get('avis')||'lien').replace(/[^a-z0-9_-]/gi,'').slice(0,20)||'lien':''}catch(e){return ''}})();
+  (()=>{
+    AV_Q.concat(AV_X).forEach(([k,t,s],i)=>{const box=$(i<AV_Q.length?'av-notes':'av-notes-x');const q=document.createElement('div');q.className='av-q';
+      const tt=document.createElement('span');tt.id='av-t-'+k;tt.textContent=(i<AV_Q.length?(i+1)+'. ':'')+t+(i?'':' *');q.append(tt);
+      if(s){const sm=document.createElement('small');sm.textContent=s;q.append(sm)}
+      const st=document.createElement('div');st.className='stars';st.setAttribute('role','radiogroup');st.setAttribute('aria-labelledby',tt.id);
+      for(let v=5;v>=1;v--){const inp=document.createElement('input');inp.type='radio';inp.name='av-'+k;inp.value=v;inp.id='av-'+k+'-'+v;inp.setAttribute('aria-label',v+(v>1?' étoiles':' étoile')+' sur 5');
+        const lb=document.createElement('label');lb.htmlFor=inp.id;lb.textContent='★';lb.setAttribute('aria-hidden','true');st.append(inp,lb)}
+      q.append(st);box.append(q)})})();
+  const avForm=$('avf'),avOpenBtn=$('av-open');
+  function avOpen(on){avForm.hidden=!on;avOpenBtn.setAttribute('aria-expanded',on?'true':'false');avOpenBtn.textContent=on?'Fermer le questionnaire':(avPrev()?'Modifier mon avis':'Donner mon avis')}
+  const avPrev=()=>{try{return JSON.parse(localStorage.getItem('alr-avis')||'null')}catch(e){return null}};
+  function avFill(){const p=avPrev();if(!p)return;
+    Object.entries(p.notes||{}).forEach(([k,v])=>{const el=$('av-'+k+'-'+v);if(el)el.checked=true});
+    [['reco','av-reco'],['profil','av-profil'],['meteoVu','av-meteovu']].forEach(([k,n])=>{const el=avForm.querySelector('input[name="'+n+'"][value="'+(p[k]||'')+'"]');if(el)el.checked=true});
+    $('av-texte').value=p.texte||'';$('av-amel').value=p.ameliorer||'';$('av-prenom').value=p.prenom||'';$('av-commune').value=p.commune||'';$('av-accord').checked=p.accord!==false}
+  avFill();avOpen(false);
+  avOpenBtn.addEventListener('click',()=>{const on=avForm.hidden;avOpen(on);if(on)avForm.scrollIntoView({behavior:'smooth',block:'start'})});
+  if(avSrc){avOpen(true);setTimeout(()=>{$('avis').scrollIntoView({behavior:'smooth',block:'start'})},400)}
+  const avT0=Date.now();
+  avForm.addEventListener('submit',async e=>{e.preventDefault();const out=$('av-out'),b=$('av-send');
+    const val=n=>{const el=avForm.querySelector('input[name="'+n+'"]:checked');return el?el.value:''};
+    const notes={};AV_Q.concat(AV_X).forEach(([k])=>{const v=+val('av-'+k);if(v)notes[k]=v});
+    const a={notes,reco:val('av-reco'),meteoVu:val('av-meteovu'),profil:val('av-profil'),texte:$('av-texte').value.trim(),ameliorer:$('av-amel').value.trim(),
+      prenom:$('av-prenom').value.trim(),commune:$('av-commune').value.trim(),accord:$('av-accord').checked,src:avSrc||'site'};
+    if(!notes.asso){say(out,"Donnez au moins une note à l'association (question 1).",'err');$('av-asso-5').focus();return}
+    if(a.prenom.length<2){say(out,'Indiquez votre prénom.','err');$('av-prenom').focus();return}
+    const piege=$('av-site').value;
+    if(piege||Date.now()-avT0<3000){say(out,'Merci, avis envoyé.','ok');return}
+    b.disabled=true;say(out,'Envoi…');
+    try{if(!db||!db.avis)throw new Error('indispo');await db.avis(crVid()||('x'+Date.now().toString(36)+Math.random().toString(36).slice(2)),a,piege);
+      try{localStorage.setItem('alr-avis',JSON.stringify(a))}catch(err){}
+      say(out,'Merci '+a.prenom.split(' ')[0]+' ! Votre avis est bien reçu. Il sera publié après relecture.','ok');loadAvisPub()}
+    catch(err){const m=String(err&&err.message||'');say(out,/trop|54000/.test(m)?'Beaucoup d’avis en ce moment, réessayez dans quelques minutes.':'Envoi impossible pour le moment, réessayez plus tard.','err')}
+    b.disabled=false});
+  function avBars(notes,x){const w=document.createElement('div');w.className='av-bars';
+    (x?AV_Q.concat(AV_X):AV_Q).forEach(([k])=>{if(notes[k]==null)return;const r=document.createElement('div');r.className='av-bar';
+      const s=document.createElement('span');s.textContent=AV_COURT[k];const i=document.createElement('i');i.style.setProperty('--w',(100*notes[k]/5)+'%');
+      const em=document.createElement('em');em.textContent=avNum(notes[k]);r.append(s,i,em);w.append(r)});return w}
+  async function loadAvisPub(){
+    if(!db||!db.avisPublics)return;let r;try{r=await db.avisPublics()}catch(e){return}if(!r)return;
+    const sum=$('av-sum'),list=$('av-list'),all=$('av-all');
+    if((r.total||0)>=AV_MIN&&r.moyenne){sum.textContent='';
+      const big=document.createElement('div');big.className='av-big';const b=document.createElement('b');b.textContent=avNum(r.moyenne);
+      const sp=document.createElement('span');sp.innerHTML='<span class="av-st"></span><br>';sp.querySelector('.av-st').textContent=avStars(r.moyenne)+'  sur 5';
+      sp.append(document.createTextNode(r.total+' avis'+(r.reco!=null?' · '+r.reco+' % recommandent l’asso':'')));big.append(b,sp);
+      sum.append(big,avBars(r.notes||{}));sum.hidden=false}else sum.hidden=true;
+    const items=r.liste||[];list.textContent='';
+    items.forEach((x,i)=>{const c=document.createElement('article');c.className='av-card';if(i>=6)c.hidden=true;
+      const st=document.createElement('span');st.className='av-st';st.textContent=avStars(avMoy(x.notes));st.setAttribute('aria-label',avNum(avMoy(x.notes))+' sur 5');
+      const p=document.createElement('p');p.textContent='« '+x.texte+' »';
+      const sm=document.createElement('small');sm.textContent=[x.prenom,x.commune,AV_PROFIL[x.profil],avDate(x.date)].filter(Boolean).join(' · ');
+      c.append(st,p,sm);list.append(c)});
+    list.hidden=!items.length;all.hidden=items.length<=6}
+  $('av-all').addEventListener('click',e=>{$('av-list').querySelectorAll('.av-card[hidden]').forEach(c=>c.hidden=false);e.currentTarget.hidden=true});
   function applyTexts(){
     document.querySelectorAll('[data-k]').forEach(el=>{
       const val=contenu[el.dataset.k];
@@ -1877,6 +2047,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     db.collection('sorties').onSnapshot(q=>{sorties=q.docs.map(d=>Object.assign({id:d.id},d.data()));renderAgenda();renderEditor();try{renderCrPublic();renderCr()}catch(e){}},()=>{renderAgenda()});
     db.collection('annonces').onSnapshot(q=>{annonces=q.docs.map(d=>Object.assign({id:d.id},d.data()));renderAnnonces();renderAnEditor()},()=>{});
     refreshCount();
+    loadAvisPub();
     db.collection('photos').onSnapshot(q=>{photos=q.docs.map(d=>Object.assign({id:d.id},d.data()));renderStrip();renderPhEditor();try{renderCrPublic();renderAgenda()}catch(e){}try{phCleanDupes()}catch(e){}},()=>{});
     db.collection('presences').onSnapshot(q=>{presences=q.docs.map(d=>Object.assign({id:d.id},d.data()));renderAgenda();renderEditor()},()=>{});
   })();
@@ -1911,7 +2082,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       $('gate').hidden=false;$('login').hidden=false;$('admin-body').hidden=true;$('logout').hidden=true;return;
     }
     $('gate').hidden=true;$('admin-body').hidden=false;$('logout').hidden=false;
-    fillTextForm();renderEditor();renderAnEditor();loadInscriptions();loadContacts();loadAdmins();loadStats();loadLakes();
+    fillTextForm();renderEditor();renderAnEditor();loadInscriptions();loadContacts();loadAvis();loadAdmins();loadStats();loadLakes();
     try{assets=window.claude&&await window.claude.use('assets')}catch(e){}
     renderPhEditor();phCleanDupes();
   });
@@ -1944,6 +2115,59 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   const VS_PER=[[7,'7 jours'],[30,'30 jours'],[90,'3 mois'],[365,'1 an']];
   function renderVsPer(){const b=$('vs-per');b.textContent='';VS_PER.forEach(([d,l])=>{const c=document.createElement('button');c.type='button';c.className='chip';c.textContent=l;c.setAttribute('aria-pressed',d===vsDays?'true':'false');c.addEventListener('click',()=>{vsDays=d;loadStats()});b.append(c)})}
   const paysNom=(()=>{let dn=null;try{dn=new Intl.DisplayNames(['fr'],{type:'region'})}catch(e){}return k=>{if(!k||k==='??'||k==='XX'||k==='T1')return 'Inconnu';const f=String.fromCodePoint(...[...k].map(c=>127397+c.charCodeAt(0)));let n=k;try{n=dn?dn.of(k):k}catch(e){}return f+' '+n}})();
+  // Avis des membres (admin)
+  async function loadAvis(){const box=$('av-adm');
+    let list;try{const q=await db.collection('avis').get();list=q.docs.map(d=>Object.assign({id:d.id},d.data())).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')))}
+    catch(e){box.innerHTML='<p class="msg err">Avis indisponibles.</p>';return}
+    const nu=list.filter(a=>!a.lu).length;$('av-n').hidden=!nu;$('av-n').textContent=nu;
+    box.textContent='';if(!list.length){box.innerHTML='<p class="msg">Aucun avis pour l’instant. Le questionnaire est sur le site : alpinelakeriders.com/?avis</p>';return}
+    const all=[],par={};list.forEach(a=>Object.entries(a.notes||{}).forEach(([k,v])=>{all.push(+v);(par[k]=par[k]||[]).push(+v)}));
+    const moy=v=>v.length?v.reduce((x,y)=>x+y,0)/v.length:0;
+    const rr=list.filter(a=>a.reco),reco=rr.length?Math.round(100*rr.filter(a=>a.reco==='oui').length/rr.length):null;
+    const kpi=document.createElement('div');kpi.className='av-adm-kpi';
+    [[list.length,'avis reçus'],[avNum(moy(all))+' / 5','note moyenne'],[reco==null?'—':reco+' %','recommandent'],[list.filter(a=>a.publie).length,'publiés sur le site']].forEach(([v,l])=>{const d=document.createElement('div');const b=document.createElement('b');b.textContent=v;const s=document.createElement('span');s.textContent=l;d.append(b,s);kpi.append(d)});
+    const notes={};Object.entries(par).forEach(([k,v])=>notes[k]=moy(v));
+    const com={};list.forEach(a=>{const c=(a.commune||'').trim();if(c){const k=c.toLowerCase();com[k]=com[k]||{n:0,l:c};com[k].n++}});
+    const cl=Object.values(com).sort((a,b)=>b.n-a.n);
+    const cp=document.createElement('p');cp.className='msg';cp.style.margin='12px 0';cp.textContent=cl.length?'Communes : '+cl.map(c=>c.l+' ('+c.n+')').join(', '):'';
+    const bar=document.createElement('div');bar.style.cssText='display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 16px';
+    const ex=document.createElement('button');ex.type='button';ex.className='pill line small';ex.textContent='Exporter les avis (CSV)';
+    ex.addEventListener('click',()=>{const c=v=>{v=v==null?'':String(v);return /[";\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+      const rows=[['Date','Prénom','Commune','Profil',...AV_Q.concat(AV_X).map(q=>AV_COURT[q[0]]),'Recommande','Météo vue','Avis','À améliorer','Accord publication','Publié']];
+      list.forEach(a=>rows.push([(a.date||'').slice(0,10),a.prenom,a.commune,AV_PROFIL[a.profil]||'',...AV_Q.concat(AV_X).map(q=>(a.notes||{})[q[0]]||''),AV_RECO[a.reco]||'',AV_METEO[a.meteoVu]||'',a.texte,a.ameliorer,a.accord?'oui':'non',a.publie?'oui':'non']));
+      const blob=new Blob(['﻿'+rows.map(r=>r.map(c).join(';')).join('\n')],{type:'text/csv;charset=utf-8'});
+      const l=document.createElement('a');l.href=URL.createObjectURL(blob);l.download='avis-alpine-lake-riders.csv';l.click();setTimeout(()=>URL.revokeObjectURL(l.href),2000)});
+    const mv={};list.forEach(a=>{if(a.meteoVu)mv[a.meteoVu]=(mv[a.meteoVu]||0)+1});
+    const mp=document.createElement('p');mp.className='msg';mp.style.margin='12px 0';
+    mp.textContent=Object.keys(mv).length||par.meteo?'Météo des spots : '+(par.meteo?'utilité '+avNum(moy(par.meteo))+'/5 · ':'')+Object.entries(AV_METEO).map(([k,l])=>l+' '+(mv[k]||0)).join(', '):'';
+    bar.append(ex);box.append(kpi,avBars(notes,1),mp,cp,bar);
+    const wrap=document.createElement('div');wrap.className='ct-adm';box.append(wrap);
+    list.forEach(a=>{const el=document.createElement('details');el.className='ct-it av-it'+(a.lu?'':' new');
+      const sm=document.createElement('summary');const dt=a.date?new Date(a.date).toLocaleString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'';
+      sm.innerHTML='<b></b><span></span><em></em>';sm.querySelector('b').textContent=(a.prenom||'')+' '+avStars(avMoy(a.notes));
+      sm.querySelector('span').textContent=(a.publie?'● Publié · ':'')+(a.texte||a.ameliorer||'').slice(0,70);sm.querySelector('em').textContent=dt;
+      const body=document.createElement('div');body.className='ct-body';
+      const n=document.createElement('div');n.className='av-n';
+      AV_Q.concat(AV_X).forEach(([k])=>{if((a.notes||{})[k]){const s=document.createElement('span');s.textContent=AV_COURT[k]+' : '+a.notes[k]+'/5';n.append(s)}});
+      if(a.reco){const s=document.createElement('span');s.textContent='Recommande : '+AV_RECO[a.reco];n.append(s)}
+      if(a.meteoVu){const s=document.createElement('span');s.textContent='Météo des spots : '+AV_METEO[a.meteoVu];n.append(s)}
+      const meta=document.createElement('p');meta.className='msg';meta.textContent=[a.commune,AV_PROFIL[a.profil],dt,({mail:'venu par l’e-mail',whatsapp:'venu par WhatsApp'})[a.src]||''].filter(Boolean).join(' · ');
+      body.append(meta,n);
+      if(a.texte){const p=document.createElement('p');p.textContent='« '+a.texte+' »';body.append(p)}
+      if(a.ameliorer){const p=document.createElement('p');p.className='av-imp';p.textContent='À améliorer (privé) : '+a.ameliorer;body.append(p)}
+      const tag=document.createElement('p');const t=document.createElement('span');t.className='av-tag'+(a.publie?' on':'');t.textContent=a.publie?'Publié sur le site':'Non publié';tag.append(t);
+      if(!a.accord){const w=document.createElement('span');w.className='msg';w.style.marginLeft='10px';w.textContent='La personne n’a pas accepté la publication.';tag.append(w)}
+      else if(!a.texte){const w=document.createElement('span');w.className='msg';w.style.marginLeft='10px';w.textContent='Pas de texte : seules ses notes comptent dans les moyennes.';tag.append(w)}
+      body.append(tag);
+      const bb=document.createElement('div');bb.className='bar';bb.style.cssText='display:flex;gap:8px;flex-wrap:wrap';
+      const pub=document.createElement('button');pub.type='button';pub.className='pill '+(a.publie?'line':'ink')+' small';pub.textContent=a.publie?'Masquer du site':'Publier sur le site';
+      pub.disabled=!a.publie&&(!a.accord||!a.texte);
+      pub.addEventListener('click',async()=>{pub.disabled=true;try{await db.doc('avis/'+a.id).update({publie:!a.publie,lu:true});await loadAvis();loadAvisPub()}catch(e){pub.disabled=false}});
+      const del=document.createElement('button');del.type='button';del.className='pill line small';del.textContent='Supprimer';let armed=false;
+      del.addEventListener('click',async()=>{if(!armed){armed=true;del.textContent='Confirmer';setTimeout(()=>{armed=false;del.textContent='Supprimer'},4000);return}try{await db.doc('avis/'+a.id).delete();await loadAvis();loadAvisPub()}catch(e){}});
+      bb.append(pub,del);body.append(bb);el.append(sm,body);
+      el.addEventListener('toggle',()=>{if(el.open&&!a.lu){a.lu=true;el.classList.remove('new');db.doc('avis/'+a.id).update({lu:true}).catch(()=>{});const k=+$('av-n').textContent-1;$('av-n').textContent=k;$('av-n').hidden=k<1}});
+      wrap.append(el)})}
   async function loadContacts(){const box=$('ct-adm');
     try{const q=await db.collection('contacts').get();const list=q.docs.map(d=>Object.assign({id:d.id},d.data())).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')));
       const nu=list.filter(c=>!c.lu).length;$('ct-n').hidden=!nu;$('ct-n').textContent=nu;
