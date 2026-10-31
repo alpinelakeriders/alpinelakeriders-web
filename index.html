@@ -2176,18 +2176,38 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
   const AV_RELANCE='Bonjour {p}, merci beaucoup pour ton avis sur Alpine Lake Riders ! 🙏 Si tu as 30 secondes, ajoute un petit mot (une phrase suffit, tu peux aussi la dicter avec le micro) : ce sont les commentaires écrits qui pèsent le plus auprès des communes pour garder nos spots ouverts. 👉 https://alpinelakeriders.com/?avis=relance Merci ! Damien';
   const waNum=t=>{let d=String(t||'').replace(/[^\d+]/g,'');if(d.startsWith('+'))d=d.slice(1);else if(d.startsWith('00'))d=d.slice(2);else if(/^0\d{9}$/.test(d))d='33'+d.slice(1);return /^\d{8,15}$/.test(d)?d:''};
   function avRelance(a){const w=document.createElement('details');w.className='av-rel';
-    const s=document.createElement('summary');s.className='pill line small';s.textContent='Relancer pour un petit mot';w.append(s);
-    const box=document.createElement('div');box.style.cssText='display:grid;gap:8px;margin-top:10px';w.append(box);
-    w.addEventListener('toggle',()=>{if(!w.open)return;box.textContent='';
-      const p1=norm((a.prenom||'').split(/\s+/)[0]),com=norm(a.commune);
-      const c=membres.filter(m=>norm(m.prenom).split(/[\s-]+/)[0]===p1).sort((x,y)=>(norm(y.ville)===com)-(norm(x.ville)===com));
-      const h=document.createElement('p');h.className='msg';h.textContent=c.length?'Membres prénommés « '+a.prenom.split(/\s+/)[0]+' » : choisissez la bonne personne.':'Aucun membre avec ce prénom dans la liste.';box.append(h);
-      c.slice(0,6).forEach(m=>{const r=document.createElement('div');r.style.cssText='display:flex;gap:8px;flex-wrap:wrap;align-items:center';
-        const n=document.createElement('span');n.textContent=[cap(m.prenom),cap(m.nom),m.ville?'('+cap(m.ville)+')':''].filter(Boolean).join(' ');r.append(n);
-        const txt=AV_RELANCE.replace('{p}',cap(m.prenom).split(' ')[0]);const num=waNum(m.tel);
-        if(num){const l=document.createElement('a');l.className='pill ink small';l.target='_blank';l.rel='noopener';l.textContent='WhatsApp';l.href='https://wa.me/'+num+'?text='+encodeURIComponent(txt);r.append(l)}
-        if(m.email){const l=document.createElement('a');l.className='pill line small';l.textContent='E-mail';l.href='mailto:'+encodeURIComponent(m.email)+'?subject='+encodeURIComponent('Un petit mot pour Alpine Lake Riders ?')+'&body='+encodeURIComponent(txt);r.append(l)}
-        box.append(r)})});
+    const s=document.createElement('summary');s.className='pill line small';s.textContent=a.relance?'Relancé ✓ · relancer encore':'Relancer pour un petit mot';w.append(s);
+    const box=document.createElement('div');box.style.cssText='display:grid;gap:10px;margin-top:10px';w.append(box);
+    const p0=(a.prenom||'').split(/\s+/)[0];
+    // Mémorise la personne relancée (pour retrouver le bon contact la prochaine fois)
+    const mark=who=>{const r={qui:who,le:new Date().toISOString()};a.relance=r;s.textContent='Relancé ✓ · relancer encore';db.doc('avis/'+a.id).update({relance:r}).catch(()=>{})};
+    const line=(label,first,num,email,who)=>{const r=document.createElement('div');r.style.cssText='display:flex;gap:8px;flex-wrap:wrap;align-items:center';
+      const n=document.createElement('span');n.textContent=label;r.append(n);const txt=AV_RELANCE.replace('{p}',first);
+      if(num){const l=document.createElement('a');l.className='pill ink small';l.target='_blank';l.rel='noopener';l.textContent='WhatsApp';l.href='https://wa.me/'+num+'?text='+encodeURIComponent(txt);l.addEventListener('click',()=>mark(who));r.append(l)}
+      if(email){const l=document.createElement('a');l.className='pill line small';l.textContent='E-mail';l.href='mailto:'+encodeURIComponent(email)+'?subject='+encodeURIComponent('Un petit mot pour Alpine Lake Riders ?')+'&body='+encodeURIComponent(txt);l.addEventListener('click',()=>mark(who));r.append(l)}
+      return r};
+    const list=document.createElement('div');list.style.cssText='display:grid;gap:8px';
+    const show=q=>{list.textContent='';const nq=norm(q);
+      let c=nq?membres.filter(m=>[m.prenom,m.nom,m.email,cap(m.prenom)+' '+cap(m.nom)].some(x=>norm(x).includes(nq))):membres.filter(m=>norm(m.prenom).split(/[\s-]+/)[0]===norm(p0));
+      const com=norm(a.commune),prev=a.relance&&norm(a.relance.qui);
+      c=c.sort((x,y)=>((norm(cap(y.prenom)+' '+cap(y.nom))===prev)-(norm(cap(x.prenom)+' '+cap(x.nom))===prev))||((norm(y.ville)===com)-(norm(x.ville)===com)));
+      const h=document.createElement('p');h.className='msg';
+      h.textContent=c.length?(nq?'Résultats pour « '+q+' » :':'Membres prénommés « '+p0+' » :'):(nq?'Aucun membre trouvé pour « '+q+' ».':'Aucun membre avec ce prénom : cherchez par nom ci-dessous, ou choisissez le contact dans WhatsApp.');
+      list.append(h);
+      c.slice(0,8).forEach(m=>{const who=cap(m.prenom)+' '+cap(m.nom);list.append(line(who+(m.ville?' ('+cap(m.ville)+')':'')+(prev&&norm(who)===prev?' · déjà relancé':''),cap(m.prenom).split(' ')[0],waNum(m.tel),m.email,who))})};
+    w.addEventListener('toggle',()=>{if(!w.open||box.childElementCount)return;
+      if(a.relance){const r=document.createElement('p');r.className='msg ok';r.textContent='Relancé le '+new Date(a.relance.le).toLocaleDateString('fr-FR',{day:'numeric',month:'short'})+' : '+a.relance.qui;box.append(r)}
+      const f=document.createElement('label');f.className='f';f.innerHTML='<span class="label">Pas la bonne personne ? Tapez un autre nom ou prénom</span><input type="search" autocomplete="off" placeholder="ex. Martin, Léa M., lea@…">';
+      const inp=f.querySelector('input');let t=null;inp.addEventListener('input',()=>{clearTimeout(t);t=setTimeout(()=>show(inp.value.trim()),150)});
+      // Contact introuvable dans la liste : WhatsApp s'ouvre et Damien choisit lui-même le contact
+      const wa=document.createElement('div');wa.style.cssText='display:flex;gap:8px;flex-wrap:wrap;align-items:center';
+      const wn=document.createElement('input');wn.className='av-wa-name';wn.placeholder='Prénom à utiliser dans le message';wn.value=p0;wn.style.cssText='font:400 15px var(--sans);color:var(--fg);background:transparent;border:0;border-bottom:1px solid var(--line);padding:6px 0;min-width:0;flex:1 1 180px';
+      const wb=document.createElement('a');wb.className='pill line small';wb.target='_blank';wb.rel='noopener';wb.textContent='WhatsApp : choisir le contact';
+      const upd=()=>{wb.href='https://wa.me/?text='+encodeURIComponent(AV_RELANCE.replace('{p}',wn.value.trim()||p0))};upd();wn.addEventListener('input',upd);
+      wb.addEventListener('click',()=>mark((wn.value.trim()||p0)+' (contact choisi dans WhatsApp)'));
+      wa.append(wn,wb);
+      const wl=document.createElement('p');wl.className='msg';wl.textContent='Contact introuvable ou nom différent dans WhatsApp ? Ouvrez WhatsApp et choisissez vous-même la personne :';
+      box.append(f,list,wl,wa);show('')});
     return w}
   // Avis des membres (admin)
   async function loadAvis(){const box=$('av-adm');
