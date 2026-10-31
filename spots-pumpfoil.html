@@ -1,0 +1,1466 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Annuaire des spots de pumpfoil · Alpine Lake Riders</title>
+<meta name="description" content="L'annuaire des spots de pumpfoil en France et en Europe : pontons, quais, clubs et lacs sur une carte, autour de vous ou près d'un lieu précis.">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="media/logo-alr-noir.svg" type="image/svg+xml">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+
+
+.leaflet-pane,
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-marker-shadow,
+.leaflet-tile-container,
+.leaflet-pane > svg,
+.leaflet-pane > canvas,
+.leaflet-zoom-box,
+.leaflet-image-layer,
+.leaflet-layer {
+	position: absolute;
+	left: 0;
+	top: 0;
+	}
+.leaflet-container {
+	overflow: hidden;
+	}
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+	-webkit-user-select: none;
+	   -moz-user-select: none;
+	        user-select: none;
+	  -webkit-user-drag: none;
+	}
+
+.leaflet-tile::selection {
+	background: transparent;
+}
+
+.leaflet-safari .leaflet-tile {
+	image-rendering: -webkit-optimize-contrast;
+	}
+
+.leaflet-safari .leaflet-tile-container {
+	width: 1600px;
+	height: 1600px;
+	-webkit-transform-origin: 0 0;
+	}
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+	display: block;
+	}
+
+
+.leaflet-container .leaflet-overlay-pane svg {
+	max-width: none !important;
+	max-height: none !important;
+	}
+.leaflet-container .leaflet-marker-pane img,
+.leaflet-container .leaflet-shadow-pane img,
+.leaflet-container .leaflet-tile-pane img,
+.leaflet-container img.leaflet-image-layer,
+.leaflet-container .leaflet-tile {
+	max-width: none !important;
+	max-height: none !important;
+	width: auto;
+	padding: 0;
+	}
+
+.leaflet-container img.leaflet-tile {
+	
+	mix-blend-mode: plus-lighter;
+}
+
+.leaflet-container.leaflet-touch-zoom {
+	-ms-touch-action: pan-x pan-y;
+	touch-action: pan-x pan-y;
+	}
+.leaflet-container.leaflet-touch-drag {
+	-ms-touch-action: pinch-zoom;
+	
+	touch-action: none;
+	touch-action: pinch-zoom;
+}
+.leaflet-container.leaflet-touch-drag.leaflet-touch-zoom {
+	-ms-touch-action: none;
+	touch-action: none;
+}
+.leaflet-container {
+	-webkit-tap-highlight-color: transparent;
+}
+.leaflet-container a {
+	-webkit-tap-highlight-color: rgba(51, 181, 229, 0.4);
+}
+.leaflet-tile {
+	filter: inherit;
+	visibility: hidden;
+	}
+.leaflet-tile-loaded {
+	visibility: inherit;
+	}
+.leaflet-zoom-box {
+	width: 0;
+	height: 0;
+	-moz-box-sizing: border-box;
+	     box-sizing: border-box;
+	z-index: 800;
+	}
+
+.leaflet-overlay-pane svg {
+	-moz-user-select: none;
+	}
+
+.leaflet-pane         { z-index: 400; }
+
+.leaflet-tile-pane    { z-index: 200; }
+.leaflet-overlay-pane { z-index: 400; }
+.leaflet-shadow-pane  { z-index: 500; }
+.leaflet-marker-pane  { z-index: 600; }
+.leaflet-tooltip-pane   { z-index: 650; }
+.leaflet-popup-pane   { z-index: 700; }
+
+.leaflet-map-pane canvas { z-index: 100; }
+.leaflet-map-pane svg    { z-index: 200; }
+
+.leaflet-vml-shape {
+	width: 1px;
+	height: 1px;
+	}
+.lvml {
+	behavior: url(#default#VML);
+	display: inline-block;
+	position: absolute;
+	}
+
+
+
+
+.leaflet-control {
+	position: relative;
+	z-index: 800;
+	pointer-events: visiblePainted; 
+	pointer-events: auto;
+	}
+.leaflet-top,
+.leaflet-bottom {
+	position: absolute;
+	z-index: 1000;
+	pointer-events: none;
+	}
+.leaflet-top {
+	top: 0;
+	}
+.leaflet-right {
+	right: 0;
+	}
+.leaflet-bottom {
+	bottom: 0;
+	}
+.leaflet-left {
+	left: 0;
+	}
+.leaflet-control {
+	float: left;
+	clear: both;
+	}
+.leaflet-right .leaflet-control {
+	float: right;
+	}
+.leaflet-top .leaflet-control {
+	margin-top: 10px;
+	}
+.leaflet-bottom .leaflet-control {
+	margin-bottom: 10px;
+	}
+.leaflet-left .leaflet-control {
+	margin-left: 10px;
+	}
+.leaflet-right .leaflet-control {
+	margin-right: 10px;
+	}
+
+
+
+
+.leaflet-fade-anim .leaflet-popup {
+	opacity: 0;
+	-webkit-transition: opacity 0.2s linear;
+	   -moz-transition: opacity 0.2s linear;
+	        transition: opacity 0.2s linear;
+	}
+.leaflet-fade-anim .leaflet-map-pane .leaflet-popup {
+	opacity: 1;
+	}
+.leaflet-zoom-animated {
+	-webkit-transform-origin: 0 0;
+	    -ms-transform-origin: 0 0;
+	        transform-origin: 0 0;
+	}
+svg.leaflet-zoom-animated {
+	will-change: transform;
+}
+
+.leaflet-zoom-anim .leaflet-zoom-animated {
+	-webkit-transition: -webkit-transform 0.25s cubic-bezier(0,0,0.25,1);
+	   -moz-transition:    -moz-transform 0.25s cubic-bezier(0,0,0.25,1);
+	        transition:         transform 0.25s cubic-bezier(0,0,0.25,1);
+	}
+.leaflet-zoom-anim .leaflet-tile,
+.leaflet-pan-anim .leaflet-tile {
+	-webkit-transition: none;
+	   -moz-transition: none;
+	        transition: none;
+	}
+
+.leaflet-zoom-anim .leaflet-zoom-hide {
+	visibility: hidden;
+	}
+
+
+
+
+.leaflet-interactive {
+	cursor: pointer;
+	}
+.leaflet-grab {
+	cursor: -webkit-grab;
+	cursor:    -moz-grab;
+	cursor:         grab;
+	}
+.leaflet-crosshair,
+.leaflet-crosshair .leaflet-interactive {
+	cursor: crosshair;
+	}
+.leaflet-popup-pane,
+.leaflet-control {
+	cursor: auto;
+	}
+.leaflet-dragging .leaflet-grab,
+.leaflet-dragging .leaflet-grab .leaflet-interactive,
+.leaflet-dragging .leaflet-marker-draggable {
+	cursor: move;
+	cursor: -webkit-grabbing;
+	cursor:    -moz-grabbing;
+	cursor:         grabbing;
+	}
+
+
+.leaflet-marker-icon,
+.leaflet-marker-shadow,
+.leaflet-image-layer,
+.leaflet-pane > svg path,
+.leaflet-tile-container {
+	pointer-events: none;
+	}
+
+.leaflet-marker-icon.leaflet-interactive,
+.leaflet-image-layer.leaflet-interactive,
+.leaflet-pane > svg path.leaflet-interactive,
+svg.leaflet-image-layer.leaflet-interactive path {
+	pointer-events: visiblePainted; 
+	pointer-events: auto;
+	}
+
+
+
+.leaflet-container {
+	background: #ddd;
+	outline-offset: 1px;
+	}
+.leaflet-container a {
+	color: #0078A8;
+	}
+.leaflet-zoom-box {
+	border: 2px dotted #38f;
+	background: rgba(255,255,255,0.5);
+	}
+
+
+
+.leaflet-container {
+	font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-size: 0.75rem;
+	line-height: 1.5;
+	}
+
+
+
+
+.leaflet-bar {
+	box-shadow: 0 1px 5px rgba(0,0,0,0.65);
+	border-radius: 4px;
+	}
+.leaflet-bar a {
+	background-color: #fff;
+	border-bottom: 1px solid #ccc;
+	width: 26px;
+	height: 26px;
+	line-height: 26px;
+	display: block;
+	text-align: center;
+	text-decoration: none;
+	color: black;
+	}
+.leaflet-bar a,
+.leaflet-control-layers-toggle {
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	display: block;
+	}
+.leaflet-bar a:hover,
+.leaflet-bar a:focus {
+	background-color: #f4f4f4;
+	}
+.leaflet-bar a:first-child {
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	}
+.leaflet-bar a:last-child {
+	border-bottom-left-radius: 4px;
+	border-bottom-right-radius: 4px;
+	border-bottom: none;
+	}
+.leaflet-bar a.leaflet-disabled {
+	cursor: default;
+	background-color: #f4f4f4;
+	color: #bbb;
+	}
+
+.leaflet-touch .leaflet-bar a {
+	width: 30px;
+	height: 30px;
+	line-height: 30px;
+	}
+.leaflet-touch .leaflet-bar a:first-child {
+	border-top-left-radius: 2px;
+	border-top-right-radius: 2px;
+	}
+.leaflet-touch .leaflet-bar a:last-child {
+	border-bottom-left-radius: 2px;
+	border-bottom-right-radius: 2px;
+	}
+
+
+
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
+	font: bold 18px 'Lucida Console', Monaco, monospace;
+	text-indent: 1px;
+	}
+
+.leaflet-touch .leaflet-control-zoom-in, .leaflet-touch .leaflet-control-zoom-out  {
+	font-size: 22px;
+	}
+
+
+
+
+.leaflet-control-layers {
+	box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+	background: #fff;
+	border-radius: 5px;
+	}
+.leaflet-control-layers-toggle {
+	background-image: url(images/layers.png);
+	width: 36px;
+	height: 36px;
+	}
+.leaflet-retina .leaflet-control-layers-toggle {
+	background-image: url(images/layers-2x.png);
+	background-size: 26px 26px;
+	}
+.leaflet-touch .leaflet-control-layers-toggle {
+	width: 44px;
+	height: 44px;
+	}
+.leaflet-control-layers .leaflet-control-layers-list,
+.leaflet-control-layers-expanded .leaflet-control-layers-toggle {
+	display: none;
+	}
+.leaflet-control-layers-expanded .leaflet-control-layers-list {
+	display: block;
+	position: relative;
+	}
+.leaflet-control-layers-expanded {
+	padding: 6px 10px 6px 6px;
+	color: #333;
+	background: #fff;
+	}
+.leaflet-control-layers-scrollbar {
+	overflow-y: scroll;
+	overflow-x: hidden;
+	padding-right: 5px;
+	}
+.leaflet-control-layers-selector {
+	margin-top: 2px;
+	position: relative;
+	top: 1px;
+	}
+.leaflet-control-layers label {
+	display: block;
+	font-size: 13px;
+	font-size: 1.08333em;
+	}
+.leaflet-control-layers-separator {
+	height: 0;
+	border-top: 1px solid #ddd;
+	margin: 5px -10px 5px -6px;
+	}
+
+
+.leaflet-default-icon-path { 
+	background-image: url(images/marker-icon.png);
+	}
+
+
+
+
+.leaflet-container .leaflet-control-attribution {
+	background: #fff;
+	background: rgba(255, 255, 255, 0.8);
+	margin: 0;
+	}
+.leaflet-control-attribution,
+.leaflet-control-scale-line {
+	padding: 0 5px;
+	color: #333;
+	line-height: 1.4;
+	}
+.leaflet-control-attribution a {
+	text-decoration: none;
+	}
+.leaflet-control-attribution a:hover,
+.leaflet-control-attribution a:focus {
+	text-decoration: underline;
+	}
+.leaflet-attribution-flag {
+	display: inline !important;
+	vertical-align: baseline !important;
+	width: 1em;
+	height: 0.6669em;
+	}
+.leaflet-left .leaflet-control-scale {
+	margin-left: 5px;
+	}
+.leaflet-bottom .leaflet-control-scale {
+	margin-bottom: 5px;
+	}
+.leaflet-control-scale-line {
+	border: 2px solid #777;
+	border-top: none;
+	line-height: 1.1;
+	padding: 2px 5px 1px;
+	white-space: nowrap;
+	-moz-box-sizing: border-box;
+	     box-sizing: border-box;
+	background: rgba(255, 255, 255, 0.8);
+	text-shadow: 1px 1px #fff;
+	}
+.leaflet-control-scale-line:not(:first-child) {
+	border-top: 2px solid #777;
+	border-bottom: none;
+	margin-top: -2px;
+	}
+.leaflet-control-scale-line:not(:first-child):not(:last-child) {
+	border-bottom: 2px solid #777;
+	}
+
+.leaflet-touch .leaflet-control-attribution,
+.leaflet-touch .leaflet-control-layers,
+.leaflet-touch .leaflet-bar {
+	box-shadow: none;
+	}
+.leaflet-touch .leaflet-control-layers,
+.leaflet-touch .leaflet-bar {
+	border: 2px solid rgba(0,0,0,0.2);
+	background-clip: padding-box;
+	}
+
+
+
+
+.leaflet-popup {
+	position: absolute;
+	text-align: center;
+	margin-bottom: 20px;
+	}
+.leaflet-popup-content-wrapper {
+	padding: 1px;
+	text-align: left;
+	border-radius: 12px;
+	}
+.leaflet-popup-content {
+	margin: 13px 24px 13px 20px;
+	line-height: 1.3;
+	font-size: 13px;
+	font-size: 1.08333em;
+	min-height: 1px;
+	}
+.leaflet-popup-content p {
+	margin: 17px 0;
+	margin: 1.3em 0;
+	}
+.leaflet-popup-tip-container {
+	width: 40px;
+	height: 20px;
+	position: absolute;
+	left: 50%;
+	margin-top: -1px;
+	margin-left: -20px;
+	overflow: hidden;
+	pointer-events: none;
+	}
+.leaflet-popup-tip {
+	width: 17px;
+	height: 17px;
+	padding: 1px;
+
+	margin: -10px auto 0;
+	pointer-events: auto;
+
+	-webkit-transform: rotate(45deg);
+	   -moz-transform: rotate(45deg);
+	    -ms-transform: rotate(45deg);
+	        transform: rotate(45deg);
+	}
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+	background: white;
+	color: #333;
+	box-shadow: 0 3px 14px rgba(0,0,0,0.4);
+	}
+.leaflet-container a.leaflet-popup-close-button {
+	position: absolute;
+	top: 0;
+	right: 0;
+	border: none;
+	text-align: center;
+	width: 24px;
+	height: 24px;
+	font: 16px/24px Tahoma, Verdana, sans-serif;
+	color: #757575;
+	text-decoration: none;
+	background: transparent;
+	}
+.leaflet-container a.leaflet-popup-close-button:hover,
+.leaflet-container a.leaflet-popup-close-button:focus {
+	color: #585858;
+	}
+.leaflet-popup-scrolled {
+	overflow: auto;
+	}
+
+.leaflet-oldie .leaflet-popup-content-wrapper {
+	-ms-zoom: 1;
+	}
+.leaflet-oldie .leaflet-popup-tip {
+	width: 24px;
+	margin: 0 auto;
+
+	-ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678)";
+	filter: progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678);
+	}
+
+.leaflet-oldie .leaflet-control-zoom,
+.leaflet-oldie .leaflet-control-layers,
+.leaflet-oldie .leaflet-popup-content-wrapper,
+.leaflet-oldie .leaflet-popup-tip {
+	border: 1px solid #999;
+	}
+
+
+
+
+.leaflet-div-icon {
+	background: #fff;
+	border: 1px solid #666;
+	}
+
+
+
+
+.leaflet-tooltip {
+	position: absolute;
+	padding: 6px;
+	background-color: #fff;
+	border: 1px solid #fff;
+	border-radius: 3px;
+	color: #222;
+	white-space: nowrap;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	pointer-events: none;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+	}
+.leaflet-tooltip.leaflet-interactive {
+	cursor: pointer;
+	pointer-events: auto;
+	}
+.leaflet-tooltip-top:before,
+.leaflet-tooltip-bottom:before,
+.leaflet-tooltip-left:before,
+.leaflet-tooltip-right:before {
+	position: absolute;
+	pointer-events: none;
+	border: 6px solid transparent;
+	background: transparent;
+	content: "";
+	}
+
+
+
+.leaflet-tooltip-bottom {
+	margin-top: 6px;
+}
+.leaflet-tooltip-top {
+	margin-top: -6px;
+}
+.leaflet-tooltip-bottom:before,
+.leaflet-tooltip-top:before {
+	left: 50%;
+	margin-left: -6px;
+	}
+.leaflet-tooltip-top:before {
+	bottom: 0;
+	margin-bottom: -12px;
+	border-top-color: #fff;
+	}
+.leaflet-tooltip-bottom:before {
+	top: 0;
+	margin-top: -12px;
+	margin-left: -6px;
+	border-bottom-color: #fff;
+	}
+.leaflet-tooltip-left {
+	margin-left: -6px;
+}
+.leaflet-tooltip-right {
+	margin-left: 6px;
+}
+.leaflet-tooltip-left:before,
+.leaflet-tooltip-right:before {
+	top: 50%;
+	margin-top: -6px;
+	}
+.leaflet-tooltip-left:before {
+	right: 0;
+	margin-right: -12px;
+	border-left-color: #fff;
+	}
+.leaflet-tooltip-right:before {
+	left: 0;
+	margin-left: -12px;
+	border-right-color: #fff;
+	}
+
+
+
+@media print {
+	
+	.leaflet-control {
+		-webkit-print-color-adjust: exact;
+		print-color-adjust: exact;
+		}
+	}
+.leaflet-cluster-anim .leaflet-marker-icon, .leaflet-cluster-anim .leaflet-marker-shadow {
+	-webkit-transition: -webkit-transform 0.3s ease-out, opacity 0.3s ease-in;
+	-moz-transition: -moz-transform 0.3s ease-out, opacity 0.3s ease-in;
+	-o-transition: -o-transform 0.3s ease-out, opacity 0.3s ease-in;
+	transition: transform 0.3s ease-out, opacity 0.3s ease-in;
+}
+
+.leaflet-cluster-spider-leg {
+	
+	-webkit-transition: -webkit-stroke-dashoffset 0.3s ease-out, -webkit-stroke-opacity 0.3s ease-in;
+	-moz-transition: -moz-stroke-dashoffset 0.3s ease-out, -moz-stroke-opacity 0.3s ease-in;
+	-o-transition: -o-stroke-dashoffset 0.3s ease-out, -o-stroke-opacity 0.3s ease-in;
+	transition: stroke-dashoffset 0.3s ease-out, stroke-opacity 0.3s ease-in;
+}
+
+</style>
+<style>
+/* Mise en page : la vidéo de l'accueil en bandeau, puis une grande phrase, la carte (liste à gauche, carte à droite),
+   quelques photos et les conseils. Mêmes couleurs que le site : noir et blanc, le vert du lac en touche. */
+:root{
+  --paper:#ffffff; --ink:#0d1111; --grey:#6d7574; --hair:#e6e9e8; --lake:#16757a;
+  --bg:var(--paper); --fg:var(--ink); --muted:var(--grey); --line:var(--hair); --tint:#f4f6f6;
+  --land:#eef1f0; --water:#ffffff; --border:#cfd6d4; --lakefill:#cfe5e4;
+  --sans:"Geist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono:"Geist Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0a0d0d; --fg:#eef1f0; --muted:#8e9897; --line:#1f2625; --tint:#121717; --lake:#4fb3b0;
+  --land:#151b1b; --water:#0a0d0d; --border:#2a3332; --lakefill:#123536; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0a0d0d; --fg:#eef1f0; --muted:#8e9897; --line:#1f2625; --tint:#121717; --lake:#4fb3b0;
+  --land:#151b1b; --water:#0a0d0d; --border:#2a3332; --lakefill:#123536; color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;padding:0}
+body{overflow-x:clip;background:var(--bg);color:var(--fg);font:400 16px/1.6 var(--sans);-webkit-font-smoothing:antialiased;letter-spacing:-.005em}
+img,video{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--lake);outline-offset:3px}
+p{margin:0}
+h1,h2,h3{margin:0;font-weight:500;letter-spacing:-.035em;text-wrap:balance}
+button,input,select{font:inherit;color:inherit}
+.wrap{max-width:1320px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+@media (min-width:800px){.wrap{padding-left:max(48px,env(safe-area-inset-left,0px));padding-right:max(48px,env(safe-area-inset-right,0px))}}
+.label{font:500 12px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.logo-dark{display:none}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .logo-light{display:none}:root:not([data-theme="light"]) .logo-dark{display:block}}
+:root[data-theme="dark"] .logo-light{display:none}
+:root[data-theme="dark"] .logo-dark{display:block}
+
+/* Barre du haut (comme l'accueil) */
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:1100;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:1101;background:var(--bg)}
+.topbar .wrap{display:flex;justify-content:space-between;align-items:center;gap:20px;padding-block:14px}
+.topbar ul{display:flex;gap:32px;list-style:none;margin:0;padding:0;font-size:14px;color:var(--muted)}
+.topbar ul a:hover,.topbar ul a[aria-current]{color:var(--fg)}
+@media (max-width:860px){.topbar ul{display:none}}
+.lang-sw{display:inline-flex;align-items:center;gap:2px;font:500 12px/1 var(--mono);letter-spacing:.04em;margin-left:auto}
+.lang-sw button{background:none;border:0;padding:7px 6px;border-radius:6px;color:var(--muted);cursor:pointer}
+.lang-sw button[aria-pressed="true"]{color:var(--fg);font-weight:600}
+.lang-sw i{font-style:normal;color:var(--line)}
+@media (min-width:861px){.lang-sw{margin-left:0}}
+
+.pill{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:44px;padding:0 22px;border-radius:999px;font:500 14px/1 var(--sans);border:0;cursor:pointer;transition:transform .2s;white-space:nowrap}
+.pill:hover{transform:translateY(-1px)}
+.pill.ink{background:var(--fg);color:var(--bg)}
+.pill.line{background:transparent;color:var(--fg);box-shadow:inset 0 0 0 1px var(--line)}
+.pill.line:hover{box-shadow:inset 0 0 0 1px var(--fg)}
+.pill.small{height:34px;padding:0 14px;font-size:13px}
+
+/* Bandeau vidéo (repris de l'accueil, un peu moins haut pour garder la carte proche) */
+.hero{position:relative;width:100%;aspect-ratio:16/7;max-width:100%;overflow:hidden;background:#0d1111;color:#fff}
+.hero video,.hero .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 45%,rgba(0,0,0,.42) 100%);z-index:1}
+@media (max-width:760px){.hero{aspect-ratio:4/3.6}.hero video,.hero .poster{object-position:47% 50%}}
+.hero .mark{position:absolute;right:clamp(14px,3.2vw,56px);bottom:clamp(12px,3vw,48px);margin:0;z-index:2}
+.hero .mark img{width:clamp(96px,14vw,240px);height:auto;filter:drop-shadow(0 1px 2px rgba(0,0,0,.22))}
+.hero .cap{position:absolute;left:clamp(16px,3.2vw,56px);bottom:clamp(14px,3vw,48px);z-index:2;display:grid;gap:10px;max-width:min(62%,640px)}
+.hero .cap .label{color:rgba(255,255,255,.82)}
+.hero h1{font-size:clamp(28px,4.6vw,64px);line-height:.98;font-weight:500;letter-spacing:-.045em;text-shadow:0 1px 18px rgba(0,0,0,.25)}
+.vbtn{position:absolute;right:clamp(14px,3.2vw,56px);top:clamp(12px,2.4vw,32px);z-index:2;background:rgba(0,0,0,.18);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:0;border-radius:999px;color:#fff;font:500 11px var(--mono);letter-spacing:.04em;text-transform:uppercase;cursor:pointer;padding:7px 11px}
+@media (max-width:560px){.hero .cap{max-width:70%}}
+
+/* Intro */
+.intro{padding-block:clamp(56px,7vw,104px) clamp(40px,5vw,72px)}
+.statement{font-size:clamp(32px,4.6vw,64px);line-height:1.03;font-weight:450;letter-spacing:-.045em;max-width:20ch}
+.statement em{font-style:normal;color:var(--lake)}
+.sub{margin-top:20px;font-size:clamp(17px,1.7vw,22px);line-height:1.4;color:var(--muted);max-width:44ch;letter-spacing:-.015em}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px;margin-top:clamp(40px,5vw,72px);border-top:1px solid var(--line);padding-top:24px}
+.stats b{display:block;font-size:clamp(32px,4.4vw,56px);font-weight:400;letter-spacing:-.05em;line-height:1;font-variant-numeric:tabular-nums}
+.stats span{display:block;margin-top:10px;color:var(--muted);font-size:14px}
+@media (max-width:700px){.stats{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:28px}}
+
+/* Outils de recherche */
+#carte{scroll-margin-top:64px;padding-bottom:clamp(72px,9vw,128px)}
+.head{display:flex;justify-content:space-between;align-items:end;gap:16px 24px;flex-wrap:wrap;margin-bottom:28px}
+.head h2{font-size:clamp(32px,4.4vw,60px);line-height:1}
+.head p{color:var(--muted);max-width:42ch}
+.tools{display:grid;gap:14px;margin-bottom:18px}
+.findrow{display:flex;gap:10px;flex-wrap:wrap}
+.search{position:relative;flex:1 1 320px;min-width:0}
+.search input{width:100%;height:52px;border-radius:999px;border:0;background:var(--tint);box-shadow:inset 0 0 0 1px var(--line);padding:0 46px 0 48px;font-size:16px;outline:none}
+.search input::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none}
+.search input:focus{box-shadow:inset 0 0 0 1.5px var(--fg)}
+.search svg.ic{position:absolute;left:18px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.search .clr{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;border:0;background:transparent;cursor:pointer;color:var(--muted);font-size:20px;line-height:1}
+.search .clr:hover{color:var(--fg)}
+.sugg{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:1200;background:var(--bg);border-radius:18px;box-shadow:0 0 0 1px var(--line),0 18px 40px -12px rgba(0,0,0,.25);padding:6px;list-style:none;margin:0;max-height:min(380px,60vh);overflow:auto}
+.sugg li{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:10px 14px;border-radius:12px;cursor:pointer}
+.sugg li[aria-selected="true"],.sugg li:hover{background:var(--tint)}
+.sugg li b{font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sugg li span{font:500 11px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);flex:none}
+.sugg .none{color:var(--muted);cursor:default}
+.near{height:52px;padding:0 22px}
+.near svg{flex:none}
+.near[aria-busy="true"] svg{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chip{height:36px;padding:0 14px;border-radius:999px;border:0;background:transparent;box-shadow:inset 0 0 0 1px var(--line);font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.chip:hover{box-shadow:inset 0 0 0 1px var(--fg)}
+.chip[aria-pressed="true"]{background:var(--fg);color:var(--bg);box-shadow:none}
+.chip small{font:500 11px/1 var(--mono);opacity:.6;font-variant-numeric:tabular-nums}
+.chips .sep{width:1px;height:22px;background:var(--line);margin:0 4px}
+.sel{position:relative}
+.sel select{appearance:none;-webkit-appearance:none;height:36px;border-radius:999px;border:0;background:transparent;box-shadow:inset 0 0 0 1px var(--line);padding:0 34px 0 14px;font-size:14px;cursor:pointer}
+.sel::after{content:"";position:absolute;right:15px;top:50%;width:6px;height:6px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:translateY(-70%) rotate(45deg);pointer-events:none;color:var(--muted)}
+.dot{width:9px;height:9px;border-radius:50%;flex:none;display:inline-block}
+.dot.libre{background:var(--lake)}
+.dot.autre{background:var(--bg);box-shadow:inset 0 0 0 2px var(--fg)}
+.chip[aria-pressed="true"] .dot.libre{background:#4fb3b0}
+.status{display:flex;justify-content:space-between;align-items:center;gap:8px 16px;flex-wrap:wrap;font-size:14px;color:var(--muted);min-height:34px}
+.status b{color:var(--fg);font-weight:500}
+.status .msg{color:var(--fg)}
+.status button.link{background:none;border:0;padding:0;color:var(--lake);cursor:pointer;font-size:14px}
+
+/* Carte + liste */
+.finder{display:grid;grid-template-columns:1fr;gap:0;border-top:1px solid var(--fg)}
+@media (min-width:960px){.finder{grid-template-columns:minmax(340px,410px) 1fr;height:min(80vh,780px);min-height:560px}}
+.map-box{position:relative;min-height:0;height:58vh;max-height:560px;background:var(--water);border-bottom:1px solid var(--line)}
+@media (min-width:960px){.map-box{height:auto;max-height:none;order:2;border-bottom:0;border-left:1px solid var(--line)}}
+#map{position:absolute;inset:0;background:var(--water)}
+.legend{position:absolute;left:12px;bottom:12px;z-index:500;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:12px;box-shadow:0 0 0 1px var(--line);padding:9px 12px;display:grid;gap:6px;font-size:12px;color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:8px}
+.reset{position:absolute;right:12px;top:12px;z-index:500;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.view{display:inline-flex;background:var(--bg);border-radius:999px;box-shadow:0 0 0 1px var(--line);padding:3px;gap:2px}
+.view button{border:0;background:transparent;height:28px;padding:0 12px;border-radius:999px;font-size:12px;cursor:pointer;color:var(--muted)}
+.view button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+.satnote{position:absolute;right:12px;bottom:28px;z-index:500;background:var(--bg);box-shadow:0 0 0 1px var(--line);border-radius:12px;padding:7px 12px;font-size:12px;line-height:1.35;color:var(--muted);max-width:min(300px,52%)}
+.leaflet-sat-pane img{transition:opacity .5s}
+#map.sat .city span{color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.8)}
+#map.sat .mk:not(.libre):not(.alr){background:#fff;box-shadow:inset 0 0 0 2.5px #0d1111,0 0 0 2px #fff,0 1px 4px rgba(0,0,0,.5)}
+#map.sat .mk.libre{box-shadow:0 0 0 2.5px #fff,0 1px 4px rgba(0,0,0,.5)}
+#map.sat .mk.alr{box-shadow:0 0 0 3px #fff,0 2px 8px rgba(0,0,0,.6)}
+#map.sat .pin{box-shadow:0 0 0 2px #fff}
+.reset .pill{background:var(--bg);box-shadow:0 0 0 1px var(--line)}
+.list{min-height:0;overflow:auto;overscroll-behavior:contain}
+@media (min-width:960px){.list{order:1}}
+.list ol{list-style:none;margin:0;padding:0}
+.it{border-bottom:1px solid var(--line)}
+.it>button{all:unset;box-sizing:border-box;display:grid;grid-template-columns:1fr auto;gap:4px 14px;width:100%;padding:16px 16px 16px 0;cursor:pointer}
+@media (min-width:960px){.it>button{padding:16px 22px 16px 0}}
+.it>button:focus-visible{outline:2px solid var(--lake);outline-offset:-2px}
+.it h3{font-size:17px;letter-spacing:-.02em;line-height:1.3;display:flex;gap:9px;align-items:baseline;min-width:0}
+.it h3 .dot{transform:translateY(-1px)}
+.it .where{grid-column:1;font-size:14px;color:var(--muted);min-width:0}
+.it .km{grid-row:1/span 2;grid-column:2;align-self:center;text-align:right;font:500 13px/1.2 var(--mono);font-variant-numeric:tabular-nums;color:var(--fg)}
+.it .km small{display:block;color:var(--muted);font-size:11px;letter-spacing:.04em;text-transform:uppercase;margin-top:3px}
+.it .tags{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.tag{font:500 11px/1 var(--mono);letter-spacing:.03em;text-transform:uppercase;padding:5px 8px;border-radius:6px;background:var(--tint);color:var(--muted)}
+.tag.libre{background:color-mix(in srgb,var(--lake) 14%,transparent);color:var(--lake)}
+.tag.alr{background:var(--fg);color:var(--bg)}
+.it:hover>button h3,.it.on>button h3{color:var(--lake)}
+.it.on{background:linear-gradient(90deg,transparent,var(--tint))}
+.fiche{display:grid;gap:12px;padding:0 16px 20px 0}
+@media (min-width:960px){.fiche{padding-right:22px}}
+.fiche dl{display:grid;grid-template-columns:110px 1fr;gap:6px 14px;margin:0;font-size:14px}
+.fiche dt{color:var(--muted)}
+.fiche dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.fiche .rm{font-size:14px;color:var(--muted);border-left:2px solid var(--line);padding-left:12px}
+.fiche .acts{display:flex;gap:8px;flex-wrap:wrap}
+.more{padding:20px 0}
+.empty{padding:40px 0;color:var(--muted)}
+.empty b{display:block;color:var(--fg);font-weight:500;font-size:18px;margin-bottom:6px}
+
+/* Marqueurs de la carte */
+.leaflet-container{font-family:var(--sans);background:var(--water)}
+.city span{position:absolute;transform:translate(-50%,-50%);white-space:nowrap;font:500 10px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);opacity:.85;pointer-events:none}
+.mk{width:14px;height:14px;border-radius:50%;background:var(--bg);box-shadow:inset 0 0 0 2.5px var(--fg),0 1px 3px rgba(0,0,0,.25);transition:transform .15s}
+.mk.libre{background:var(--lake);box-shadow:0 0 0 2px var(--bg),0 1px 3px rgba(0,0,0,.3)}
+.mk.on{transform:scale(1.6)}
+.mk.alr{width:30px;height:30px;background:var(--fg);box-shadow:0 0 0 3px var(--bg),0 2px 8px rgba(0,0,0,.35);display:grid;place-items:center;color:var(--bg);font:600 9px/1 var(--mono);letter-spacing:.02em}
+.mk.alr.on{transform:scale(1.25)}
+.cl{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--fg);color:var(--bg);font:500 13px/1 var(--mono);font-variant-numeric:tabular-nums;box-shadow:0 0 0 4px color-mix(in srgb,var(--fg) 18%,transparent)}
+.cl.big{width:46px;height:46px;font-size:14px}
+.me{width:18px;height:18px;border-radius:50%;background:#2f7de1;box-shadow:0 0 0 4px rgba(47,125,225,.25),0 0 0 2px #fff inset}
+.pin{width:14px;height:14px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--fg);box-shadow:0 0 0 2px var(--bg)}
+.leaflet-popup-content-wrapper{border-radius:14px;background:var(--bg);color:var(--fg);box-shadow:0 0 0 1px var(--line),0 16px 36px -10px rgba(0,0,0,.3)}
+.leaflet-popup-tip{background:var(--bg);box-shadow:0 0 0 1px var(--line)}
+.leaflet-popup-content{margin:14px 16px;font-size:14px;line-height:1.45;min-width:200px}
+.leaflet-popup-content h4{margin:0 0 2px;font-size:16px;font-weight:500;letter-spacing:-.02em}
+.leaflet-popup-content p{color:var(--muted);margin:0 0 10px}
+.leaflet-popup-content .acts{display:flex;gap:6px;flex-wrap:wrap}
+.leaflet-popup-content .pill.small{height:30px;padding:0 12px;font-size:12px}
+.leaflet-container a.leaflet-popup-close-button{color:var(--muted)}
+.leaflet-bar a{background:var(--bg);color:var(--fg);border-bottom-color:var(--line)}
+.leaflet-bar a:hover{background:var(--tint)}
+.leaflet-bar{box-shadow:0 0 0 1px var(--line)!important;border:0!important}
+.leaflet-control-attribution{background:color-mix(in srgb,var(--bg) 80%,transparent)!important;color:var(--muted)!important;font-size:10px}
+.leaflet-control-attribution a{color:var(--muted)!important}
+.marker-cluster-anim .leaflet-marker-icon,.marker-cluster-anim .leaflet-marker-shadow{transition:transform .3s ease-out,opacity .3s ease-in}
+
+/* Photos */
+.photos{padding-block:clamp(72px,9vw,128px) 0;border-top:1px solid var(--line)}
+.ph{display:grid;gap:12px;grid-template-columns:1fr}
+@media (min-width:760px){.ph{grid-template-columns:1.6fr 1fr;grid-template-rows:1fr 1fr;height:clamp(420px,46vw,640px)}.ph figure:first-child{grid-row:1/span 2}}
+.ph figure{margin:0;position:relative;overflow:hidden;border-radius:2px;background:var(--tint);min-height:0}
+.ph img{width:100%;height:100%;object-fit:cover;aspect-ratio:16/10}
+@media (min-width:760px){.ph img{aspect-ratio:auto}}
+.ph figure::after{content:"";position:absolute;inset:auto 0 0;height:30%;background:linear-gradient(180deg,transparent,rgba(0,0,0,.45));pointer-events:none}
+.ph figcaption{position:absolute;z-index:1;left:14px;bottom:12px;color:#fff;font:500 11px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;text-shadow:0 1px 6px rgba(0,0,0,.5)}
+.ph-meta{display:flex;justify-content:space-between;align-items:center;gap:12px 24px;flex-wrap:wrap;margin-top:22px}
+.ph-meta p{color:var(--muted);max-width:52ch}
+
+/* Conseils */
+.tips{padding-block:clamp(72px,9vw,128px)}
+.trio{display:grid;border-top:1px solid var(--line)}
+@media (min-width:860px){.trio{grid-template-columns:repeat(3,1fr)}}
+.trio div{padding:28px 32px 28px 0;display:grid;gap:10px;align-content:start;border-bottom:1px solid var(--line)}
+@media (min-width:860px){.trio div{border-bottom:0}.trio div+div{padding-left:32px;border-left:1px solid var(--line)}}
+.trio h3{font-size:22px}
+.trio p{color:var(--muted);max-width:36ch}
+.trio .label{color:var(--lake)}
+
+/* Ajouter un spot */
+.add{background:var(--tint)}
+.add .wrap{padding-block:clamp(64px,8vw,112px);display:grid;gap:28px}
+@media (min-width:860px){.add .wrap{grid-template-columns:1.2fr 1fr;align-items:end}}
+.add h2{font-size:clamp(32px,4.4vw,60px);line-height:1}
+.add p{color:var(--muted);margin-top:16px;max-width:46ch}
+.add .box{display:grid;gap:12px;justify-items:start}
+.add .mail{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font:500 15px/1.3 var(--mono);user-select:all}
+.add .acts{display:flex;gap:10px;flex-wrap:wrap}
+
+footer .wrap{padding-block:56px 36px;display:grid;gap:36px}
+footer .top{display:flex;justify-content:space-between;gap:32px;flex-wrap:wrap;align-items:start}
+footer .top img{height:clamp(84px,9vw,112px);width:auto}
+footer ul{list-style:none;margin:0;padding:0;display:flex;gap:10px 28px;flex-wrap:wrap;font-size:14px;color:var(--muted)}
+footer ul a:hover{color:var(--fg)}
+footer .legal{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.gate{min-height:100vh;display:grid;place-items:center;padding:40px max(20px,env(safe-area-inset-left,0px)) 40px max(20px,env(safe-area-inset-right,0px));background:var(--tint)}
+.gate-box{width:100%;max-width:380px;display:grid;gap:12px;background:var(--bg);border-radius:20px;box-shadow:0 0 0 1px var(--line);padding:32px 28px}
+.gate-box img{height:72px;width:auto;margin-bottom:8px}
+.gate-box h1{font-size:28px;line-height:1.1}
+.gate-box p{color:var(--muted);font-size:15px}
+#g-fields{display:grid;gap:8px;margin-top:6px}
+#g-fields label{font-size:13px;color:var(--muted)}
+#g-fields input{height:46px;border-radius:12px;border:0;box-shadow:inset 0 0 0 1px var(--line);background:var(--bg);padding:0 14px;font-size:16px}
+#g-fields input:focus{outline:none;box-shadow:inset 0 0 0 1.5px var(--fg)}
+#g-fields .pill{margin-top:8px}
+.g-msg{min-height:1.4em;font-size:14px}.g-msg.err{color:#c2410c}
+.g-back{font-size:14px;color:var(--muted)}.g-back:hover{color:var(--fg)}
+.maquette button{all:unset;cursor:pointer;text-decoration:underline}
+.maquette{position:fixed;left:50%;pointer-events:auto!important;transform:translateX(-50%);bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:1300;background:var(--fg);color:var(--bg);font:500 11px/1 var(--mono);letter-spacing:.05em;text-transform:uppercase;padding:8px 12px;border-radius:999px;white-space:nowrap;opacity:.9;pointer-events:none}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+</head>
+<body>
+<div class="gate" id="gate">
+  <form class="gate-box" id="g-form">
+    <img class="logo-light" src="media/logo-alr-noir.svg" alt="Alpine Lake Riders" width="2869" height="1699"><img class="logo-dark" src="media/logo-alr-blanc.svg" alt="Alpine Lake Riders" width="2869" height="1699">
+    <h1>Page en préparation</h1>
+    <p id="g-txt">Réservée aux administrateurs du site pour l'instant.</p>
+    <div id="g-fields" hidden>
+      <label for="g-email">E-mail</label><input id="g-email" type="email" autocomplete="username" required>
+      <label for="g-pass">Mot de passe</label><input id="g-pass" type="password" autocomplete="current-password" required>
+      <button class="pill ink" type="submit">Se connecter</button>
+    </div>
+    <p class="g-msg" id="g-msg" aria-live="polite"></p>
+    <a class="g-back" href="/">← Retour au site</a>
+  </form>
+</div>
+<div id="page" hidden>
+<nav class="topbar"><div class="wrap">
+  <span class="label">Alpine Lake Riders Association</span>
+  <ul>
+    <li><a href="/#asso" data-t="navAsso">L'asso</a></li>
+    <li><a href="/#agenda" data-t="navAgenda">Agenda</a></li>
+    <li><a href="/#debuter" data-t="navDebuter">Débuter</a></li>
+    <li><a href="#carte" aria-current="page" data-t="navSpots">Spots</a></li>
+    <li><a href="/lacs.html" data-t="navLacs">Lacs</a></li>
+  </ul>
+  <span class="lang-sw" aria-label="Langue"><button type="button" data-lang="fr" aria-pressed="true">FR</button><i aria-hidden="true">/</i><button type="button" data-lang="en" aria-pressed="false">EN</button></span>
+  <a class="pill ink" href="#ajouter" data-t="navAdd">Ajouter un spot</a>
+</div></nav>
+
+<header class="hero" id="top">
+  <img class="poster" src="media/hero-hd-poster.jpg" alt="">
+  <video id="v" poster="media/hero-hd-poster.jpg" muted loop playsinline preload="auto" aria-label="Un rider en pumpfoil glisse au ras de l'eau verte du lac de la Terrasse"></video>
+  <div class="cap">
+    <span class="label" data-t="heroLabel">Où pumper ce week-end&nbsp;?</span>
+    <h1 data-t="heroTitle">Annuaire des spots de pumpfoil</h1>
+  </div>
+  <p class="mark"><img src="media/logo-alr-blanc.svg" alt="Alpine Lake Riders" width="2869" height="1699"></p>
+  <button class="vbtn" id="vb" type="button">Pause</button>
+</header>
+
+<section class="intro"><div class="wrap">
+  <p class="statement" data-t="statement" data-html>Des pontons, des quais et des lacs pour pumper, <em>du lac de la Terrasse à Copenhague.</em></p>
+  <p class="sub" data-t="sub">Les spots repérés par la communauté et les clubs. Trouvez le plus proche, vérifiez l'accès, et partez rider.</p>
+  <div class="stats">
+    <div><b id="st-spots">0</b><span data-t="stSpots">spots recensés</span></div>
+    <div><b id="st-pays">0</b><span data-t="stPays">pays</span></div>
+    <div><b id="st-libre">0</b><span data-t="stLibre">en accès libre</span></div>
+    <div><b id="st-fr">0</b><span data-t="stFr">en France</span></div>
+  </div>
+</div></section>
+
+<section id="carte"><div class="wrap">
+  <div class="head">
+    <h2 data-t="mapTitle">La carte des spots</h2>
+    <p data-t="mapSub">Tapez une ville, un lac ou le nom d'un spot, ou laissez la carte vous trouver.</p>
+  </div>
+  <div class="tools">
+    <div class="findrow">
+      <div class="search" id="search">
+        <svg class="ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="q" type="search" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-controls="sugg" aria-autocomplete="list" placeholder="Annecy, Lac de Zurich, Lyon…" aria-label="Rechercher un lieu ou un spot">
+        <button class="clr" id="q-clr" type="button" aria-label="Effacer" hidden>×</button>
+        <ul class="sugg" id="sugg" role="listbox" hidden></ul>
+      </div>
+      <button class="pill line near" id="near" type="button"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="7.5"/></svg><span data-t="near">Autour de moi</span></button>
+    </div>
+    <div class="chips" id="chips" role="group" aria-label="Filtres"></div>
+  </div>
+  <div class="status" aria-live="polite"><span id="count"></span><span id="msg" class="msg"></span></div>
+  <div class="finder">
+    <div class="map-box">
+      <div id="map" role="region" aria-label="Carte des spots"></div>
+      <div class="legend" aria-hidden="true">
+        <span><i class="dot libre"></i><span data-t="lgLibre">Accès libre</span></span>
+        <span><i class="dot autre"></i><span data-t="lgAutre">Club, école ou à vérifier</span></span>
+      </div>
+      <div class="reset"><span class="view" id="view" role="group" aria-label="Fond de carte"><button type="button" data-v="auto" aria-pressed="true" data-t="vAuto">Auto</button><button type="button" data-v="plan" aria-pressed="false" data-t="vPlan">Plan</button><button type="button" data-v="sat" aria-pressed="false" data-t="vSat">Satellite</button></span><button class="pill small" id="all" type="button" data-t="allEurope">Toute l'Europe</button></div>
+      <div class="satnote" id="satnote" hidden></div>
+    </div>
+    <div class="list" id="list"><ol id="ol"></ol><div class="more" id="more" hidden><button class="pill line small" id="more-b" type="button"></button></div></div>
+  </div>
+</div></section>
+
+<section class="photos"><div class="wrap">
+  <div class="head"><h2 data-t="phTitle">Notre spot maison</h2></div>
+  <div class="ph">
+    <figure><img src="media/riders-ponton.jpg" alt="Des riders attendent leur tour sur le ponton du lac de la Terrasse" loading="lazy" width="2200" height="1237"><figcaption data-t="ph1">Lac de la Terrasse · Isère</figcaption></figure>
+    <figure><img src="media/depart-ponton.jpg" alt="Départ en dockstart depuis le ponton" loading="lazy" width="2200" height="1238"><figcaption data-t="ph2">Dockstart au ponton</figcaption></figure>
+    <figure><img src="media/aerien-ponton.jpg" alt="Le ponton et le lac vus du ciel" loading="lazy" width="2200" height="1238"><figcaption data-t="ph3">Vu du ciel</figcaption></figure>
+  </div>
+  <div class="ph-meta">
+    <p data-t="phText">Le ponton de l'asso au lac de la Terrasse, face à la Dent de Crolles. Sessions ouvertes, initiations et Apéros Pumpfoil toute la saison.</p>
+    <a class="pill line" href="/#agenda" data-t="phBtn">Venir rider avec nous</a>
+  </div>
+</div></section>
+
+<section class="tips"><div class="wrap">
+  <div class="head"><h2 data-t="tipsTitle">Avant d'y aller</h2></div>
+  <div class="trio">
+    <div><span class="label" data-t="t1l">Accès</span><h3 data-t="t1h">Vérifiez qui gère le ponton</h3><p data-t="t1p">Beaucoup de spots dépendent d'un club ou d'une école. Un message avant de venir, et vous êtes accueilli.</p></div>
+    <div><span class="label" data-t="t2l">Sécurité</span><h3 data-t="t2h">Jamais seul sur l'eau</h3><p data-t="t2p">Ridez à deux, avec un gilet ou une combinaison adaptée à la température de l'eau. Le foil coupe : gardez vos distances.</p></div>
+    <div><span class="label" data-t="t3l">Partage</span><h3 data-t="t3h">Respectez les baigneurs</h3><p data-t="t3p">Évitez les zones de baignade et les heures d'affluence. Le matin et le soir, l'eau est plus plate et le spot plus calme.</p></div>
+  </div>
+</div></section>
+
+<section class="add" id="ajouter"><div class="wrap">
+  <div>
+    <h2 data-t="addTitle">Un spot manque&nbsp;?</h2>
+    <p data-t="addText">Envoyez-nous son nom, sa position GPS et une photo du ponton. On vérifie et on l'ajoute à la carte.</p>
+  </div>
+  <div class="box">
+    <span class="label" data-t="addMail">Par e-mail</span>
+    <div class="mail"><span id="mail">alpinelakeriders@gmail.com</span><button class="pill line small" id="copy" type="button" data-t="copy">Copier</button></div>
+    <div class="acts"><a class="pill ink" href="https://chat.whatsapp.com/D0wUPuh0QP87qtSMwNR3xT" target="_blank" rel="noopener" data-t="addWa">Groupe WhatsApp</a></div>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <div class="top">
+    <a href="#top" aria-label="Alpine Lake Riders, retour en haut"><img class="logo-light" src="media/logo-alr-noir.svg" alt="Alpine Lake Riders" width="2869" height="1699"><img class="logo-dark" src="media/logo-alr-blanc.svg" alt="Alpine Lake Riders" width="2869" height="1699"></a>
+    <ul><li><a href="/#asso" data-t="navAsso">L'asso</a></li><li><a href="/#agenda" data-t="navAgenda">Agenda</a></li><li><a href="#carte" data-t="navSpots">Spots</a></li><li><a href="/lacs.html" data-t="navLacs">Lacs</a></li><li><a href="/#rejoindre" data-t="navJoin">Adhérer</a></li></ul>
+  </div>
+  <div class="legal"><span data-t="legal1">© 2026 Alpine Lake Riders · Association loi 1901 · La Terrasse, Isère</span><span data-t="legal2">Spots recensés en octobre 2026 à partir de sources publiques. Positions approchées signalées.</span></div>
+</div></footer>
+</div>
+<div class="maquette" id="badge" hidden><span data-t="maquette">Page privée · visible par les admins</span> · <button type="button" id="logout">Déconnexion</button></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="js/config.js?v=50"></script>
+<script src="js/backend.js?v=52"></script>
+<script>window.SPOTS=[{"i":1,"p":"FR","rg":"Auvergne-Rhône-Alpes","v":"Aix-les-Bains","n":"Aix-les-Bains – Grand Port","la":45.702,"lo":5.888,"ap":1,"t":"ponton","c":"ponton","e":"Lac du Bourget","a":"libre (sessions test)","ac":"libre","st":"Ketos (fabricant)","s":"Saison chaude : mardi/mercredi en alternance avec Chavoires","li":"https://www.ketos-foil.com/","so":"https://www.destination-annecy.com/pump-foil-annecy/","rm":"Lieu exact non publié ; coordonnées = Grand Port d'Aix (hypothèse)."},{"i":2,"p":"FR","rg":"Auvergne-Rhône-Alpes","v":"Annecy (Annecy-le-Vieux)","n":"Le Petit Port – ponton bas","la":45.9097,"lo":6.1497,"ap":1,"t":"ponton","c":"ponton","e":"Lac d'Annecy","a":"libre","ac":"libre","st":"Foil Club Annecy (communauté locale)","f":"rendez-vous des pumpers du matin","s":"Meilleur au lever du soleil (eau plate)","li":"https://www.destination-annecy.com/pump-foil-annecy/","so":"https://www.destination-annecy.com/pump-foil-annecy/","rm":"Départ directement du quai. Coordonnées approchées du Petit Port d'Albigny. Respecter zones de baignade."},{"i":3,"p":"FR","rg":"Auvergne-Rhône-Alpes","v":"Annecy (Chavoires)","n":"Chavoires – ponton","la":45.896,"lo":6.159,"ap":1,"t":"ponton","c":"ponton","e":"Lac d'Annecy","a":"libre (sessions test)","ac":"libre","st":"Ketos (fabricant)","s":"Saison chaude : sessions test mardi et mercredi (Chavoires ou Aix-les-Bains), calendrier variable","li":"https://www.ketos-foil.com/","so":"https://www.destination-annecy.com/pump-foil-annecy/","rm":"Ketos « Pump Sessions » sur les pontons d'Annecy et du Bourget (ketos-foil1.odoo.com/en/pump-foil)."},{"i":4,"p":"FR","rg":"Auvergne-Rhône-Alpes","v":"Divonne-les-Bains","n":"Lac de Divonne – Divona Pump Foil Club","la":46.36,"lo":6.144,"ap":1,"t":"club","c":"club","e":"Lac de Divonne","a":"via club/école","ac":"club","st":"Divona Pump Foil Club (asso)","li":"https://www.helloasso.com/associations/divona-pump-foil-club","so":"https://www.helloasso.com/associations/divona-pump-foil-club","rm":"Initiation et progression encadrées. Plan d'eau supposé = lac de Divonne (non nommé par la source)."},{"i":5,"p":"FR","rg":"Auvergne-Rhône-Alpes","v":"Duingt","n":"Duingt","la":45.828,"lo":6.201,"ap":1,"t":"ponton","c":"ponton","e":"Lac d'Annecy","a":"libre","ac":"libre","s":"Eau souvent lisse","li":"https://www.destination-annecy.com/pump-foil-annecy/","so":"https://www.destination-annecy.com/pump-foil-annecy/","rm":"Près du rétrécissement du lac."},{"i":6,"p":"FR","rg":"Auvergne-Rhône-Alpes","v":"La Terrasse","n":"Lac de la Terrasse – ponton Alpine Lake Riders","la":45.31973,"lo":5.94782,"ap":0,"t":"ponton","c":"ponton","e":"Lac de la Terrasse (base de loisirs intercommunale)","a":"via club/école","ac":"club","st":"Alpine Lake Riders (asso)","f":"sessions + apéros pumpfoil","s":"Apéro pumpfoil 15h-18h30 ; ponton fermé du 1er nov. au 18 déc. 2026","li":"https://alpinelakeriders.com/","ph":"https://www.youtube.com/shorts/416EEPn0luM","so":"https://alpinelakeriders.com/","rm":"Base de l'asso. Casque requis au début, ne jamais rider seul. GPS à confirmer par l'asso. | GPS repris du site alpinelakeriders.com (bloc météo)."},{"i":7,"p":"FR","rg":"Auvergne-Rhône-Alpes","v":"Lac d'Annecy (lieu non précisé)","n":"Lac d'Annecy Paddle Club – section pumping foil","ap":1,"t":"club","c":"club","e":"Lac d'Annecy","a":"via club/école","ac":"club","st":"Lac d'Annecy Paddle Club (asso)","s":"Saison non précisée","li":"https://annecysupclub.com/pumping-foil/","so":"https://annecysupclub.com/pumping-foil/","rm":"Matériel fourni, pas de supplément pour adhérents, séance découverte possible. Ponton non localisé."},{"i":8,"p":"FR","rg":"Auvergne-Rhône-Alpes","v":"Lac du Bourget (lieu non précisé)","n":"Les Ailes du Lac – section pump foil","ap":1,"t":"club","c":"club","e":"Lac du Bourget","a":"via club/école","ac":"club","st":"Les Ailes du Lac (asso)","li":"https://lesailesdulac.org/pumpfoil/","so":"https://lesailesdulac.org/pumpfoil/","rm":"Site en construction ; contact lesailesdulac@etik.com. Ponton non localisé."},{"i":9,"p":"FR","rg":"Auvergne-Rhône-Alpes","v":"Lyon (base non précisée)","n":"Lyon Sport Métropole Voile – activité Pump Foil","ap":1,"t":"club","c":"club","a":"via club/école","ac":"club","st":"Lyon Sport Métropole (section voile)","s":"Saison 2026 ouverte le 18 avril","li":"https://voile.lyonsportmetropole.org/","so":"https://voile.lyonsportmetropole.org/","rm":"Le club confirme l'activité Pump Foil en 2026 ; plan d'eau non indiqué (siège 33 bis cours Général Giraud, Lyon 1er). À vérifier."},{"i":10,"p":"FR","rg":"Auvergne-Rhône-Alpes","v":"Mayres-Savel","n":"Lac de Monteynard – Camping de Savel (Foil'ie au Lac / Open National PumpFoil)","la":44.88295,"lo":5.68514,"ap":0,"t":"plage","c":"lac","e":"Lac de Monteynard-Avignonet","a":"événement","ac":"event","st":"La Foil'ie au Lac / FFSurf","f":"Open National PumpFoil étape 1 (gagné par les frères Tuaiva)","s":"13-14 juin 2026","li":"https://lafoilie.com/","ph":"https://www.youtube.com/shorts/77EjfCkBknY","so":"https://lafoilie.com/","rm":"1re étape Open National Pumpfoil 2026 (foil-magazine.com, 18/06/2026). Spot de compétition, pas forcément ponton permanent."},{"i":11,"p":"FR","rg":"Auvergne-Rhône-Alpes","v":"Meyzieu","n":"Base nautique de Meyzieu (WWM) – Grand Large","la":45.783,"lo":5.002,"ap":1,"t":"base nautique","c":"club","e":"Lac du Grand Large","a":"via club/école","ac":"club","st":"WWM (Windfoil Windsurf Meyzieu)","s":"Base ouverte début avril à fin octobre","li":"https://ufr-staps.univ-lyon1.fr/staps/actualites/wing-foil-et-pumpfoil-decouvrez-ces-pratiques-sportives","so":"https://ufr-staps.univ-lyon1.fr/staps/actualites/wing-foil-et-pumpfoil-decouvrez-ces-pratiques-sportives","rm":"Séances pumpfoil UFR STAPS Lyon 1 au club WWM. Coordonnées approchées."},{"i":12,"p":"FR","rg":"Auvergne-Rhône-Alpes","v":"Saint-Jorioz","n":"Saint-Jorioz","la":45.8375,"lo":6.1655,"ap":1,"t":"ponton","c":"ponton","e":"Lac d'Annecy","a":"libre","ac":"libre","s":"Matin calme","li":"https://www.destination-annecy.com/pump-foil-annecy/","so":"https://www.destination-annecy.com/pump-foil-annecy/","rm":"Rive ouest, accès facile."},{"i":13,"p":"FR","rg":"Auvergne-Rhône-Alpes","v":"Sévrier","n":"NCY SUP – ponton pumping foil privé","la":45.86,"lo":6.142,"ap":1,"t":"ponton","c":"ponton","e":"Lac d'Annecy","a":"via club/école","ac":"club","st":"NCY SUP (école)","s":"Nouveau 2026 ; ouvert tous les jours sur réservation (fermeture 22-29 oct.) ; tarifs à venir","li":"https://ncy-sup.com/pumping-foil-annecy/","so":"https://ncy-sup.com/pumping-foil-annecy/","rm":"Spot privé avec ponton dédié, adresse exacte non publiée. Formules Découverte 1h / stage 3 séances / pass saison."},{"i":14,"p":"FR","rg":"Auvergne-Rhône-Alpes","v":"Sévrier","n":"Pump Foil Academy – ponton privé (Indiana test center)","la":45.862,"lo":6.143,"ap":1,"t":"ponton","c":"ponton","e":"Lac d'Annecy","a":"via club/école","ac":"club","st":"Pump Foil Academy (école, Jérôme Baudoux)","s":"Saison estivale (non précisé)","li":"https://pumpfoil-academy.com/","so":"https://pumpfoil-academy.com/","rm":"Première académie française dédiée au pump foil ; ponton privé à Sévrier, adresse non publiée."},{"i":15,"p":"FR","rg":"Auvergne-Rhône-Alpes","v":"Sévrier","n":"Sévrier – « dockstart des pontons »","la":45.8645,"lo":6.1435,"ap":1,"t":"ponton","c":"ponton","e":"Lac d'Annecy","a":"libre / via école","ac":"libre","st":"NCY SUP, Pump Foil Academy (pontons privés)","f":"spot réputé, zone des écoles","s":"Matin conseillé","li":"https://www.destination-annecy.com/pump-foil-annecy/","so":"https://www.destination-annecy.com/pump-foil-annecy/","rm":"Rive ouest. Coordonnées approchées du port de Sévrier."},{"i":16,"p":"FR","rg":"Auvergne-Rhône-Alpes","v":"Talloires-Montmin","n":"Talloires – ponton bas de l'aviron","la":45.8414,"lo":6.2129,"ap":1,"t":"ponton","c":"ponton","e":"Lac d'Annecy","a":"toléré","ac":"libre","st":"Club d'aviron (ponton)","li":"https://www.destination-annecy.com/pump-foil-annecy/","so":"https://www.destination-annecy.com/pump-foil-annecy/","rm":"Rive est, au pied du Roc de Chère. Partage avec rameurs."},{"i":17,"p":"FR","rg":"Auvergne-Rhône-Alpes","v":"Talloires-Montmin (Angon)","n":"Angon","la":45.83,"lo":6.2125,"ap":1,"t":"ponton","c":"ponton","e":"Lac d'Annecy","a":"libre","ac":"libre","f":"calme","li":"https://www.destination-annecy.com/pump-foil-annecy/","so":"https://www.destination-annecy.com/pump-foil-annecy/","rm":"Sous les falaises de Talloires."},{"i":18,"p":"FR","rg":"Auvergne-Rhône-Alpes","v":"Veyrier-du-Lac","n":"La Brune","la":45.888,"lo":6.172,"ap":1,"t":"ponton","c":"ponton","e":"Lac d'Annecy","a":"libre","ac":"libre","li":"https://www.destination-annecy.com/pump-foil-annecy/","so":"https://www.destination-annecy.com/pump-foil-annecy/","rm":"Rive est, eau ouverte."},{"i":19,"p":"FR","rg":"Bretagne","v":"Brest (29)","n":"Natural Advent – cours de dock start autour de Brest","la":48.39,"lo":-4.49,"ap":1,"t":"école","c":"club","e":"Rade de Brest / spots variés","a":"via école (cours 2h, payant)","ac":"club","st":"Natural Advent (shop à Lannilis)","s":"Toute l'année; stages pendant vacances","li":"https://www.natural-advent.fr/produit/cours-de-dock-start/","so":"https://www.natural-advent.fr/produit/cours-de-dock-start/","rm":"Spot non nommé (« différents spots autour de Brest »). Coordonnées = centre de Brest, très imprécises. À préciser auprès de l'école."},{"i":20,"p":"FR","rg":"Bretagne","v":"Camaret-sur-Mer (29)","n":"Port de Camaret – Championnats de France de pumpfoil 2026","la":48.279,"lo":-4.596,"ap":1,"t":"port","c":"port","e":"Port de Camaret","a":"événement","ac":"event","st":"Fédération Française de Surf / Presqu'île de Crozon Foil Festival","s":"Championnats 2026 (automne)","li":"https://foil-magazine.com/yvanna-vourron-et-titouan-tournus-championne-de-france-de-pumpfoil/","so":"https://www.surfingfrance.com/actualites/surf-foil/competitions-federales/yvanna-vourron-et-titouan-tournus-champions-de-france-de-pumpfoil-a-camaret-sur-mer.html","rm":"Titre FFS: champions de France de pumpfoil « à Camaret-sur-Mer » (Y. Vourron, T. Tournus). Lieu exact dans le port non confirmé."},{"i":21,"p":"FR","rg":"Bretagne","v":"Crozon (29)","n":"Port de Morgat – Crozon Foil Festival Dock Start Pumping Contest","la":48.2245,"lo":-4.4975,"ap":1,"t":"port","c":"port","e":"Baie de Douarnenez (port de Morgat)","a":"événement (accès libre hors événement non précisé)","st":"Crozon Foil Festival","s":"Contest le 18/10/2025","li":"https://crozonfoilfestival.com/crozon-foil-festival-2025-dock-start-pumping-contest-2/","ph":"https://www.sports-addict.net/fr/article/general/en-images-les-meilleurs-surfeurs-mondiaux-ont-assure-le-spectacle-a-crozon-avec-le-dockstart-pumping-foil/6ad5e0490fd55a66070b1e7d","so":"https://foil-magazine.com/crozon-foil-festival-2025-le-show-en-dockstart-pumping-foil/","rm":"Départs depuis les quais du port; riders internationaux. Spot d'événement."},{"i":22,"p":"FR","rg":"Bretagne","v":"La Forêt-Fouesnant (29)","n":"Finistère Kite School – Port-La-Forêt (Ilot Skoen)","la":47.897,"lo":-3.977,"ap":1,"t":"école / port","c":"club","e":"Baie de La Forêt","a":"via école (cours payants)","ac":"club","st":"Finistère Kite School","s":"Toute l'année, 7j/7, créneaux fixés la veille selon météo","li":"https://www.finisterekiteschool.com/dockstart/","so":"https://www.finisterekiteschool.com/dockstart/","rm":"Cours dockstart/pumping: apprentissage tracté au bateau puis départ ponton (ponton non nommé). RDV cabane d'accueil Ilot Skoen."},{"i":23,"p":"FR","rg":"Bretagne","v":"Larmor-Plage / Lorient (56)","n":"French Foil Lorient – Quai de l'embarcadère","la":47.7065,"lo":-3.38,"ap":1,"t":"quai","c":"ponton","e":"Rade de Lorient","a":"via école","ac":"club","st":"French Foil (école itinérante Grand Ouest)","li":"https://frenchfoil.fr/nous-trouver","so":"https://frenchfoil.fr/nous-trouver","rm":"Dockstart proposé à la base de Lorient (Quai de l'embarcadère, 56260 Larmor-Plage, tél +33 7 81 03 63 92). Cours de pumping aussi: https://frenchfoil.fr/apprendre-le-foil/pumping-foil (bases La Baule/Le Pouliguen, Larmor-Baden non reliées explicitement au dockstart)."},{"i":24,"p":"FR","rg":"Nouvelle-Aquitaine","v":"Bordeaux (33)","n":"Port de la Lune / Bassins à flot – FFS Foil Pumping Challenge (Bord'O MoonDays)","la":44.8645,"lo":-0.5525,"ap":1,"t":"quai / bassin","c":"ponton","e":"Garonne / Bassins à flot","a":"événement","ac":"event","st":"Les Marins de la Lune (Bord'O MoonDays) / FFS Tour National de Foil","s":"19/06/2026 (épreuves dock start et flat start)","li":"https://figaronautisme.meteoconsult.fr/actus-nautisme-flash/2026-06-08/88423-la-federation-francaise-de-surf-lance-son-tour-national-de-foil-2026","so":"https://figaronautisme.meteoconsult.fr/actus-nautisme-flash/2026-06-08/88423-la-federation-francaise-de-surf-lance-son-tour-national-de-foil-2026","rm":"Étape FFS « Port de la Lune ». Bord'O MoonDays se tient aux Bassins à flot (cf. wingsoftheocean.com) ; club Marins de la Lune dispose d'un ponton à Port Bastide (rive droite, ~44.844,-0.556). Emplacement exact de l'épreuve à confirmer."},{"i":25,"p":"FR","rg":"Nouvelle-Aquitaine","v":"La Couarde-sur-Mer (17, Île de Ré)","n":"Centre Nautique Couardais","la":46.2,"lo":-1.429,"ap":1,"t":"base nautique","c":"club","e":"Pertuis / bassin abrité (eau très plate)","a":"via club / à confirmer","ac":"club","st":"Centre Nautique Couardais","s":"Accès à l'eau quelle que soit la marée (selon source)","li":"https://srokacompany.com/en/blogs/news/the-best-foil-and-wingfoil-spots-on-ile-de-re","so":"https://srokacompany.com/en/blogs/news/the-best-foil-and-wingfoil-spots-on-ile-de-re","rm":"Cité par Sroka comme « THE ideal spot for practicing dockstart » (pontons, eau très plate). Contexte wingfoil dockstart. Coordonnées très approchées, à vérifier. Confiance moyenne."},{"i":26,"p":"FR","rg":"Nouvelle-Aquitaine","v":"Soustons (40)","n":"Lac de Soustons – dock start","la":43.775,"lo":-1.317,"ap":1,"t":"lac","c":"lac","e":"Lac de Soustons","a":"non précisé","st":"Probablement Club de Voile Soustons Marensin ou Boardhead Wingfoil School (non confirmé)","li":"https://france3-regions.franceinfo.fr/nouvelle-aquitaine/landes/dax/video-decouvrez-le-wingfoil-et-le-dock-start-deux-nouveaux-sports-nautiques-sur-le-lac-de-soustons-2763890.html","so":"https://france3-regions.franceinfo.fr/nouvelle-aquitaine/landes/dax/video-decouvrez-le-wingfoil-et-le-dock-start-deux-nouveaux-sports-nautiques-sur-le-lac-de-soustons-2763890.html","rm":"Reportage vidéo France 3 « Découvrez le Wingfoil et le Dock start … sur le lac de Soustons » (page non lisible, robots). Structure et ponton à confirmer. Confiance moyenne."},{"i":27,"p":"FR","rg":"Occitanie","v":"Frontignan","n":"Tiki Center – étang d'Ingril","la":43.4425,"lo":3.793,"ap":1,"t":"étang","c":"lac","e":"Étang d'Ingril","a":"via club/école","ac":"club","st":"Tiki Center (école)","s":"Toute l'année ; cours 1h30, 80€","li":"https://tiki-center.com/cours-pumping-foil-dockstart/","so":"https://tiki-center.com/cours-pumping-foil-dockstart/","rm":"46 av. d'Ingril, 34110 Frontignan ; départ ponton à genoux puis debout. Aussi côté mer."},{"i":28,"p":"FR","rg":"Occitanie","v":"La Grande-Motte","n":"La Grande-Motte – plage centrale","la":43.558,"lo":4.08,"ap":1,"t":"plage","c":"lac","e":"Méditerranée","a":"libre","ac":"libre","st":"Piouz (asso)","li":"https://piouz.org/","so":"https://piouz.org/","rm":"Plage abritée à petites vagues ; objectif d'un ponton Piouz (pas encore existant)."},{"i":29,"p":"FR","rg":"Occitanie","v":"Leucate (La Franqui)","n":"Mondial du Vent – Pump Foil (Surf Foil World Tour)","la":42.937,"lo":3.033,"ap":1,"t":"plage","c":"lac","e":"Méditerranée","a":"événement","ac":"event","st":"Mairie de Leucate / Mondial du Vent","s":"Mi-avril (16-21 avril 2025)","li":"https://sportmag.fr/voile-le-mondial-du-vent-2025-innove","so":"https://sportmag.fr/voile-le-mondial-du-vent-2025-innove","rm":"1re étape du World Tour pump foil ; échelles fournies par Piouz."},{"i":30,"p":"FR","rg":"Occitanie","v":"Mauguio (Carnon)","n":"Carnon – avant-port YCMC (Pumpade, Open France Pump Foil)","la":43.548,"lo":3.978,"ap":1,"t":"port","c":"port","e":"Avant-port de Carnon (mer)","a":"événement / asso","ac":"event","st":"Piouz (asso Pump Foil Lab) & YCMC","f":"jusqu'à 35 riders (2025)","s":"Pumpades juin ; étape Open France 26-27 sept. 2026","li":"https://piouz.org/our-events/","so":"https://piouz.org/our-events/","rm":"Rampes dockstart et échelles fournies par Piouz lors des events."},{"i":31,"p":"FR","rg":"Occitanie","v":"Mauguio (Carnon)","n":"Carnon – plage des Roquilles (test Axis)","la":43.542,"lo":3.956,"ap":1,"t":"plage","c":"lac","e":"Méditerranée","a":"événement","ac":"event","st":"Piouz","s":"19 juil. 2026 9h-13h","li":"https://piouz.org/our-events/","so":"https://piouz.org/our-events/","rm":"Test matériel pump foil ; confiance moyenne en tant que spot régulier."},{"i":32,"p":"FR","rg":"Occitanie","v":"Palavas-les-Flots","n":"Palavas – session pump foil Piouz","la":43.528,"lo":3.93,"ap":1,"t":"plage","c":"lac","e":"Méditerranée","st":"Piouz","li":"https://piouz.org/category/pump-foil-2/","so":"https://piouz.org/category/pump-foil-2/","rm":"Session matinale avec prof de surf ; lieu exact non précisé. Confiance faible."},{"i":33,"p":"FR","rg":"Pays de la Loire","v":"L'Aiguillon-sur-Mer (85)","n":"Atlantic Wakepark – ponton Dock Start Pumping Foil","la":46.337,"lo":-1.3,"ap":1,"t":"ponton","c":"ponton","e":"Plan d'eau d'eau de mer (téléski nautique)","a":"payant (location matériel 1h30 = 45 €, « accès illimité au ponton » listé)","ac":"club","st":"Atlantic Wakepark (Téléski Nautique de Vendée)","s":"Voir page horaires du wakepark","li":"https://www.atlanticwakepark.com/dock-start-pumping-foil/","so":"https://www.atlanticwakepark.com/dock-start-pumping-foil/","rm":"Nouveauté 2026, présenté comme le seul ponton de Vendée dédié. À 5 min de La Tranche-sur-Mer. Tél 06 76 27 55 04. Coordonnées approchées (position exacte du plan d'eau à vérifier)."},{"i":34,"p":"FR","rg":"Pays de la Loire","v":"Pornichet (44)","n":"Port d'échouage de Pornichet – ponton","la":47.257,"lo":-2.353,"ap":1,"t":"port","c":"port","e":"Port d'échouage (mer)","a":"non précisé","s":"Dépend de la marée (port d'échouage)","li":"https://www.pimpyourride.fr/session-surf-foil-dockstart-a-pornichet-avec-mathieu-hervoche/","ph":"https://www.youtube.com/watch?v=MApkUu1DycM","so":"https://www.pimpyourride.fr/session-surf-foil-dockstart-a-pornichet-avec-mathieu-hervoche/","rm":"Session surf foil dockstart avec Mathieu Hervoche (Pimpyourride). Source ancienne; autorisation actuelle inconnue."},{"i":35,"p":"FR","rg":"Provence-Alpes-Côte d'Azur","v":"Crots","n":"Serre-Ponçon – ponton plage de Chanterenne (Le Spot)","la":44.537,"lo":6.457,"ap":1,"t":"ponton","c":"ponton","e":"Lac de Serre-Ponçon","a":"via club/école (location)","ac":"club","st":"Le Spot Serre-Ponçon (école wingfoil)","s":"Saison ~fin mai à fin sept., 10h-18h","li":"https://www.spot-wingfoil.com/","so":"https://www.spot-wingfoil.com/","rm":"Programme Dockstart/pumping ; ponton à quelques mètres de l'école."},{"i":36,"p":"FR","rg":"Provence-Alpes-Côte d'Azur","v":"Embrun","n":"Outdoormix Festival – contest pumpfoil","la":44.556,"lo":6.483,"ap":1,"t":"plan d'eau","c":"lac","e":"Plan d'eau d'Embrun / Serre-Ponçon","a":"événement","ac":"event","st":"Outdoormix Festival","s":"Contest fin mai (qualifs sam. 18h30-20h30, finale dim.)","li":"https://www.outdoormixfestival.com/our-sports/pumpfoil","so":"https://www.outdoormixfestival.com/our-sports/pumpfoil","rm":"Lieu exact non précisé (partenaire CNA Serre-Ponçon) ; plan d'eau d'Embrun probable."},{"i":37,"p":"FR","rg":"Provence-Alpes-Côte d'Azur","v":"Hyères","n":"Baie de l'Almanarre – MF Kite (cours pump foil / dock start)","la":43.072,"lo":6.134,"ap":1,"t":"plage","c":"lac","e":"Baie de l'Almanarre (mer)","a":"via club/école","ac":"club","st":"MF Kite (école)","s":"4 avril–11 nov. (saison), ouvert toute l'année","li":"https://www.mfkite.com/cours-de-pumping-foil/","so":"https://www.mfkite.com/cours-de-pumping-foil/","rm":"Cours au bateau dans la baie, dock start en fin de cursus. Groupe 150€/3h30 en saison."},{"i":38,"p":"FR","rg":"Provence-Alpes-Côte d'Azur","v":"Hyères","n":"Hyères Pump Foil Festival","la":43.0805,"lo":6.153,"ap":1,"t":"port","c":"port","e":"Rade d'Hyères","a":"événement","ac":"event","s":"Samedi 3 octobre, 9h-18h","li":"https://cotedazurfrance.fr/offres/hyeres-pump-foil-festival-hyeres-fr-6822293/","so":"https://cotedazurfrance.fr/offres/hyeres-pump-foil-festival-hyeres-fr-6822293/","rm":"Lieu exact non récupéré (page inaccessible) ; coordonnées = port d'Hyères par défaut."},{"i":39,"p":"FR","rg":"Provence-Alpes-Côte d'Azur","v":"Hyères","n":"KiteSurf Passion – cours pump foil & dock start","ap":1,"t":"école","c":"club","e":"Rade d'Hyères","a":"via club/école","ac":"club","st":"KiteSurf Passion","li":"https://www.kitesurfpassion.com/pump-foil-dock-start-w1.html","so":"https://www.kitesurfpassion.com/pump-foil-dock-start-w1.html","rm":"Page non lisible (robots) ; lieu exact inconnu."},{"i":40,"p":"FR","rg":"Provence-Alpes-Côte d'Azur","v":"Lac de Sainte-Croix (Verdon)","n":"Lac de Sainte-Croix","la":43.77,"lo":6.17,"ap":1,"t":"lac","c":"lac","e":"Lac de Sainte-Croix","st":"écoles/clubs locaux","li":"https://srokacompany.com/en/blogs/actualites/pratiquer-le-foil-en-lac-de-montagne-nos-adresses","so":"https://srokacompany.com/en/blogs/actualites/pratiquer-le-foil-en-lac-de-montagne-nos-adresses","rm":"Source générique (dockstart possible), aucun ponton identifié. Confiance faible."},{"i":41,"p":"FR","rg":"Provence-Alpes-Côte d'Azur","v":"Savines-le-Lac","n":"Salon du Foil Serre-Ponçon (Open National Pumpfoil)","la":44.527,"lo":6.404,"ap":1,"t":"plage","c":"lac","e":"Lac de Serre-Ponçon","a":"événement","ac":"event","st":"Salon du Foil Serre-Ponçon","s":"20-21 juin 2026 (2e édition)","li":"https://foil-magazine.com/salon-du-foil-2026-serre-poncon/","so":"https://foil-magazine.com/salon-du-foil-2026-serre-poncon/","rm":"Open National Pumpfoil au programme. Emplacement exact à Savines non précisé."},{"i":42,"p":"FR","rg":"Île-de-France","v":"Chartrettes (77590)","n":"Club de ski nautique et wakeboard de Chartrettes","la":48.4895,"lo":2.7,"ap":1,"t":"club","c":"club","e":"Seine","a":"via club (appeler avant, adhérents ski/wake prioritaires)","ac":"club","st":"Club de ski nautique de Chartrettes","s":"1er juin-15 oct; mar-ven 18h-20h30, WE/fériés 14h30-20h30","so":"https://www.thecornershop.fr/content/85-pumping-foil-les-5-meilleurs-spots-a-decouvrir-en-ile-de-france","rm":"Angle rue de la Cave / chemin de halage. Près de Fontainebleau (cf. article Takoon « session dockstart à Fontainebleau » 30/07/2025, spot non nommé: https://takoon.com/en-eu/blogs/stories/une-session-dockstart-a-fontainebleau)."},{"i":43,"p":"FR","rg":"Île-de-France","v":"Jablines (77450)","n":"Centre nautique de Jablines – Île de loisirs de Jablines-Annet","la":48.913,"lo":2.733,"ap":1,"t":"base nautique","c":"club","e":"Lac de Jablines","a":"toléré / via base (accord du staff), payant entrée (~7 €/j selon Sroka)","ac":"libre","st":"Centre nautique de Jablines","s":"Hors saison 8h-19h; saison baignade 10h-18h","so":"https://www.thecornershop.fr/content/85-pumping-foil-les-5-meilleurs-spots-a-decouvrir-en-ile-de-france","rm":"Réservé riders confirmés (ponton instable)."},{"i":44,"p":"FR","rg":"Île-de-France","v":"Moisson (78840)","n":"Base nautique de Moisson-Lavacourt (Île de loisirs de Moisson-Mousseaux)","la":49.0735,"lo":1.672,"ap":1,"t":"base nautique","c":"club","e":"Lac de Moisson (~120 ha)","a":"toléré / via base (passer à l'accueil signaler départ ponton)","ac":"libre","st":"Base nautique de Moisson-Lavacourt","s":"9h-17h30 basse saison, 9h-18h haute saison","li":"https://www.thecornershop.fr/content/85-pumping-foil-les-5-meilleurs-spots-a-decouvrir-en-ile-de-france","so":"https://www.thecornershop.fr/content/85-pumping-foil-les-5-meilleurs-spots-a-decouvrir-en-ile-de-france","rm":"Adresse Route de Mousseaux. Article The Corner Shop (non daté, ~2024). Confiance bonne."},{"i":45,"p":"FR","rg":"Île-de-France","v":"Saint-Maur-des-Fossés (94100)","n":"Club de ski nautique de Saint-Maur – Quai de Bonneuil","la":48.7905,"lo":2.4975,"ap":1,"t":"club","c":"club","e":"Marne (~30 m de large)","a":"via club (voir staff pour règles et mise à l'eau)","ac":"club","st":"Club de ski nautique de Saint-Maur","s":"Mer 14h-19h, ven 16h-19h, sam-dim 10h-19h","so":"https://www.thecornershop.fr/content/85-pumping-foil-les-5-meilleurs-spots-a-decouvrir-en-ile-de-france","rm":"Vagues des bateaux de traction utilisables. Coordonnées approchées sur le quai de Bonneuil, à vérifier."},{"i":46,"p":"FR","rg":"Île-de-France","v":"Saint-Quentin-en-Yvelines (Trappes/Montigny)","n":"SQY – Île de loisirs de Saint-Quentin-en-Yvelines","la":48.78901,"lo":2.02197,"ap":0,"t":"base de loisirs","c":"club","e":"Étang de Saint-Quentin","a":"payant (entrée île de loisirs ~8 €/pers selon Sroka)","ac":"club","s":"Île de loisirs ouverte ~8h-19h30 (général, Sroka)","li":"https://project7iii.com/foildata/map/sqy","so":"https://project7iii.com/foildata/map/sqy","rm":"Fiche 7III « A spot to dockstart near Paris » (alban). Seul spot pump foil France sur 7III. Infos entrée: https://srokacompany.com/blogs/actualites/meilleurs-spots-de-wing-foil-a-saint-quentin-en-yvelines"},{"i":47,"p":"FR","rg":"Île-de-France","v":"Vaires-sur-Marne (77360)","n":"Stade nautique olympique / Club nautique de Vaires-Torcy","la":48.8645,"lo":2.63,"ap":1,"t":"base nautique","c":"club","e":"Bassin olympique de Vaires-sur-Marne","a":"toléré / via club (autorisation à l'accueil, pontons libres seulement, adhérents prioritaires)","ac":"libre","st":"Club nautique de Vaires (Vaires-Torcy)","li":"https://foil-magazine.com/competition-internationale-de-pump-foil-a-paris/","so":"https://www.thecornershop.fr/content/85-pumping-foil-les-5-meilleurs-spots-a-decouvrir-en-ile-de-france","rm":"Route de Torcy. Compétition internationale de pump foil les 20-21/09/2025 (Gliss & Van Paris Show) au stade nautique. Confiance bonne."},{"i":48,"p":"CH","rg":"Berne","v":"Bienne (Biel)","n":"Barkenhafen Dock","la":47.12796,"lo":7.23335,"ap":0,"t":"ponton","c":"ponton","e":"Lac de Bienne","a":"libre","ac":"libre","st":"Rampe de pumpfoil ~50 cm au-dessus de l'eau fixée au ponton","s":"Cours Uni Berne (Sunsetshop) ex. 13/07/2026 18h-19h30","li":"https://project7iii.com/foildata/map/barkenhafen-dock-510b3a","ph":"https://images2.imgbox.com/20/ab/ut4CFllz_o.jpg","so":"https://project7iii.com/foildata/map/barkenhafen-dock-510b3a","rm":"Près du restaurant La Péniche ; le Sunsetshop derrière La Péniche sert de base aux cours de pumpfoil de l'Université de Berne (zssw.unibe.ch)."},{"i":49,"p":"CH","rg":"Berne","v":"Bienne (Biel)","n":"Müllermatte","la":47.13297,"lo":7.22811,"ap":0,"t":"ponton","c":"ponton","e":"Lac de Bienne","a":"libre","ac":"libre","st":"Ponton pour drop start","s":"Beaucoup d'algues en été","li":"https://project7iii.com/foildata/map/muellermatte-biel","so":"https://project7iii.com/foildata/map/muellermatte-biel","rm":"Signalé par nilsmango. Algues abondantes l'été (hauteur ≥85 cm en hiver selon la note)."},{"i":50,"p":"CH","rg":"Berne","v":"Bönigen","n":"Bönigen – départ tour du lac de Brienz","la":46.688,"lo":7.895,"ap":1,"t":"lac","c":"lac","e":"Lac de Brienz","a":"libre","ac":"libre","so":"https://www.plattformj.ch/artikel/235490/","rm":"Départ du tour du lac de Brienz en pumpfoil (~36 km) par Pascal Hiltbrand début août 2025. Point ponctuel."},{"i":51,"p":"CH","rg":"Berne","v":"Spiez","n":"Interlakenstrasse","la":46.6683,"lo":7.71959,"ap":0,"t":"ponton","c":"ponton","e":"Lac de Thoune","a":"libre","ac":"libre","st":"Bon ponton, running start facile","so":"https://project7iii.com/foildata/map/interlakenstrasse-spiez","rm":"Parking en face, douches chaudes gratuites. Posté par un compte nommé « test » : confiance moyenne."},{"i":52,"p":"CH","rg":"Berne","v":"Unterseen (Neuhaus)","n":"Neuhaus – départ tour du lac de Thoune","la":46.681,"lo":7.815,"ap":1,"t":"lac","c":"lac","e":"Lac de Thoune","a":"libre","ac":"libre","st":"Plage/rive","so":"https://www.plattformj.ch/artikel/235490/","rm":"Départ/arrivée du tour du lac de Thoune en pumpfoil (~42 km) par Pascal Hiltbrand en août 2025. Point de départ ponctuel, pas un spot établi."},{"i":53,"p":"CH","rg":"Berne","v":"Wohlen bei Bern","n":"Wohlensee – Rowing Club Bern","la":46.965,"lo":7.37,"ap":1,"t":"club","c":"club","e":"Wohlensee (Aar)","a":"via club/école","ac":"club","st":"Rive / ponton du club d'aviron","li":"https://www.foilbern.ch/","so":"https://www.plattformj.ch/artikel/235490/","rm":"FoilBern donne ses cours de pumpfoil au Rowing Club Bern ; Pascal Hiltbrand y pump depuis la rive. Rameurs et bateaux prioritaires. Coordonnées approchées (Wohlensee), emplacement exact du club à vérifier."},{"i":54,"p":"CH","rg":"Bâle-Campagne","v":"Birsfelden","n":"Inseli Pump","la":47.5606,"lo":7.63181,"ap":0,"t":"ponton","c":"ponton","e":"Rhin","a":"toléré","ac":"libre","st":"Petit ponton de pumpfoil","li":"https://project7iii.com/foildata/map/inseli-pump-birsfelden","so":"https://project7iii.com/foildata/map/inseli-pump-birsfelden","rm":"Le club d'aviron est le « placeholder » du lieu : les foilers y sont invités, attention aux nageurs et rameurs (commentaires Wassersport Basel)."},{"i":55,"p":"CH","rg":"Grisons","v":"Silvaplana","n":"Silvaplana Camping Dockstart Dock","la":46.45473,"lo":9.79301,"ap":0,"t":"ponton","c":"ponton","e":"Lac de Silvaplana","a":"libre","ac":"libre","st":"Ponton dockstart ~40 cm","f":"Très populaire","s":"Le matin (eau calme, sans vent) ; cours découverte gratuits Silvaplana Tourisme / Windsurfing Silvaplana (juin 2026)","li":"https://silvaplana.ch/en/events/2026-06/pumpfoil-schnupperkurs","ph":"https://www.instagram.com/p/CxBkhkDq1QT/","so":"https://project7iii.com/foildata/map/silvaplana-camping-dockstart-dock-1c9123","rm":"Point listé par zdavatz (fondateur de pump.zuerich / Indiana), aussi dans le CSV open source github.com/zdavatz/pumpspots. Premier ponton officiel de pumpfoil construit par Zeno Davatz (totalsup, 27/04/2023). Location : Windsurfing Silvaplana, Stradun Chantunel 4."},{"i":56,"p":"CH","rg":"Neuchâtel","v":"La Tène","n":"Schiffanlegestelle La Tène","la":47.0048,"lo":7.02308,"ap":0,"t":"ponton","c":"ponton","e":"Lac de Neuchâtel","a":"toléré","ac":"libre","st":"Débarcadère de bateaux","ph":"https://www.instagram.com/reel/DBx_jOzP2u4/","so":"https://project7iii.com/foildata/map/schiffanlegestelle-la-tene-9cd6d2","rm":"Tous les départs possibles, nombreuses vagues des bateaux. Débarcadère de ligne : Sroka rappelle que les débarcadères en service régulier sont à éviter."},{"i":57,"p":"CH","rg":"Neuchâtel","v":"Saint-Blaise","n":"Rue du Port","la":47.00976,"lo":6.98741,"ap":0,"t":"port","c":"port","e":"Lac de Neuchâtel","li":"https://project7iii.com/foildata/map/rue-du-port-saint-blaise","so":"https://project7iii.com/foildata/map/rue-du-port-saint-blaise","rm":"Aucune description, seulement un lien webcam (lacdeneuchatel.roundshot.com). Sroka : vérifier la profondeur, rives peu profondes. Confiance moyenne."},{"i":58,"p":"CH","rg":"Neuchâtel / Berne","v":"Thielle / Gampelen (Zihlkanal)","n":"Zihlkanal Restaurant Rothaus","la":47.01084,"lo":7.03127,"ap":0,"t":"canal","c":"lac","e":"Canal de la Thielle (Zihlkanal)","a":"toléré","ac":"libre","st":"Pas de ponton fixe (ponton apporté par un rider)","ph":"https://www.instagram.com/reel/DBx_jOzP2u4/","so":"https://project7iii.com/foildata/map/zihlkanal-restaurant-rothaus","rm":"Ponton amené par « Santosh » ; tous départs possibles, vagues de bateaux. Même vidéo que La Tène."},{"i":59,"p":"CH","rg":"Soleure","v":"Soleure (d'après coordonnées)","n":"Bödeli/Dock","la":47.2072,"lo":7.54136,"ap":0,"t":"quai","c":"ponton","e":"Aar","a":"libre","ac":"libre","st":"Quai béton","li":"https://project7iii.com/foildata/map/boedeli-dock","so":"https://project7iii.com/foildata/map/boedeli-dock","rm":"« Super easy concrete dock near the train station ». Le nom évoque le Bödeli (Interlaken) mais les coordonnées tombent sur l'Aar à Soleure près de la gare : à vérifier."},{"i":60,"p":"CH","rg":"Vaud","v":"Vallée de Joux","n":"Lac de Joux","la":46.63,"lo":6.23,"ap":1,"t":"lac","c":"lac","e":"Lac de Joux","a":"libre","ac":"libre","st":"Pontons (non précisés)","s":"Gèle souvent en hiver","li":"https://srokacompany.com/en/blogs/actualites/nos-spots-preferes-en-suisse-pour-la-pratique-du-dockstart","so":"https://srokacompany.com/en/blogs/actualites/nos-spots-preferes-en-suisse-pour-la-pratique-du-dockstart","rm":"Cité par Sroka comme spot dockstart favori, sans ponton précis (Sroka ne publie volontairement pas de liste de pontons). Coordonnées = centre du lac."},{"i":61,"p":"CH","rg":"Zoug","v":"Oberägeri (d'après coordonnées)","n":"Steg am Ägerisee","la":47.13219,"lo":8.62246,"ap":0,"t":"ponton","c":"ponton","e":"Lac d'Ägeri","a":"libre","ac":"libre","st":"Ponton","ph":"https://www.instagram.com/reel/DOfss-2jzSs","so":"https://github.com/zdavatz/pumpspots/blob/main/pumpspots.csv","rm":"Posté par jzaech : « Steg sieht gut aus, alle Starts möglich ». Commune déduite des coordonnées."},{"i":62,"p":"CH","rg":"Zoug","v":"Zoug","n":"Zoug – Code Foils Flatwater Demo Day","la":47.166,"lo":8.515,"ap":1,"t":"lac","c":"lac","e":"Lac de Zoug","so":"https://standupmagazin.com/en/2025/06/code-foil-goes-to-switzerland/","rm":"Demo day pumpfoil/flatwater Code Foils à Zoug ; lieu exact non précisé. Confiance faible."},{"i":63,"p":"CH","rg":"Zurich","v":"Erlenbach","n":"Ruderclub Erlenbach","la":47.306,"lo":8.58785,"ap":0,"t":"club","c":"club","e":"Lac de Zurich","a":"via club/école","ac":"club","st":"Ponton bas ~15 cm","f":"Événements (Pumpfoil Event 24/06/2023, Build and Pump 27/06/2026)","li":"https://pump.zuerich","ph":"https://www.instagram.com/p/C7a26EXKT5v/","so":"https://project7iii.com/foildata/map/ruderclub-erlenbach-3a64a0","rm":"Point listé par zdavatz (fondateur de pump.zuerich / Indiana), aussi dans le CSV open source github.com/zdavatz/pumpspots. Shop « Gerry Gearloose » sur place, bon pour tester du matériel."},{"i":64,"p":"CH","rg":"Zurich","v":"Erlenbach (d'après coordonnées)","n":"Marienhalde","la":47.29428,"lo":8.59787,"ap":0,"t":"ponton","c":"ponton","e":"Lac de Zurich","a":"libre","ac":"libre","st":"Ponton haut ~60 cm (drop start), échelle, douche, WC","li":"https://pump.zuerich/spots/","ph":"https://www.instagram.com/reel/CtopO-TqYuJ/","so":"https://project7iii.com/foildata/map/marienhalde-b6f0f0","rm":"Point listé par zdavatz (fondateur de pump.zuerich / Indiana), aussi dans le CSV open source github.com/zdavatz/pumpspots."},{"i":65,"p":"CH","rg":"Zurich","v":"Fällanden","n":"Steg Fällanden","la":47.36111,"lo":8.65375,"ap":0,"t":"ponton","c":"ponton","e":"Lac de Greifensee","a":"libre","ac":"libre","st":"Ponton","ph":"https://maps.app.goo.gl/RWbpJ8o3opRZx7xK7?g_st=aw","so":"https://project7iii.com/foildata/map/steg-faellanden-a7a293","rm":"« Steg sieht gut aus » (aloulier) : tous départs possibles, quelques vagues de bateaux. Confiance moyenne (pas d'essai confirmé)."},{"i":66,"p":"CH","rg":"Zurich","v":"Küsnacht","n":"Hermitage Küsnacht","la":47.32241,"lo":8.57671,"ap":0,"t":"port","c":"port","e":"Lac de Zurich","a":"libre","ac":"libre","st":"Ponton ~50 cm","f":"Pêcheurs présents","li":"https://pump.zuerich/spots/","ph":"https://www.instagram.com/p/C0WtaAnK6Om/","so":"https://project7iii.com/foildata/map/hermitage-kuesnacht-aad19c","rm":"Point listé par zdavatz (fondateur de pump.zuerich / Indiana), aussi dans le CSV open source github.com/zdavatz/pumpspots. Les bateaux de croisière font une bonne vague ; port bien pour travailler les tricks."},{"i":67,"p":"CH","rg":"Zurich","v":"Meilen (d'après coordonnées)","n":"Foilclub Zürichsee","la":47.26658,"lo":8.64924,"ap":0,"t":"club","c":"club","e":"Lac de Zurich","a":"via club/école","ac":"club","st":"Ponton 20-40 cm à côté de la Badi","s":"Pratique quotidienne pour membres","li":"https://pump.zuerich/spots/","ph":"https://www.instagram.com/p/C79YoCzK0iv/","so":"https://project7iii.com/foildata/map/foilclub-zuerichsee-91db6b","rm":"Adhésion possible. Doublon sur project7iii (slug foilclub-zuerichsee, 47.266554/8.649207, posté par dlieber : « neben der Badi », ~40 cm). Commune déduite des coordonnées."},{"i":68,"p":"CH","rg":"Zurich","v":"Oberrieden","n":"INDIANA Showroom Oberrieden","la":47.27518,"lo":8.583,"ap":0,"t":"ponton","c":"ponton","e":"Lac de Zurich","a":"libre","ac":"libre","st":"Ponton ~30 cm","s":"Location de matériel le jeudi après-midi","li":"https://pump.zuerich/spots/","ph":"https://www.instagram.com/reel/C5puupIKwJ1/","so":"https://project7iii.com/foildata/map/indiana-showroom-oberrieden-0bf1eb","rm":"Point listé par zdavatz (fondateur de pump.zuerich / Indiana), aussi dans le CSV open source github.com/zdavatz/pumpspots. Shop Indiana (marque suisse) ; goofy et regular."},{"i":69,"p":"CH","rg":"Zurich","v":"Zollikon","n":"Altersheim Zollikon","la":47.33358,"lo":8.57091,"ap":0,"t":"ponton","c":"ponton","e":"Lac de Zurich","a":"libre","ac":"libre","st":"Ponton","li":"https://pump.zuerich/spots/","ph":"https://www.instagram.com/p/CysgnsoKXs1/","so":"https://github.com/zdavatz/pumpspots/blob/main/pumpspots.csv","rm":"Listé dans le CSV pumpspots mais noté « Not ideal for pumpfoiling » (mieux pour SUP foil/wingfoil). Confiance faible pour le pump."},{"i":70,"p":"CH","rg":"Zurich","v":"Zollikon (d'après coordonnées)","n":"Chickendock","la":47.32892,"lo":8.57276,"ap":0,"t":"ponton","c":"ponton","e":"Lac de Zurich","a":"libre","ac":"libre","st":"Ponton ~50 cm, 2 échelles","f":"Très fréquenté (plongeurs, nageurs, pumpfoilers)","li":"https://pump.zuerich/spots/","ph":"https://www.instagram.com/p/C_IvVANKor_/","so":"https://project7iii.com/foildata/map/chickendock-b1b71d","rm":"Point listé par zdavatz (fondateur de pump.zuerich / Indiana), aussi dans le CSV open source github.com/zdavatz/pumpspots. Règles ville de Zurich : zones à bouées jaunes interdites (baignades, réserves), pas de priorité sur les bateaux, nom/adresse sur la planche, gilet 50 N au-delà de 300 m ou en rivière."},{"i":71,"p":"CH","rg":"Zurich","v":"Zurich","n":"Letten Steg","la":47.38488,"lo":8.53636,"ap":0,"t":"ponton","c":"ponton","e":"Limmat","a":"restreint","ac":"restreint","st":"Ponton 25-35 cm selon niveau de la rivière","s":"Interdit autour des bains Oberer/Unterer Letten pendant leurs heures d'ouverture","li":"https://www.stadt-zuerich.ch/de/stadtleben/sport-und-erholung/gewaesser/pumpfoiling.html","ph":"https://www.instagram.com/p/COhzth3jq6O/","so":"https://project7iii.com/foildata/map/letten-steg","rm":"Point listé par zdavatz (fondateur de pump.zuerich / Indiana), aussi dans le CSV open source github.com/zdavatz/pumpspots. Bon pour side start regular, départ face au courant plus facile (totalsup 2023). Ville de Zurich : navigation interdite Münsterbrücke→Oberer Letten ; entre Oberer et Unterer Letten interdit aux heures d'ouverture des bains ; Wipkingerpark→Höngger Wehr autorisé mais déconseillé ; barrage de Höngg dangereux."},{"i":72,"p":"CH","rg":"Zurich","v":"Zurich (Riesbach)","n":"Hafen Riesbach","la":47.35667,"lo":8.54868,"ap":0,"t":"port","c":"port","e":"Lac de Zurich","a":"libre","ac":"libre","st":"Mur de port, max ~20 cm","li":"https://pump.zuerich/spots/","ph":"https://www.instagram.com/reel/Cz-r559qdVT/","so":"https://project7iii.com/foildata/map/hafen-riesbach-a7c179","rm":"Point listé par zdavatz (fondateur de pump.zuerich / Indiana), aussi dans le CSV open source github.com/zdavatz/pumpspots. Drop depuis le mur du port intéressant, goofy et regular. Garder les entrées de port libres. Règles ville de Zurich : zones à bouées jaunes interdites (baignades, réserves), pas de priorité sur les bateaux, nom/adresse sur la planche, gilet 50 N au-delà de 300 m ou en rivière."},{"i":73,"p":"CH","rg":"Zurich","v":"Zurich (Seefeld)","n":"Tinguely Dock","la":47.35254,"lo":8.55202,"ap":0,"t":"ponton","c":"ponton","e":"Lac de Zurich","a":"libre","ac":"libre","st":"Ponton ~50 cm selon niveau, pas d'échelle","li":"https://pump.zuerich/spots/","ph":"https://www.instagram.com/p/C8r9yXPqZGv/","so":"https://project7iii.com/foildata/map/tinguely-dock-zuerich-453d5d","rm":"Point listé par zdavatz (fondateur de pump.zuerich / Indiana), aussi dans le CSV open source github.com/zdavatz/pumpspots. Pas d'échelle pour sortir. Règles ville de Zurich : zones à bouées jaunes interdites (baignades, réserves), pas de priorité sur les bateaux, nom/adresse sur la planche, gilet 50 N au-delà de 300 m ou en rivière."},{"i":74,"p":"CH","rg":"Zurich","v":"Zurich (Tiefenbrunnen)","n":"KIBAG Tiefenbrunnen","la":47.34606,"lo":8.56373,"ap":0,"t":"quai","c":"ponton","e":"Lac de Zurich","a":"libre","ac":"libre","st":"Bord bas 15-20 cm (beach/side/frog start)","li":"https://pump.zuerich/spots/","ph":"https://www.instagram.com/p/Cl8W6Jbqdwp/","so":"https://project7iii.com/foildata/map/kibag-tiefenbrunnen-c57a90","rm":"Point listé par zdavatz (fondateur de pump.zuerich / Indiana), aussi dans le CSV open source github.com/zdavatz/pumpspots. Règles ville de Zurich : zones à bouées jaunes interdites (baignades, réserves), pas de priorité sur les bateaux, nom/adresse sur la planche, gilet 50 N au-delà de 300 m ou en rivière."},{"i":75,"p":"CH","rg":"Zurich","v":"Zurich (Tiefenbrunnen)","n":"Park Tiefenbrunnen","la":47.35241,"lo":8.55444,"ap":0,"t":"quai","c":"ponton","e":"Lac de Zurich","a":"restreint","ac":"restreint","st":"Bord ~20 cm","s":"Seulement en saison principale (hiver) après la fin de la baignade officielle ; entraînement pump.zuerich mer. 14h-16h (fin oct.-mi-avril)","li":"https://pump.zuerich","ph":"https://www.instagram.com/p/C5dTeoPKrrG/","so":"https://project7iii.com/foildata/map/park-tiefenbrunnen-8007b1","rm":"Point listé par zdavatz (fondateur de pump.zuerich / Indiana), aussi dans le CSV open source github.com/zdavatz/pumpspots. Berceau de « Pump Tsüri ». Selon Sroka (2026), plus de ponton officiel d'entraînement à Zurich depuis mai 2025 ; pump.zuerich milite pour des radeaux/rampe hors zones jaunes (projet 2027)."},{"i":76,"p":"CH","rg":"Zurich","v":"Zurich (Tiefenbrunnen)","n":"Schiffsteg Bahnhof Tiefenbrunnen","la":47.34985,"lo":8.56049,"ap":0,"t":"ponton","c":"ponton","e":"Lac de Zurich","a":"toléré","ac":"libre","st":"Débarcadère ~60 cm","li":"https://pump.zuerich/spots/","ph":"https://www.instagram.com/reel/C4vWxdJqFhO/","so":"https://project7iii.com/foildata/map/schiffsteg-bahnhof-tiefenbrunnen-754513","rm":"Point listé par zdavatz (fondateur de pump.zuerich / Indiana), aussi dans le CSV open source github.com/zdavatz/pumpspots. « Achtung Kursschiffe » ; la ville demande de laisser libres les débarcadères."},{"i":77,"p":"CH","rg":"Zurich","v":"Zurich (Wollishofen)","n":"Cassiopeiasteg Ecke","la":47.34094,"lo":8.53885,"ap":0,"t":"ponton","c":"ponton","e":"Lac de Zurich","a":"libre","ac":"libre","st":"Ponton ~50 cm, sortie facile","li":"https://pump.zuerich/spots/","ph":"https://www.instagram.com/reel/CPIpCFojcuz/","so":"https://project7iii.com/foildata/map/cassiopeiasteg-ecke-ffd8ab","rm":"Point listé par zdavatz (fondateur de pump.zuerich / Indiana), aussi dans le CSV open source github.com/zdavatz/pumpspots. Goofy et regular. Règles ville de Zurich : zones à bouées jaunes interdites (baignades, réserves), pas de priorité sur les bateaux, nom/adresse sur la planche, gilet 50 N au-delà de 300 m ou en rivière."},{"i":78,"p":"CH","rg":"Zurich","v":"Zurich (Wollishofen)","n":"Floss Strandbad Wollishofen","la":47.34145,"lo":8.53833,"ap":0,"t":"ponton","c":"ponton","e":"Lac de Zurich","a":"restreint","ac":"restreint","st":"Radeau (Floss) de la plage, ~40 cm","s":"Public seulement hors saison de baignade (saison pump = hiver) ; entraînement ASVZ 7h-9h pendant la saison de bains","li":"https://pump.zuerich/spots/","ph":"https://www.instagram.com/p/Cy-yeAZtlrp/","so":"https://project7iii.com/foildata/map/floss-strandbad-wollishofen-05a13b","rm":"Point listé par zdavatz (fondateur de pump.zuerich / Indiana), aussi dans le CSV open source github.com/zdavatz/pumpspots. Wollishofen cité par pump.zuerich comme lieu envisagé pour une rampe/ponton d'entraînement hors zones interdites. Règles ville de Zurich : zones à bouées jaunes interdites (baignades, réserves), pas de priorité sur les bateaux, nom/adresse sur la planche, gilet 50 N au-delà de 300 m ou en rivière."},{"i":79,"p":"DE","rg":"Bade-Wurtemberg","v":"Constance","n":"Wassersportzentrum Universität Konstanz","la":47.6925,"lo":9.1905,"ap":1,"t":"club","c":"club","e":"Lac de Constance (Überlinger See)","a":"via club/école","ac":"club","st":"Ponton du centre nautique","s":"Cours jeu./ven. 19h-20h30, mai-sept.","li":"https://sportbuchung.hsp.uni-konstanz.de/angebote/aktueller_zeitraum/_Surfen__Pump_Foiling.html","so":"https://sportbuchung.hsp.uni-konstanz.de/angebote/aktueller_zeitraum/_Surfen__Pump_Foiling.html","rm":"Cours de pump foiling du sport universitaire, départ depuis le ponton. Coordonnées approchées."},{"i":80,"p":"DE","rg":"Bavière","v":"Oberschleißheim","n":"Olympia-Regattastrecke Oberschleißheim","la":48.2385,"lo":11.518,"ap":1,"t":"club","c":"club","e":"Bassin d'aviron olympique","a":"via club/école","ac":"club","st":"Ponts de départ de la régate","s":"Pumpfoil jeu.-sam. 15h30-20h30 (zones balisées) depuis le 12/10/2026 ; cours efoilbase jeu. 15h30-17h et 17h30-19h (13/08-31/10/2026)","li":"https://efoilbase.com/tryouts/pumpfoiling","so":"https://www.mrc1880.de/2026/10/teilweise-sperrungen-auf-der-regattastrecke-fuer-pump-und-efoil-training/","rm":"Adresse Dachauer Str. 35 ; accès pumpfoil par Kuppelfeldstraße. Cours efoilbase (avec Duotone) 70 €. Lieu de la SFT Pump Foil World Cup (Munich Water Days, 12-14 juin). Partage avec les rameurs."},{"i":81,"p":"DE","rg":"Bavière","v":"Seefeld (Pilsensee)","n":"SUP-Station Pilsensee (Bavarian Waters)","la":48.03,"lo":11.193,"ap":1,"t":"ponton","c":"ponton","e":"Pilsensee","a":"payant","ac":"club","st":"Dockingstation / ponton de départ (pump table)","s":"À partir de l'été 2026 ; boutique 10h-19h","li":"https://www.bavarianwaters.com/sup-touren-und-kurse/wingfoil-und-pumpfoil-m%C3%BCnchen-bayern","so":"https://www.bavarianwaters.com/sup-touren-und-kurse/wingfoil-und-pumpfoil-m%C3%BCnchen-bayern","rm":"Cours débutant 89 €/2 h, location ponton de départ 10 €/2 h, location matériel 39 €/h. Coordonnées approchées (lac)."},{"i":82,"p":"DE","rg":"Bavière","v":"Wörthsee (Bachern)","n":"Seefelder Straße, Bachern","la":48.05238,"lo":11.16148,"ap":0,"t":"ponton","c":"ponton","e":"Wörthsee","a":"libre","ac":"libre","st":"3 pontons espacés d'env. 200 m, accès par escalier","f":"Fréquenté par les baigneurs en été","ph":"https://project7iii.com/foildata/map/seefelder-strasse-bachern","so":"https://project7iii.com/foildata/map/seefelder-strasse-bachern","rm":"Posté par Moritz ; parking disponible."},{"i":83,"p":"DE","rg":"Berlin","v":"Berlin (Friedrichshagen)","n":"Müggelsee – Seebad Friedrichshagen","la":52.444,"lo":13.627,"ap":1,"t":"ponton","c":"ponton","e":"Müggelsee","a":"libre","ac":"libre","st":"Ponton près d'un bateau de pêche","so":"https://standupmagazin.com/en/2022/07/1-german-pumpfoil-masters/","rm":"Lieu du 1er German Pumpfoil Masters (14/08/2022) ; sessions dans la zone de bains à horaires fixés."},{"i":84,"p":"DE","rg":"Berlin","v":"Berlin (Friedrichshagen)","n":"Nalani SUPsurfing – Müggelseedamm 216","la":52.4465,"lo":13.621,"ap":1,"t":"ponton","c":"ponton","e":"Müggelsee / Spree","a":"payant","ac":"club","st":"Ponton de la station","s":"Location 10h-20h","li":"https://nalani-supsurfing.com/pumpfoil/","so":"https://nalani-supsurfing.com/pumpfoil/","rm":"Cours 100 €/2 h (max 3), carte 10 h 220 €, location jour 95 €. Utilisation des vagues de bateaux sur la Spree/Müggelsee."},{"i":85,"p":"DE","rg":"Hambourg","v":"Hambourg","n":"Pump dock Café AlsterCliff","la":53.572,"lo":9.997,"ap":1,"t":"ponton","c":"ponton","e":"Außenalster","a":"libre","ac":"libre","st":"Ponton","f":"Scène locale active","li":"https://www.duotonesports.com/it/wing-foiling/storie/hamburg-city-pump","so":"https://www.duotonesports.com/it/wing-foiling/storie/hamburg-city-pump","rm":"« The famous pump dock near Café AlsterCliff » (Duotone). Shop Stoked Zone (Zimmerstr. 12) organise cours et tests à Hambourg. Coordonnées approchées."},{"i":86,"p":"DE","rg":"Schleswig-Holstein","v":"Plön","n":"Gut Wittmoldt","la":54.1735,"lo":10.471,"ap":1,"t":"lac","c":"lac","e":"Lac de Plön","a":"payant","ac":"club","f":"Pumpfoil Festival 2025 : >100 visiteurs, 20 compétiteurs","s":"Événement juillet","li":"https://www.surf-magazin.de/en/sup/scene-and-events/pumpfoil-festival-2025-yannik-holste-and-jette-koep-win-at-gut-wittmoldt-great-atmosphere-and-lots-of-testers/","so":"https://www.surf-magazin.de/en/sup/scene-and-events/pumpfoil-festival-2025-yannik-holste-and-jette-koep-win-at-gut-wittmoldt-great-atmosphere-and-lots-of-testers/","rm":"Site d'événement (1001grad Events), pas forcément accessible hors festival. Coordonnées approchées."},{"i":87,"p":"AT","rg":"Carinthie","v":"Krumpendorf","n":"Pump Foil Club Austria – radeau Wörthersee","la":46.6265,"lo":14.2205,"ap":1,"t":"club","c":"club","e":"Wörthersee","a":"payant","ac":"club","st":"Radeau solaire + départ du ponton","f":"Forte affluence (événement été 2025)","s":"Été","li":"https://www.1000thingsmagazine.com/de/a/2152146/pumpfoiling-woerthersee/","so":"https://www.1000thingsmagazine.com/de/a/2152146/pumpfoiling-woerthersee/","rm":"Pump Foil Club Austria (pumpfoil.at), contact Patrick Rauter ; cours 2 h 75 €, cours quotidiens avec Wörthersee-Rosental Tourismus. Plage exacte non précisée."},{"i":88,"p":"AT","rg":"Haute-Autriche","v":"Ebensee (Rindbach)","n":"Lakeventure Ebensee – SFT Pump Foil","la":47.8045,"lo":13.788,"ap":1,"t":"lac","c":"lac","e":"Traunsee","f":"Finale Surf Foil World Tour","s":"4-6 sept. 2026 (événement)","li":"https://www.tips.at/nachrichten/gmunden/sport/730805-surf-foil-world-tour-kehrt-zurueck-pump-foil-elite-hebt-am-traunsee-ab","so":"https://standupmagazin.com/en/2025/09/surf-foil-tour-traunsee-finals","rm":"Compétition pumpfoil (finale SFT) dans le secteur Rindbach ; Lakebase/Windbar sur place. Spot d'événement."},{"i":89,"p":"AT","rg":"Haute-Autriche","v":"Unterach am Attersee","n":"Unterach (Attersee sud)","la":47.804,"lo":13.49,"ap":1,"t":"lac","c":"lac","e":"Attersee","a":"libre","ac":"libre","s":"Eau calme","li":"https://www.oberoesterreich.at/magazin/stefan-spiessberger.html","so":"https://www.oberoesterreich.at/magazin/stefan-spiessberger.html","rm":"Cité par le rider Stefan Spiessberger comme bon endroit pour le foil-pumping par eau calme. Pas de ponton précisé, confiance moyenne."},{"i":90,"p":"IT","rg":"Lombardie","v":"Cremia","n":"Wing Foil Cremia – cours pump foil","la":46.087,"lo":9.272,"ap":1,"t":"club","c":"club","e":"Lac de Côme","a":"via club/école","ac":"club","s":"Sessions à horaires fixes (aucune programmée lors de la consultation)","li":"https://wingfoilcremia.it/corsi/pump-foil/","so":"https://wingfoilcremia.it/corsi/pump-foil/","rm":"École proposant des cours de pump foil ; ponton non précisé. Coordonnées approchées."},{"i":91,"p":"IT","rg":"Lombardie","v":"Dervio","n":"ASD D Lago Foiling","la":46.077,"lo":9.306,"ap":1,"t":"club","c":"club","e":"Lac de Côme","a":"via club/école","ac":"club","st":"Darse (Via alla Darsena)","li":"https://dlagocomofoiling.it/en/","so":"https://dlagocomofoiling.it/en/","rm":"Club eFoil/kitefoil/pumpfoil, Via alla Darsena. Dockstart non mentionné explicitement. Coordonnées approchées."},{"i":92,"p":"IT","rg":"Vénétie","v":"Peschiera del Garda","n":"Peschiera del Garda (Federico Caretto)","la":45.439,"lo":10.692,"ap":1,"t":"lac","c":"lac","e":"Lac de Garde","li":"https://www.larena.it/territorio-veronese/garda-baldo/peschiera-pump-foil-federuci-caretto-1.12603381","so":"https://www.larena.it/territorio-veronese/garda-baldo/peschiera-pump-foil-federuci-caretto-1.12603381","rm":"Article L'Arena sur un pump-foiler de Peschiera ; contenu non lisible (seul le titre). Lieu exact inconnu, confiance faible."},{"i":93,"p":"BE","rg":"Flandre (Anvers)","v":"Mechelen","n":"Foilingschool Mechelen – Eglegemvijver (WVD Mechelen)","la":51.04,"lo":4.45,"ap":1,"t":"lac","c":"lac","e":"Eglegemvijver (étang)","a":"via club/école","ac":"club","st":"Ponton/dock dédié pumpfoil","s":"Sur rendez-vous ; surtout l'été","li":"https://www.foilingschool-mechelen.be/pumpfoil/","so":"https://www.foilingschool-mechelen.be/pumpfoil/","rm":"Adresse : Eglegemweg 8, 2811 Mechelen. Cours privé 80 €/h, pack 3h 200 €, location 2h 55 €. Accès au dock : membres toujours, non-membres pass journée 10 €. Cours en NL/FR/EN. Coordonnées très approximatives (zone de Mechelen) — à recaler sur l'adresse."},{"i":94,"p":"DK","rg":"Hovedstaden/Sjælland","n":"Spot sans nom Pump foil DK n°10","la":55.6781,"lo":12.0698,"ap":0,"t":"ponton","c":"ponton","st":"ponton/quai (dock)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Point sans nom importé d'une Google My Maps dans la carte Pump foil DK, statut non testé, aucun détail — confiance très faible, à vérifier."},{"i":95,"p":"DK","rg":"Hovedstaden/Sjælland","n":"Spot sans nom Pump foil DK n°12","la":55.5354,"lo":12.23447,"ap":0,"t":"ponton","c":"ponton","st":"ponton/quai (dock)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Point sans nom importé d'une Google My Maps dans la carte Pump foil DK, statut non testé, aucun détail — confiance très faible, à vérifier."},{"i":96,"p":"DK","rg":"Hovedstaden/Sjælland","n":"Spot sans nom Pump foil DK n°13","la":55.78632,"lo":12.44344,"ap":0,"t":"ponton","c":"ponton","st":"ponton/quai (dock)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Point sans nom importé d'une Google My Maps dans la carte Pump foil DK, statut non testé, aucun détail — confiance très faible, à vérifier."},{"i":97,"p":"DK","rg":"Hovedstaden/Sjælland","n":"Spot sans nom Pump foil DK n°9","la":55.65101,"lo":12.07676,"ap":0,"t":"ponton","c":"ponton","st":"ponton/quai (dock)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Point sans nom importé d'une Google My Maps dans la carte Pump foil DK, statut non testé, aucun détail — confiance très faible, à vérifier."},{"i":98,"p":"DK","rg":"Hovedstaden/Sjælland","v":"Brøndby","n":"Brøndby Kajakklub","la":55.61118,"lo":12.44331,"ap":0,"t":"club","c":"club","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":99,"p":"DK","rg":"Hovedstaden/Sjælland","v":"Farum","n":"Vinterbadeklubben Furesø","la":55.80318,"lo":12.38731,"ap":0,"t":"club","c":"club","e":"Furesø (lac)","st":"ponton/quai (dock start)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker » (fonctionne) sur la carte communautaire Pump foil DK. Pas de description dans la source (club de baignade hivernale)."},{"i":100,"p":"DK","rg":"Hovedstaden/Sjælland","v":"Hvidovre","n":"Hvidovre Roklub","la":55.62581,"lo":12.49877,"ap":0,"t":"club","c":"club","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":101,"p":"DK","rg":"Hovedstaden/Sjælland","v":"København","n":"Amager Ro- og Kajakklub","la":55.65473,"lo":12.56319,"ap":0,"t":"club","c":"club","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":102,"p":"DK","rg":"Hovedstaden/Sjælland","v":"København","n":"Kalvebod Bølge","la":55.66786,"lo":12.57326,"ap":0,"t":"ponton","c":"ponton","e":"Port de Copenhague (Kalvebod Brygge)","st":"ponton/quai (dock start)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker » (fonctionne) sur la carte communautaire Pump foil DK. Quai pour drop start à 80–130 cm de hauteur ; départ près du Kajakhotellet ou de la zone de baignade. Haut lieu du pumpfoil urbain à Copenhague."},{"i":103,"p":"DK","rg":"Hovedstaden/Sjælland","v":"København","n":"Sundby Kajakklub","la":55.66419,"lo":12.63535,"ap":0,"t":"club","c":"club","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":104,"p":"DK","rg":"Hovedstaden/Sjælland","v":"Køge","n":"Køge Havn","la":55.47039,"lo":12.19782,"ap":0,"t":"port","c":"port","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":105,"p":"DK","rg":"Hovedstaden/Sjælland","v":"Køge","n":"Køge Marina Havnebad","la":55.47275,"lo":12.1987,"ap":0,"t":"port","c":"port","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":106,"p":"DK","rg":"Hovedstaden/Sjælland","v":"Nivå","n":"Nivå Kajakklub","la":55.93874,"lo":12.52546,"ap":0,"t":"club","c":"club","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":107,"p":"DK","rg":"Hovedstaden/Sjælland","v":"Roskilde","n":"Lynghøjsøerne, Lyngager Sø (Roskilde)","la":55.62586,"lo":12.01266,"ap":0,"t":"lac","c":"lac","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible. Radeaux près de la plage et au milieu du lac."},{"i":108,"p":"DK","rg":"Midtjylland","n":"Spot sans nom Pump foil DK n°15","la":55.84958,"lo":8.27895,"ap":0,"t":"ponton","c":"ponton","st":"ponton/quai (dock)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Point sans nom importé d'une Google My Maps dans la carte Pump foil DK, statut non testé, aucun détail — confiance très faible, à vérifier."},{"i":109,"p":"DK","rg":"Midtjylland","n":"Spot sans nom Pump foil DK n°16","la":56.49545,"lo":8.58682,"ap":0,"t":"ponton","c":"ponton","st":"ponton/quai (dock)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Point sans nom importé d'une Google My Maps dans la carte Pump foil DK, statut non testé, aucun détail — confiance très faible, à vérifier."},{"i":110,"p":"DK","rg":"Midtjylland","n":"Spot sans nom Pump foil DK n°17","la":56.49455,"lo":8.59164,"ap":0,"t":"ponton","c":"ponton","st":"ponton/quai (dock)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Point sans nom importé d'une Google My Maps dans la carte Pump foil DK, statut non testé, aucun détail — confiance très faible, à vérifier."},{"i":111,"p":"DK","rg":"Midtjylland","v":"Aarhus","n":"Aarhus Roklub","la":56.16378,"lo":10.21908,"ap":0,"t":"club","c":"club","e":"Port d'Aarhus","st":"ponton/quai (dock start)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker » (fonctionne) sur la carte communautaire Pump foil DK. Pas de description dans la source."},{"i":112,"p":"DK","rg":"Midtjylland","v":"Aarhus","n":"Aarhus Sejlsportscenter","la":56.1689,"lo":10.225,"ap":0,"t":"club","c":"club","e":"Port d'Aarhus","st":"ponton (jump start uniquement)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker » (fonctionne) sur la carte communautaire Pump foil DK. Pas de description dans la source."},{"i":113,"p":"DK","rg":"Midtjylland","v":"Aarhus","n":"Aarhus Ø (Jette Tikjøbs Plads)","la":56.16793,"lo":10.22798,"ap":0,"t":"ponton","c":"ponton","st":"rochers","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker ikke » (ne fonctionne pas) sur Pump foil DK — testé et jugé inadapté. Longues algues immergées : foil dangereux, déconseillé."},{"i":114,"p":"DK","rg":"Midtjylland","v":"Aarhus","n":"Badehuset, Stationsgade","la":56.18148,"lo":10.23654,"ap":0,"t":"ponton","c":"ponton","st":"ponton","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker ikke » (ne fonctionne pas) sur Pump foil DK — testé et jugé inadapté. Pas adapté au dockstart lors du test de mai 2025 ; jump start peut-être."},{"i":115,"p":"DK","rg":"Midtjylland","v":"Aarhus","n":"Bellehage Strand","la":56.12138,"lo":10.22545,"ap":0,"t":"ponton","c":"ponton","st":"plage","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible. Départ plage."},{"i":116,"p":"DK","rg":"Midtjylland","v":"Aarhus","n":"Bellevue Strand","la":56.18969,"lo":10.24864,"ap":0,"t":"ponton","c":"ponton","e":"Baie d'Aarhus (mer)","st":"ponton/quai (dock start)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker » (fonctionne) sur la carte communautaire Pump foil DK. Partir de la section plastique au bout ; fond sableux mou ; mieux à marée basse."},{"i":117,"p":"DK","rg":"Midtjylland","v":"Aarhus","n":"Brabrand Sø (Rostadion)","la":56.14969,"lo":10.10846,"ap":0,"t":"lac","c":"lac","st":"ponton","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker ikke » (ne fonctionne pas) sur Pump foil DK — testé et jugé inadapté. Bon ponton flottant mais lac pollué (algues, E. coli) en 2025."},{"i":118,"p":"DK","rg":"Midtjylland","v":"Aarhus","n":"Det Grønne Fyr","la":56.16183,"lo":10.22899,"ap":0,"t":"ponton","c":"ponton","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":119,"p":"DK","rg":"Midtjylland","v":"Aarhus","n":"Egå Marina (Roklubben)","la":56.21108,"lo":10.29016,"ap":0,"t":"port","c":"port","e":"Baie d'Aarhus (mer)","st":"ponton/quai (dock start)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker » (fonctionne) sur la carte communautaire Pump foil DK. Bons pontons flottants du club d'aviron ; eau profonde ; risque de pollution au gasoil."},{"i":120,"p":"DK","rg":"Midtjylland","v":"Aarhus","n":"Fiskerikajen Aarhus","la":56.1657,"lo":10.22021,"ap":0,"t":"port","c":"port","e":"Port d'Aarhus","st":"ponton/quai (dock start)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker » (fonctionne) sur la carte communautaire Pump foil DK. Pas de description dans la source."},{"i":121,"p":"DK","rg":"Midtjylland","v":"Aarhus","n":"Kajak og KanoKlubben, Aarhus Træbådshavn","la":56.16749,"lo":10.22289,"ap":0,"t":"port","c":"port","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":122,"p":"DK","rg":"Midtjylland","v":"Aarhus","n":"Langs Risskov cykelsti","la":56.17091,"lo":10.22435,"ap":0,"t":"ponton","c":"ponton","st":"rochers","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible. Rochers jusqu'à un balisage permanent ; fond et profondeur peut-être adaptés."},{"i":123,"p":"DK","rg":"Midtjylland","v":"Aarhus","n":"Marselisborg Havn","la":56.13919,"lo":10.22015,"ap":0,"t":"port","c":"port","st":"rochers","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":124,"p":"DK","rg":"Midtjylland","v":"Aarhus","n":"Marselisborg Lystbådehavn (1)","la":56.13891,"lo":10.21447,"ap":0,"t":"port","c":"port","e":"Baie d'Aarhus (port)","st":"ponton/quai (dock start)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker » (fonctionne) sur la carte communautaire Pump foil DK. Dockstart possible mais difficile ; obstacles immergés ; un mât plus long aide."},{"i":125,"p":"DK","rg":"Midtjylland","v":"Aarhus","n":"Marselisborg Lystbådehavn (2)","la":56.13927,"lo":10.2188,"ap":0,"t":"port","c":"port","e":"Baie d'Aarhus (port)","st":"ponton/quai (dock start)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker » (fonctionne) sur la carte communautaire Pump foil DK. Comme le spot voisin : dockstart possible mais pas optimal ; mât long conseillé."},{"i":126,"p":"DK","rg":"Midtjylland","v":"Aarhus","n":"Sejlsportscenteret, Aarhus Ø","la":56.16952,"lo":10.22567,"ap":0,"t":"club","c":"club","e":"Port d'Aarhus","st":"rochers (rock start)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker » (fonctionne) sur la carte communautaire Pump foil DK. Pas de description dans la source."},{"i":127,"p":"DK","rg":"Midtjylland","v":"Aarhus","n":"Surf Agency","la":56.16392,"lo":10.21856,"ap":0,"t":"club","c":"club","e":"Port d'Aarhus","st":"ponton/quai (dock start)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker » (fonctionne) sur la carte communautaire Pump foil DK. Pas de description dans la source (magasin/école de surf au port d'Aarhus)."},{"i":128,"p":"DK","rg":"Midtjylland","v":"Ebeltoft","n":"Ebeltoft Havn","la":56.19248,"lo":10.66849,"ap":0,"t":"port","c":"port","e":"Ebeltoft Vig (mer)","st":"ponton/quai (dock start)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker » (fonctionne) sur la carte communautaire Pump foil DK. Pas de description dans la source."},{"i":129,"p":"DK","rg":"Midtjylland","v":"Ebeltoft","n":"Ebeltoft Ro- og Kajakklub","la":56.19329,"lo":10.6688,"ap":0,"t":"club","c":"club","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":130,"p":"DK","rg":"Midtjylland","v":"Frederiksværk","n":"Frederiksværk Ro og Kajakklub","la":55.96607,"lo":11.99802,"ap":0,"t":"club","c":"club","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":131,"p":"DK","rg":"Midtjylland","v":"Grenå","n":"Grenå Lagune Flydebro","la":56.40352,"lo":10.92077,"ap":0,"t":"ponton","c":"ponton","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":132,"p":"DK","rg":"Midtjylland","v":"Horsens","n":"Horsens Kajakklub","la":55.85889,"lo":9.87519,"ap":0,"t":"club","c":"club","e":"Horsens Fjord","st":"ponton/quai (dock start)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker » (fonctionne) sur la carte communautaire Pump foil DK. Ponton flottant bas sur le fjord ; conditions calmes ; se coordonner avec le club."},{"i":133,"p":"DK","rg":"Midtjylland","v":"Knudhule","n":"Knudhule Lystbådhavn 1","la":56.10464,"lo":9.78284,"ap":0,"t":"port","c":"port","e":"Knud Sø (lac)","st":"ponton/quai (dock start)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker » (fonctionne) sur la carte communautaire Pump foil DK. Ponton public du port de plaisance ; rebord qui gêne le placement des pieds ; abrité, fond sableux."},{"i":134,"p":"DK","rg":"Midtjylland","v":"Knudhule","n":"Knudhule Lystbådhavn 2","la":56.10474,"lo":9.78225,"ap":0,"t":"port","c":"port","e":"Knud Sø (lac)","st":"ponton/quai (dock start)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker » (fonctionne) sur la carte communautaire Pump foil DK. Même ponton du port ; rebord qui complique le décollage ; abrité, sableux."},{"i":135,"p":"DK","rg":"Midtjylland","v":"Knudhule","n":"Knudhule badebro","la":56.10298,"lo":9.78352,"ap":0,"t":"ponton","c":"ponton","e":"Knud Sø (lac)","st":"ponton/quai (dock start)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker » (fonctionne) sur la carte communautaire Pump foil DK. Ponton de baignade public bas, fond sableux ; retiré en hiver."},{"i":136,"p":"DK","rg":"Midtjylland","v":"Randers","n":"Randers Roklub","la":56.46218,"lo":10.05494,"ap":0,"t":"club","c":"club","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":137,"p":"DK","rg":"Midtjylland","v":"Ry","n":"Ravnsø","la":56.104,"lo":9.8243,"ap":0,"t":"lac","c":"lac","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible. Petite plage privée, parking très limité, plus de ponton de baignade depuis 2021."},{"i":138,"p":"DK","rg":"Midtjylland","v":"Ry","n":"Ry Roklub","la":56.09525,"lo":9.74942,"ap":0,"t":"club","c":"club","e":"Gudenå / lacs de Ry","st":"ponton/quai (dock start)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker » (fonctionne) sur la carte communautaire Pump foil DK. Long ponton bois bas ; repli abrité quand Knudhule est venté ; utilisé par les rameurs."},{"i":139,"p":"DK","rg":"Midtjylland","v":"Ry","n":"Sønder Ege ved Knud Sø","la":56.09837,"lo":9.7641,"ap":0,"t":"lac","c":"lac","e":"Knud Sø (lac)","st":"ponton (jump start uniquement)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker » (fonctionne) sur la carte communautaire Pump foil DK. Dockstart bloqué par des pieux ; jump start depuis le ponton de baignade ; fond sableux."},{"i":140,"p":"DK","rg":"Midtjylland","v":"Ry","n":"Sønder Ege ved Knud Sø 1","la":56.09917,"lo":9.76333,"ap":0,"t":"lac","c":"lac","e":"Knud Sø (lac)","st":"ponton/quai (dock start)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker » (fonctionne) sur la carte communautaire Pump foil DK. Pas de description dans la source."},{"i":141,"p":"DK","rg":"Midtjylland","v":"Ry","n":"Sønder Ege ved Knud Sø 2","la":56.09906,"lo":9.76091,"ap":0,"t":"lac","c":"lac","e":"Knud Sø (lac)","st":"ponton (jump start uniquement)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker » (fonctionne) sur la carte communautaire Pump foil DK. Pas de description dans la source."},{"i":142,"p":"DK","rg":"Midtjylland","v":"Ry","n":"Sønder Ege ved Knud Sø 2 (bis)","la":56.09869,"lo":9.75998,"ap":0,"t":"lac","c":"lac","e":"Knud Sø (lac)","st":"ponton (jump start uniquement)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker » (fonctionne) sur la carte communautaire Pump foil DK. Pas de description dans la source."},{"i":143,"p":"DK","rg":"Midtjylland","v":"Ry","n":"Vessø","la":56.07316,"lo":9.78386,"ap":0,"t":"lac","c":"lac","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":144,"p":"DK","rg":"Midtjylland","v":"Rønde","n":"Nappedam Kajakklub (ved Hullet)","la":56.27661,"lo":10.49613,"ap":0,"t":"club","c":"club","e":"Kalø Vig (mer)","st":"ponton/quai (dock start)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker » (fonctionne) sur la carte communautaire Pump foil DK. Ponton solide et bas près de la marina ; utilisé par les kayakistes ; abrité ; se renseigner auprès du club."},{"i":145,"p":"DK","rg":"Midtjylland","v":"Silkeborg","n":"Almind Sø (Østre søbad)","la":56.14803,"lo":9.55554,"ap":0,"t":"lac","c":"lac","e":"Almind Sø (lac)","st":"ponton/quai (dock start)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker » (fonctionne) sur la carte communautaire Pump foil DK. Grand ponton de baignade bas, eau très claire et profonde ; la commune demande de rester sur le ponton (pas depuis la rive) pour éviter une interdiction du foil."},{"i":146,"p":"DK","rg":"Midtjylland","v":"Silkeborg","n":"Juulsborg","la":56.12231,"lo":9.6834,"ap":0,"t":"ponton","c":"ponton","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":147,"p":"DK","rg":"Midtjylland","v":"Silkeborg","n":"Møgeløvej","la":56.12605,"lo":9.68535,"ap":0,"t":"ponton","c":"ponton","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":148,"p":"DK","rg":"Midtjylland","v":"Skanderborg","n":"Skanderborg Bybad","la":56.03552,"lo":9.93478,"ap":0,"t":"ponton","c":"ponton","e":"Skanderborg Sø (lac)","st":"ponton/quai (dock start)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker » (fonctionne) sur la carte communautaire Pump foil DK. Bon ponton flottant ; eau profonde ; idéal par temps calme ; très fréquenté l'été."},{"i":149,"p":"DK","rg":"Midtjylland","v":"Skanderborg","n":"Skanderborg Junior Sejlklub","la":56.02847,"lo":9.95616,"ap":0,"t":"club","c":"club","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":150,"p":"DK","rg":"Midtjylland","v":"Skanderborg","n":"Skanderborg Roklub","la":56.04262,"lo":9.93134,"ap":0,"t":"club","c":"club","st":"ponton","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker ikke » (ne fonctionne pas) sur Pump foil DK — testé et jugé inadapté. Bon ponton flottant mais eau peu profonde et herbiers denses : inadapté."},{"i":151,"p":"DK","rg":"Midtjylland","v":"Skanderborg","n":"Skanderborg Søbad","la":56.02063,"lo":9.91668,"ap":0,"t":"lac","c":"lac","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":152,"p":"DK","rg":"Midtjylland","v":"Skanderborg","n":"Stilling Søbad","la":56.06019,"lo":9.99179,"ap":0,"t":"lac","c":"lac","e":"Stilling-Solbjerg Sø (lac)","st":"ponton (jump start uniquement)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker » (fonctionne) sur la carte communautaire Pump foil DK. Pieux sur la plupart des sections ; adapté au jump ou deadstart ; vent d'ouest."},{"i":153,"p":"DK","rg":"Midtjylland","v":"Solbjerg","n":"Solbjerg Søsport","la":56.04431,"lo":10.07819,"ap":0,"t":"lac","c":"lac","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":154,"p":"DK","rg":"Midtjylland","v":"Tange","n":"Tange Roklub","la":56.35002,"lo":9.58297,"ap":0,"t":"club","c":"club","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":155,"p":"DK","rg":"Midtjylland","v":"Viborg","n":"Nørresøbadet, Viborg","la":56.46211,"lo":9.42477,"ap":0,"t":"lac","c":"lac","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":156,"p":"DK","rg":"Midtjylland","v":"Viborg","n":"Søndersø Søbad","la":56.43887,"lo":9.41785,"ap":0,"t":"lac","c":"lac","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":157,"p":"DK","rg":"Midtjylland","v":"Viborg","n":"Viborg Baadelaug","la":56.45486,"lo":9.41874,"ap":0,"t":"club","c":"club","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":158,"p":"DK","rg":"Midtjylland","v":"Viborg","n":"Viborg Roklub","la":56.46041,"lo":9.42371,"ap":0,"t":"club","c":"club","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":159,"p":"DK","rg":"Nordjylland","n":"Spot sans nom Pump foil DK n°20","la":57.05905,"lo":9.88703,"ap":0,"t":"ponton","c":"ponton","st":"ponton/quai (dock)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Point sans nom importé d'une Google My Maps dans la carte Pump foil DK, statut non testé, aucun détail — confiance très faible, à vérifier."},{"i":160,"p":"DK","rg":"Nordjylland","v":"Aalborg","n":"Aalborg Cablepark","la":57.04859,"lo":9.94036,"ap":0,"t":"club","c":"club","e":"Plan d'eau du cable park","st":"ponton/quai (dock start)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker » (fonctionne) sur la carte communautaire Pump foil DK. Plateforme flottante du téléski nautique ; éviter la zone du câble en fonctionnement."},{"i":161,"p":"DK","rg":"Nordjylland","v":"Aalborg","n":"Aalborg Roklub","la":57.05783,"lo":9.90634,"ap":0,"t":"club","c":"club","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":162,"p":"DK","rg":"Nordjylland","v":"Aalborg","n":"Aalborg Sejlklub","la":57.05569,"lo":9.87535,"ap":0,"t":"club","c":"club","e":"Limfjord","st":"ponton/quai (dock start)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker » (fonctionne) sur la carte communautaire Pump foil DK. Pontons flottants solides utilisés par les voiliers ; fond sable-vase ; attention au trafic."},{"i":163,"p":"DK","rg":"Nordjylland","v":"Aalborg","n":"Kridtgraven, Aalborg","la":57.04519,"lo":9.88061,"ap":0,"t":"lac","c":"lac","e":"Lac de carrière","st":"rochers (rock start)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker » (fonctionne) sur la carte communautaire Pump foil DK. Ancienne carrière de calcaire ; falaises permettant le rockstart ; eau claire et profonde."},{"i":164,"p":"DK","rg":"Nordjylland","v":"Hobro","n":"Hobro Roklub","la":56.64004,"lo":9.80327,"ap":0,"t":"club","c":"club","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":165,"p":"DK","rg":"Nordjylland","v":"Klitmøller (Thisted)","n":"Surf Pro Cold Hawaii – école de pumpfoil","la":57.04,"lo":8.49,"ap":1,"t":"club","c":"club","a":"via club/école","ac":"club","s":"Cours de 2 h (~1h30 sur l'eau) ; lieu ajusté selon la météo","li":"https://surfpro-coldhawaii.dk/en/pages/pumpfoil-skole","so":"https://surfpro-coldhawaii.dk/en/pages/pumpfoil-skole","rm":"École proposant des cours pumpfoil débutant/perfectionnement (bases Ørhagevej 150 Klitmøller et Hawblink 4D Vorupør). Le lieu exact des cours (port/ponton) n'est pas précisé ; « sites abrités ». Coordonnées approximatives de Klitmøller."},{"i":166,"p":"DK","rg":"Nordjylland","v":"Lemvig","n":"Lemvig Roklub","la":56.56318,"lo":8.29753,"ap":0,"t":"club","c":"club","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":167,"p":"DK","rg":"Nordjylland","v":"Skive","n":"Skive Roklub","la":56.57416,"lo":9.05338,"ap":0,"t":"club","c":"club","st":"ponton","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker ikke » (ne fonctionne pas) sur Pump foil DK — testé et jugé inadapté. Bon ponton mais plantes et eau trouble le jour du test."},{"i":168,"p":"DK","rg":"Nordjylland","v":"Thisted","n":"Thisted Ro- og Kajakklub","la":56.94987,"lo":8.66704,"ap":0,"t":"club","c":"club","e":"Limfjord","st":"ponton/quai (dock start)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker » (fonctionne) sur la carte communautaire Pump foil DK. Ponton flottant avec tapis antidérapants ; eau profonde ; abrité de la plupart des vents."},{"i":169,"p":"DK","rg":"Nordjylland","v":"Virksund","n":"Virksund Lystbådhavn","la":56.60848,"lo":9.29059,"ap":0,"t":"port","c":"port","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":170,"p":"DK","rg":"Sjælland","n":"Spot sans nom Pump foil DK n°1","la":54.77142,"lo":11.86141,"ap":0,"t":"ponton","c":"ponton","st":"ponton/quai (dock)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Point sans nom importé d'une Google My Maps dans la carte Pump foil DK, statut non testé, aucun détail — confiance très faible, à vérifier."},{"i":171,"p":"DK","rg":"Sjælland","n":"Spot sans nom Pump foil DK n°11","la":55.68005,"lo":11.94522,"ap":0,"t":"ponton","c":"ponton","st":"ponton/quai (dock)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Point sans nom importé d'une Google My Maps dans la carte Pump foil DK, statut non testé, aucun détail — confiance très faible, à vérifier."},{"i":172,"p":"DK","rg":"Sjælland","n":"Spot sans nom Pump foil DK n°2","la":54.66506,"lo":11.72776,"ap":0,"t":"ponton","c":"ponton","st":"ponton/quai (dock)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Point sans nom importé d'une Google My Maps dans la carte Pump foil DK, statut non testé, aucun détail — confiance très faible, à vérifier."},{"i":173,"p":"DK","rg":"Sjælland","n":"Spot sans nom Pump foil DK n°3","la":54.80345,"lo":11.63293,"ap":0,"t":"ponton","c":"ponton","st":"ponton/quai (dock)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Point sans nom importé d'une Google My Maps dans la carte Pump foil DK, statut non testé, aucun détail — confiance très faible, à vérifier."},{"i":174,"p":"DK","rg":"Sjælland","n":"Spot sans nom Pump foil DK n°4","la":54.89173,"lo":12.03798,"ap":0,"t":"ponton","c":"ponton","st":"ponton/quai (dock)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Point sans nom importé d'une Google My Maps dans la carte Pump foil DK, statut non testé, aucun détail — confiance très faible, à vérifier."},{"i":175,"p":"DK","rg":"Sjælland","n":"Spot sans nom Pump foil DK n°5","la":55.00327,"lo":11.92027,"ap":0,"t":"ponton","c":"ponton","st":"ponton/quai (dock)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Point sans nom importé d'une Google My Maps dans la carte Pump foil DK, statut non testé, aucun détail — confiance très faible, à vérifier."},{"i":176,"p":"DK","rg":"Sjælland","n":"Spot sans nom Pump foil DK n°6","la":54.98165,"lo":12.28279,"ap":0,"t":"ponton","c":"ponton","st":"ponton/quai (dock)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Point sans nom importé d'une Google My Maps dans la carte Pump foil DK, statut non testé, aucun détail — confiance très faible, à vérifier."},{"i":177,"p":"DK","rg":"Sjælland","v":"Holbæk","n":"Holbæk Marina (vinterbadeklub)","la":55.72438,"lo":11.7629,"ap":0,"t":"port","c":"port","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible. Ancien ponton flottant retiré l'hiver ; nouveau ponton ~80 m plus loin ; beaucoup d'algues. Info d'un local qui n'a pas testé."},{"i":178,"p":"DK","rg":"Sjælland","v":"Holbæk","n":"Holbæk Vinterbadere","la":55.71975,"lo":11.69661,"ap":0,"t":"ponton","c":"ponton","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":179,"p":"DK","rg":"Sjælland","v":"Kalundborg","n":"Kalundborg Roklub","la":55.67679,"lo":11.07316,"ap":0,"t":"club","c":"club","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":180,"p":"DK","rg":"Sjælland","v":"Korsør","n":"Halskov Vandsportscenter","la":55.34711,"lo":11.10979,"ap":0,"t":"club","c":"club","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":181,"p":"DK","rg":"Sjælland","v":"Korsør","n":"Korsør Ro og Kajakklub","la":55.3338,"lo":11.14739,"ap":0,"t":"club","c":"club","e":"Storebælt / port de Korsør","st":"ponton (jump start uniquement)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker » (fonctionne) sur la carte communautaire Pump foil DK. Ponton très bas ; dockstart difficile ; jump start possible mais exigeant."},{"i":182,"p":"DK","rg":"Sjælland","v":"Nykøbing Falster","n":"Guldborgsund Kajakklub","la":54.75972,"lo":11.85795,"ap":0,"t":"club","c":"club","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":183,"p":"DK","rg":"Sjælland","v":"Odsherred","n":"FK Odsherred Kajak","la":55.77869,"lo":11.61297,"ap":0,"t":"ponton","c":"ponton","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":184,"p":"DK","rg":"Syddanmark","n":"Spot sans nom Pump foil DK n°14","la":55.48159,"lo":8.41155,"ap":0,"t":"ponton","c":"ponton","st":"ponton/quai (dock)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Point sans nom importé d'une Google My Maps dans la carte Pump foil DK, statut non testé, aucun détail — confiance très faible, à vérifier."},{"i":185,"p":"DK","rg":"Syddanmark","n":"Spot sans nom Pump foil DK n°18","la":55.04134,"lo":9.4329,"ap":0,"t":"ponton","c":"ponton","st":"ponton/quai (dock)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Point sans nom importé d'une Google My Maps dans la carte Pump foil DK, statut non testé, aucun détail — confiance très faible, à vérifier."},{"i":186,"p":"DK","rg":"Syddanmark","n":"Spot sans nom Pump foil DK n°19","la":55.27095,"lo":9.88428,"ap":0,"t":"ponton","c":"ponton","st":"ponton/quai (dock)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Point sans nom importé d'une Google My Maps dans la carte Pump foil DK, statut non testé, aucun détail — confiance très faible, à vérifier."},{"i":187,"p":"DK","rg":"Syddanmark","v":"Fredericia","n":"Fredericia Roklub","la":55.56974,"lo":9.77107,"ap":0,"t":"club","c":"club","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":188,"p":"DK","rg":"Syddanmark","v":"Kolding","n":"Kolding Roklub","la":55.50022,"lo":9.5143,"ap":0,"t":"club","c":"club","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":189,"p":"DK","rg":"Syddanmark","v":"Middelfart","n":"Middelfart Kajakklub","la":55.49259,"lo":9.72898,"ap":0,"t":"club","c":"club","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":190,"p":"DK","rg":"Syddanmark","v":"Vejle","n":"Vejle Kajakklub","la":55.70813,"lo":9.5564,"ap":0,"t":"club","c":"club","e":"Vejle Fjord","st":"ponton/quai (dock start)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Virker » (fonctionne) sur la carte communautaire Pump foil DK. Ponton flottant bas dans le port ; fjord à marée ; idéal vent faible à modéré."},{"i":191,"p":"DK","rg":"Syddanmark (Fyn)","n":"Spot sans nom Pump foil DK n°7","la":54.93242,"lo":10.83117,"ap":0,"t":"ponton","c":"ponton","st":"ponton/quai (dock)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Point sans nom importé d'une Google My Maps dans la carte Pump foil DK, statut non testé, aucun détail — confiance très faible, à vérifier."},{"i":192,"p":"DK","rg":"Syddanmark (Fyn)","n":"Spot sans nom Pump foil DK n°8","la":54.89403,"lo":10.40849,"ap":0,"t":"ponton","c":"ponton","st":"ponton/quai (dock)","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Point sans nom importé d'une Google My Maps dans la carte Pump foil DK, statut non testé, aucun détail — confiance très faible, à vérifier."},{"i":193,"p":"DK","rg":"Syddanmark (Fyn)","v":"Hindsholm","n":"Korshavn","la":55.60461,"lo":10.60919,"ap":0,"t":"port","c":"port","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":194,"p":"DK","rg":"Syddanmark (Fyn)","v":"Kerteminde","n":"Kerteminde Havn","la":55.45336,"lo":10.66551,"ap":0,"t":"port","c":"port","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":195,"p":"DK","rg":"Syddanmark (Fyn)","v":"Kerteminde","n":"Kerteminde Havn (2)","la":55.45321,"lo":10.66552,"ap":0,"t":"port","c":"port","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":196,"p":"DK","rg":"Syddanmark (Fyn)","v":"Kerteminde","n":"Kerteminde Roklub","la":55.44562,"lo":10.65641,"ap":0,"t":"club","c":"club","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":197,"p":"DK","rg":"Syddanmark (Fyn)","v":"Munkebo","n":"Munkebo Havn","la":55.45548,"lo":10.55872,"ap":0,"t":"port","c":"port","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":198,"p":"DK","rg":"Syddanmark (Fyn)","v":"Munkebo","n":"Munkebo Sejl og Roklub","la":55.45353,"lo":10.55453,"ap":0,"t":"club","c":"club","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":199,"p":"DK","rg":"Syddanmark (Fyn)","v":"Nyborg","n":"Nyborg Roklub","la":55.30607,"lo":10.78711,"ap":0,"t":"club","c":"club","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":200,"p":"DK","rg":"Syddanmark (Fyn)","v":"Odense","n":"Klintebjerg Havn","la":55.47803,"lo":10.45118,"ap":0,"t":"port","c":"port","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":201,"p":"DK","rg":"Syddanmark (Fyn)","v":"Odense","n":"Odense Kajakklub","la":55.44107,"lo":10.42207,"ap":0,"t":"club","c":"club","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":202,"p":"DK","rg":"Syddanmark (Fyn)","v":"Odense","n":"Odense Kajakklub (2)","la":55.44084,"lo":10.42211,"ap":0,"t":"club","c":"club","st":"ponton/quai","li":"https://meyertechnologies.github.io/pumpfoilmap/","so":"https://github.com/MeyerTechnologies/pumpfoilmap/blob/main/data/spots.csv","rm":"Statut « Ikke testet » (non testé) : spot candidat sur la carte Pump foil DK, conditions inconnues — confiance faible."},{"i":203,"p":"GR","rg":"Dodécanèse","v":"Kos","n":"Blue Lagoon Dock Kos","la":36.90847,"lo":27.26453,"ap":0,"t":"ponton","c":"ponton","e":"Mer Égée","st":"Ponton, hauteur à l'eau 20-30 cm ; tous types de départ possibles","li":"https://project7iii.com/foildata/map/blue-lagoon-dock-kos-becb28","ph":"https://project7iii.com/foildata/map/blue-lagoon-dock-kos-becb28","so":"https://project7iii.com/foildata/map/blue-lagoon-dock-kos-becb28","rm":"Spot pumpfoil ajouté par « lkoeppel » (données issues d'un pumpspots.csv GitHub). La méta-description indique à tort Suisse ; coordonnées cohérentes avec Kos. Pas d'info d'accès."},{"i":204,"p":"NL","rg":"Flevoland","v":"Almere","n":"GlideLab Almere","la":52.37,"lo":5.22,"ap":1,"t":"club","c":"club","a":"via club/école","ac":"club","li":"https://glidelab.nl/","so":"https://glidelab.nl/","rm":"École de foil (dont pumpfoil/dockstart) ; « tous les cours à Almere et environs ». Lieu exact non communiqué (adresse société Rolbrugweg 6c, 1332AS Almere). Coordonnées = ville. Confiance moyenne sur le lien pumpfoil, faible sur le lieu."},{"i":205,"p":"NL","rg":"Hollande-Septentrionale","v":"Westerland (Hollands Kroon)","n":"Leerfoilen – Lutjestrand Amstelmeer","la":52.9,"lo":4.93,"ap":1,"t":"lac","c":"lac","e":"Amstelmeer (probable)","a":"via club/école","ac":"club","li":"https://www.leerfoilen.nl/dockstart-les/","so":"https://www.leerfoilen.nl/dockstart-les/","rm":"Cours privés dockstart/pumpfoil (1h30, matériel inclus : 100 € 1 pers., 69 €/pers. à 2, 56 €/pers. à 3). Adresse Lutjeweg 2a, 1778 LB Westerland. Plan d'eau supposé Amstelmeer d'après les URL du site. Coordonnées approximatives."},{"i":206,"p":"GB","rg":"Angleterre (Merseyside/Wirral)","v":"West Kirby","n":"West Kirby Marine Lake (Northern Kites / Wirral Watersports Centre)","la":53.3725,"lo":-3.1843,"ap":1,"t":"lac","c":"lac","e":"West Kirby Marine Lake (lac marin)","a":"via club/école","ac":"club","s":"Reprise en avril ; 7j/7 selon météo, marée et vent (< 10 nœuds)","li":"https://www.northernkites.co.uk/pages/pumpfoil-lessons","so":"https://www.northernkites.co.uk/pages/pumpfoil-lessons","rm":"Cours Intro / Improve / Dock Start (2 h, 2 pers. max, 99 £/pers.). Adresse : South Parade, West Kirby, CH48 0QG. Aussi vendu via Wonderdays. Vestiaires, douches. Coordonnées approximatives du lac."},{"i":207,"p":"SE","rg":"Gotland","v":"Gnisvärd","n":"Gotlands Kiteskola – Gnisvärds hamn","la":57.5,"lo":18.11,"ap":1,"t":"port","c":"port","e":"Mer Baltique","a":"via club/école","ac":"club","st":"Port (quai/ponton)","s":"Jours sans vent, sur demande","li":"https://gotlandskiteskola.se/produkt/pumpfoil/","so":"https://gotlandskiteskola.se/produkt/pumpfoil/","rm":"Cours pumpfoil avec matériel : 895 kr (1 pers.) à 3 000 kr (4 pers.). Coordonnées approximatives du port de Gnisvärd."}];</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
+<script>
+// Accès réservé : la page ne s'affiche qu'aux administrateurs connectés (même compte que l'admin du site).
+(function(){
+  const $=id=>document.getElementById(id);
+  const say=(t,err)=>{$('g-msg').textContent=t;$('g-msg').className='g-msg'+(err?' err':'')};
+  let user=null,started=false;
+  function open(){if(started)return;started=true;$('gate').hidden=true;$('page').hidden=false;$('badge').hidden=false;window.ALR_SPOTS_START()}
+  async function check(){
+    try{user=window.claude&&await window.claude.use('user')}catch(e){}
+    if(!user){say('Connexion indisponible pour le moment.',true);return}
+    if(await user.canEdit())open();else $('g-fields').hidden=false;
+  }
+  $('g-form').addEventListener('submit',async e=>{
+    e.preventDefault();if(!user)return;say('Connexion…');
+    try{await user.login($('g-email').value.trim(),$('g-pass').value);$('g-pass').value='';
+      if(await user.canEdit()){say('');open()}else say('Ce compte n\u2019a pas accès à cette page.',true);
+    }catch(err){say('E-mail ou mot de passe incorrect.',true)}
+  });
+  $('logout').addEventListener('click',async()=>{try{await user.logout()}catch(e){}location.href='/'});
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',check);else check();
+})();
+window.ALR_SPOTS_START=function(){
+  const $=id=>document.getElementById(id);
+  const SPOTS=window.SPOTS;
+  const ALR_ID=6;
+
+  // ---------- Langue ----------
+  let lang='fr';
+  try{const s=localStorage.getItem('alr-lang');if(s==='en')lang='en'}catch(e){}
+  const T={
+    fr:{},
+    en:{navAsso:'The club',navAgenda:'Events',navDebuter:'Get started',navSpots:'Spots',navLacs:'Lakes',navAdd:'Add a spot',navJoin:'Join',
+      heroLabel:'Where to pump this weekend?',heroTitle:'Pumpfoil Spot Directory',
+      statement:'Docks, quays and lakes to pump from, <em>from Lac de la Terrasse to Copenhagen.</em>',
+      sub:'Spots found by the community and the clubs. Find the closest one, check access, and go ride.',
+      stSpots:'spots listed',stPays:'countries',stLibre:'with free access',stFr:'in France',
+      mapTitle:'The spot map',mapSub:'Type a town, a lake or a spot name, or let the map find you.',
+      near:'Near me',lgLibre:'Free access',lgAutre:'Club, school or to be checked',allEurope:'All of Europe',
+      phTitle:'Our home spot',ph1:'Lac de la Terrasse · Isère',ph2:'Dockstart at the dock',ph3:'From above',
+      phText:'The club dock at Lac de la Terrasse, facing the Dent de Crolles. Open sessions, first rides and Pumpfoil Apéros all season.',phBtn:'Come ride with us',
+      tipsTitle:'Before you go',t1l:'Access',t1h:'Check who runs the dock',t1p:'Many spots belong to a club or a school. Send a message before you come and you will be welcome.',
+      t2l:'Safety',t2h:'Never alone on the water',t2p:'Ride in pairs, with a vest or a wetsuit suited to the water temperature. Foils cut: keep your distance.',
+      t3l:'Sharing',t3h:'Respect swimmers',t3p:'Avoid swimming areas and busy hours. Mornings and evenings bring flatter water and quieter spots.',
+      addTitle:'Missing a spot?',addText:'Send us its name, GPS position and a photo of the dock. We check it and add it to the map.',addMail:'By email',copy:'Copy',copied:'Copied',addWa:'WhatsApp group',
+      legal1:'© 2026 Alpine Lake Riders · Non-profit association · La Terrasse, Isère',legal2:'Spots listed in October 2026 from public sources. Approximate positions are flagged.',
+      maquette:'Private page · admins only',vAuto:'Auto',vPlan:'Map',vSat:'Satellite'}
+  };
+  const FR={copied:'Copié'};
+  const tr=(fr,en)=>lang==='en'?en:fr;
+  const frText={};
+  document.querySelectorAll('[data-t]').forEach(el=>{frText[el.dataset.t]=el.dataset.html!=null?el.innerHTML:el.textContent});
+  function applyLang(){
+    document.documentElement.lang=lang;
+    document.title=tr('Annuaire des spots de pumpfoil','Pumpfoil Spot Directory')+' · Alpine Lake Riders';
+    document.querySelectorAll('[data-t]').forEach(el=>{
+      const k=el.dataset.t,v=lang==='en'?(T.en[k]||frText[k]):frText[k];
+      if(el.dataset.html!=null)el.innerHTML=v;else el.textContent=v;
+    });
+    document.querySelectorAll('.lang-sw button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.lang===lang));
+    $('q').placeholder=tr('Annecy, Lac de Zurich, Lyon…','Annecy, Lake Zurich, Lyon…');
+    $('q').setAttribute('aria-label',tr('Rechercher un lieu ou un spot','Search a place or a spot'));
+    syncV();buildChips();render();
+  }
+  document.querySelectorAll('.lang-sw button').forEach(b=>b.addEventListener('click',()=>{lang=b.dataset.lang;try{localStorage.setItem('alr-lang',lang)}catch(e){}applyLang()}));
+
+  const PAYS={FR:['France','France'],CH:['Suisse','Switzerland'],DE:['Allemagne','Germany'],AT:['Autriche','Austria'],IT:['Italie','Italy'],DK:['Danemark','Denmark'],NL:['Pays-Bas','Netherlands'],BE:['Belgique','Belgium'],GR:['Grèce','Greece'],GB:['Royaume-Uni','United Kingdom'],SE:['Suède','Sweden']};
+  const pays=c=>PAYS[c]?tr(PAYS[c][0],PAYS[c][1]):c;
+  const CATS={ponton:['Pontons et quais','Docks and quays','Ponton','Dock'],club:['Clubs et écoles','Clubs and schools','Club','Club'],lac:['Lacs et plages','Lakes and beaches','Lac','Lake'],port:['Ports','Harbours','Port','Harbour']};
+  const ACC={libre:['Accès libre','Free access'],club:['Via club ou école','Through a club'],event:['Événements','Events'],restreint:['Accès restreint','Restricted']};
+
+  // ---------- Vidéo ----------
+  const v=$('v'),vb=$('vb');
+  v.src=matchMedia('(max-width: 900px)').matches?'media/hero-hd-mobile.mp4':'media/hero-hd.mp4';
+  if(!matchMedia('(prefers-reduced-motion: reduce)').matches){const p=v.play();if(p&&p.catch)p.catch(()=>{})}
+  function syncV(){vb.textContent=v.paused?tr('Lecture','Play'):'Pause'}
+  vb.addEventListener('click',()=>{v.paused?v.play().catch(()=>{}):v.pause()});
+  v.addEventListener('play',syncV);v.addEventListener('pause',syncV);
+
+  // ---------- Chiffres ----------
+  $('st-spots').textContent=SPOTS.length;
+  $('st-pays').textContent=new Set(SPOTS.map(s=>s.p)).size;
+  $('st-libre').textContent=SPOTS.filter(s=>s.ac==='libre').length;
+  $('st-fr').textContent=SPOTS.filter(s=>s.p==='FR').length;
+
+  // ---------- Lieux pour la recherche ----------
+  // Grandes villes (pour « autour de Lyon »), complétées par les villes, régions, lacs et pays des spots.
+  const VILLES=[["Paris","FR",48.857,2.352],["Lyon","FR",45.764,4.836],["Marseille","FR",43.296,5.37],["Toulouse","FR",43.605,1.444],["Nice","FR",43.71,7.262],["Nantes","FR",47.218,-1.554],["Strasbourg","FR",48.573,7.752],["Montpellier","FR",43.611,3.877],["Bordeaux","FR",44.838,-0.579],["Lille","FR",50.629,3.057],["Rennes","FR",48.117,-1.678],["Grenoble","FR",45.188,5.724],["Chambéry","FR",45.564,5.918],["Annecy","FR",45.899,6.129],["Genève","CH",46.204,6.143],["Lausanne","CH",46.52,6.633],["Zurich","CH",47.377,8.541],["Berne","CH",46.948,7.447],["Bâle","CH",47.56,7.588],["Lucerne","CH",47.05,8.309],["Lugano","CH",46.004,8.951],["Neuchâtel","CH",46.99,6.93],["Dijon","FR",47.322,5.041],["Clermont-Ferrand","FR",45.778,3.087],["Saint-Étienne","FR",45.44,4.387],["Valence","FR",44.933,4.892],["Avignon","FR",43.949,4.806],["Toulon","FR",43.124,5.928],["Hyères","FR",43.12,6.13],["Perpignan","FR",42.699,2.895],["La Rochelle","FR",46.16,-1.151],["Brest","FR",48.39,-4.486],["Caen","FR",49.182,-0.371],["Rouen","FR",49.443,1.1],["Le Havre","FR",49.494,0.108],["Tours","FR",47.394,0.685],["Orléans","FR",47.903,1.909],["Metz","FR",49.119,6.176],["Nancy","FR",48.692,6.184],["Mulhouse","FR",47.75,7.336],["Besançon","FR",47.238,6.024],["Gap","FR",44.559,6.079],["Albertville","FR",45.676,6.392],["Évian-les-Bains","FR",46.401,6.59],["Thonon-les-Bains","FR",46.371,6.48],["Biarritz","FR",43.483,-1.559],["Pau","FR",43.296,-0.37],["Limoges","FR",45.834,1.261],["Poitiers","FR",46.58,0.34],["Angers","FR",47.478,-0.563],["Le Mans","FR",48.006,0.199],["Reims","FR",49.258,4.032],["Amiens","FR",49.894,2.296],["Ajaccio","FR",41.919,8.739],["Bastia","FR",42.697,9.45],["Bruxelles","BE",50.85,4.352],["Anvers","BE",51.219,4.402],["Gand","BE",51.054,3.717],["Amsterdam","NL",52.37,4.895],["Rotterdam","NL",51.924,4.478],["Utrecht","NL",52.091,5.122],["Berlin","DE",52.52,13.405],["Munich","DE",48.137,11.576],["Hambourg","DE",53.551,9.994],["Cologne","DE",50.938,6.96],["Francfort","DE",50.11,8.682],["Stuttgart","DE",48.776,9.183],["Fribourg-en-Brisgau","DE",47.999,7.842],["Constance","DE",47.66,9.175],["Kiel","DE",54.323,10.123],["Vienne","AT",48.208,16.373],["Innsbruck","AT",47.269,11.404],["Salzbourg","AT",47.809,13.055],["Bregenz","AT",47.503,9.747],["Milan","IT",45.464,9.19],["Turin","IT",45.07,7.687],["Côme","IT",45.808,9.085],["Riva del Garda","IT",45.885,10.841],["Vérone","IT",45.438,10.992],["Venise","IT",45.44,12.316],["Gênes","IT",44.405,8.946],["Rome","IT",41.903,12.496],["Copenhague","DK",55.676,12.568],["Aarhus","DK",56.163,10.203],["Odense","DK",55.403,10.402],["Aalborg","DK",57.048,9.919],["Malmö","SE",55.605,13.003],["Göteborg","SE",57.709,11.975],["Stockholm","SE",59.329,18.069],["Londres","GB",51.507,-0.128],["Brighton","GB",50.822,-0.137],["Barcelone","ES",41.385,2.173],["Madrid","ES",40.417,-3.704],["Valence (Espagne)","ES",39.47,-0.376],["Saint-Sébastien","ES",43.318,-1.981],["Lisbonne","PT",38.722,-9.139],["Porto","PT",41.158,-8.629],["Athènes","GR",37.984,23.728],["Ljubljana","SI",46.056,14.506],["Luxembourg","LU",49.612,6.13],["Prague","CZ",50.075,14.437]];
+  const EN_NAMES={"Genève":"Geneva","Zurich":"Zurich","Berne":"Bern","Bâle":"Basel","Lucerne":"Lucerne","Bruxelles":"Brussels","Anvers":"Antwerp","Gand":"Ghent","Munich":"Munich","Hambourg":"Hamburg","Cologne":"Cologne","Francfort":"Frankfurt","Fribourg-en-Brisgau":"Freiburg","Constance":"Konstanz","Vienne":"Vienna","Salzbourg":"Salzburg","Milan":"Milan","Turin":"Turin","Côme":"Como","Vérone":"Verona","Venise":"Venice","Gênes":"Genoa","Rome":"Rome","Copenhague":"Copenhagen","Göteborg":"Gothenburg","Londres":"London","Barcelone":"Barcelona","Valence (Espagne)":"Valencia","Saint-Sébastien":"San Sebastián","Lisbonne":"Lisbon","Athènes":"Athens"};
+  const norm=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[’'`\-–_.,()/]/g,' ').replace(/\s+/g,' ').trim();
+  const PLACES=[];const seen=new Set();
+  function addPlace(name,kind,lat,lon,extra,alt){
+    const k=norm(name)+'|'+kind;if(!name||seen.has(k)||lat==null)return;seen.add(k);
+    PLACES.push({name,kind,lat,lon,extra,key:norm(name+' '+(alt||''))});
+  }
+  VILLES.forEach(c=>addPlace(c[0],'ville',c[2],c[3],c[1],EN_NAMES[c[0]]));
+  const groups=(field)=>{const g={};SPOTS.forEach(s=>{if(s.la==null||!s[field])return;(g[s[field]]=g[s[field]]||[]).push(s)});return g};
+  const centroid=a=>[a.reduce((t,s)=>t+s.la,0)/a.length,a.reduce((t,s)=>t+s.lo,0)/a.length];
+  Object.entries(groups('v')).forEach(([n,a])=>{const c=centroid(a);addPlace(n.replace(/\s*\(.*\)$/,''),'ville',c[0],c[1],a[0].p,n)});
+  Object.entries(groups('e')).forEach(([n,a])=>{const c=centroid(a);addPlace(n.replace(/\s*\(.*\)$/,''),'eau',c[0],c[1],a[0].p)});
+  Object.entries(groups('rg')).forEach(([n,a])=>{const c=centroid(a);n.split('/').forEach(p=>addPlace(p.trim(),'region',c[0],c[1],a[0].p))});
+  Object.keys(PAYS).forEach(c=>{const a=SPOTS.filter(s=>s.p===c&&s.la!=null);if(a.length){const k=centroid(a);addPlace(PAYS[c][0],'pays',k[0],k[1],c,PAYS[c][1])}});
+  SPOTS.forEach(s=>{s.key=norm([s.n,s.v,s.rg,s.e,s.st,PAYS[s.p]&&PAYS[s.p].join(' ')].join(' '))});
+
+  // ---------- État ----------
+  const PAGE=matchMedia('(max-width: 959px)').matches?10:30;
+  const st={cat:'',pays:'',libre:false,origin:null,sel:null,shown:PAGE};
+  const dist=(a,b,c,d)=>{const R=6371,r=Math.PI/180,x=Math.sin((c-a)*r/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin((d-b)*r/2)**2;return 2*R*Math.asin(Math.sqrt(x))};
+  const ORDER=['FR','CH','IT','AT','DE','BE','NL','GB','DK','SE','GR'];
+  function filtered(){
+    let a=SPOTS.filter(s=>(!st.cat||s.c===st.cat)&&(!st.pays||s.p===st.pays)&&(!st.libre||s.ac==='libre'));
+    if(st.origin){a.forEach(s=>s.d=s.la!=null?dist(st.origin.lat,st.origin.lon,s.la,s.lo):Infinity);a.sort((x,y)=>x.d-y.d)}
+    else{a.forEach(s=>s.d=null);a.sort((x,y)=>(x.i===ALR_ID?-1:y.i===ALR_ID?1:0)||ORDER.indexOf(x.p)-ORDER.indexOf(y.p)||(x.v||'').localeCompare(y.v||'','fr'))}
+    return a;
+  }
+
+  // ---------- Filtres ----------
+  function buildChips(){
+    const box=$('chips');box.textContent='';
+    const n=c=>SPOTS.filter(s=>!c||s.c===c).length;
+    const mk=(label,count,on,fn,dot)=>{const b=document.createElement('button');b.type='button';b.className='chip';b.setAttribute('aria-pressed',on);
+      if(dot){const i=document.createElement('i');i.className='dot libre';b.append(i)}
+      b.append(label);if(count!=null){const s=document.createElement('small');s.textContent=count;b.append(s)}
+      b.addEventListener('click',fn);box.append(b);return b};
+    mk(tr('Tous les spots','All spots'),SPOTS.length,!st.cat,()=>{st.cat='';update()});
+    Object.keys(CATS).forEach(c=>mk(tr(CATS[c][0],CATS[c][1]),n(c),st.cat===c,()=>{st.cat=st.cat===c?'':c;update()}));
+    const sep=document.createElement('span');sep.className='sep';sep.setAttribute('aria-hidden','true');box.append(sep);
+    mk(tr('Accès libre','Free access'),null,st.libre,()=>{st.libre=!st.libre;update()},true);
+    const w=document.createElement('label');w.className='sel';
+    const s=document.createElement('select');s.id='pays';s.setAttribute('aria-label',tr('Pays','Country'));
+    const o0=document.createElement('option');o0.value='';o0.textContent=tr('Tous les pays','All countries');s.append(o0);
+    ORDER.forEach(c=>{const k=SPOTS.filter(x=>x.p===c).length;if(!k)return;const o=document.createElement('option');o.value=c;o.textContent=pays(c)+' ('+k+')';if(st.pays===c)o.selected=true;s.append(o)});
+    s.addEventListener('change',()=>{st.pays=s.value;update(true)});
+    w.append(s);box.append(w);
+  }
+  function update(fit){st.shown=PAGE;buildChips();render();drawMarkers();if(fit&&!st.origin)fitTo(filtered())}
+
+  // ---------- Liste ----------
+  const fmtKm=d=>d<1?'<1 km':d<10?d.toFixed(1).replace('.',lang==='en'?'.':',')+' km':Math.round(d).toLocaleString(lang==='en'?'en-GB':'fr-FR')+' km';
+  const gmaps=s=>'https://www.google.com/maps/dir/?api=1&destination='+s.la+','+s.lo;
+  const gsearch=s=>'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(s.n+' '+(s.v||''));
+  function el(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
+  function link(href,txt,cls){const a=el('a',cls||'pill line small',txt);a.href=href;a.target='_blank';a.rel='noopener';return a}
+  function tags(s){
+    const t=el('div','tags');
+    if(s.i===ALR_ID)t.append(el('span','tag alr',tr('Notre spot','Our spot')));
+    t.append(el('span','tag',tr(CATS[s.c][2],CATS[s.c][3])));
+    if(s.ac)t.append(el('span','tag'+(s.ac==='libre'?' libre':''),tr(ACC[s.ac][0],ACC[s.ac][1])));
+    if(s.la==null)t.append(el('span','tag',tr('Position non publiée','No public position')));
+    else if(s.ap)t.append(el('span','tag',tr('Position approchée','Approximate position')));
+    return t;
+  }
+  function fiche(s){
+    const f=el('div','fiche'),dl=el('dl');
+    const row=(k,v)=>{if(!v)return;dl.append(el('dt',null,k),el('dd',null,v))};
+    row(tr("Plan d'eau",'Water'),s.e);row(tr('Type','Type'),s.t);row(tr('Accès','Access'),s.a);row(tr('Géré par','Run by'),s.st);
+    row(tr('Fréquentation','Crowd'),s.f);row(tr('Saison, horaires','Season, hours'),s.s);
+    if(s.la!=null)row('GPS',s.la.toFixed(4)+', '+s.lo.toFixed(4));
+    f.append(dl);
+    if(s.rm){const r=el('p','rm',s.rm);if(lang==='en')r.lang='fr';f.append(r)}
+    const a=el('div','acts');
+    a.append(link(s.la!=null?gmaps(s):gsearch(s),tr('Itinéraire','Directions'),'pill ink small'));
+    if(s.li)a.append(link(s.li,tr('Site du spot','Spot website')));
+    if(s.ph)a.append(link(s.ph,tr('Photos','Photos')));
+    if(s.so&&s.so!==s.li)a.append(link(s.so,'Source'));
+    f.append(a);return f;
+  }
+  function render(){
+    const a=filtered(),ol=$('ol');ol.textContent='';
+    const o=st.origin;
+    $('count').innerHTML='';
+    const b=el('b',null,a.length+' '+(a.length>1?'spots':'spot'));$('count').append(b);
+    if(o){$('count').append(' '+tr('triés par distance de','sorted by distance from')+' '+o.label+' · ');
+      const c=el('button','link',tr('Effacer','Clear'));c.type='button';c.addEventListener('click',clearOrigin);$('count').append(c)}
+    if(!a.length){const e=el('li','empty');e.append(el('b',null,tr('Aucun spot avec ces filtres','No spot matches these filters')),tr('Enlevez un filtre ou choisissez un autre pays.','Remove a filter or pick another country.'));ol.append(e)}
+    a.slice(0,st.shown).forEach(s=>{
+      const li=el('li','it'+(st.sel===s.i?' on':''));li.dataset.id=s.i;
+      const btn=el('button');btn.type='button';btn.setAttribute('aria-expanded',st.sel===s.i);
+      const h=el('h3');const d=el('i','dot '+(s.ac==='libre'?'libre':'autre'));h.append(d,s.n);
+      btn.append(h);
+      const right=el('span','km');
+      if(s.d!=null&&isFinite(s.d)){right.append(fmtKm(s.d));right.append(el('small',null,s.p))}else right.append(s.p);
+      btn.append(right);
+      btn.append(el('span','where',[s.v,s.rg&&s.rg!==s.v?s.rg:null,pays(s.p)].filter(Boolean).join(' · ')));
+      btn.append(tags(s));
+      btn.addEventListener('click',()=>select(st.sel===s.i?null:s.i,true));
+      li.append(btn);if(st.sel===s.i)li.append(fiche(s));ol.append(li);
+    });
+    const left=a.length-st.shown;
+    $('more').hidden=left<=0;
+    $('more-b').textContent=tr('Afficher ','Show ')+Math.min(left,PAGE)+tr(' spots de plus',' more spots');
+  }
+  $('more-b').addEventListener('click',()=>{st.shown+=PAGE;render()});
+
+  // ---------- Carte ----------
+  const map=L_map();
+  function L_map(){
+    if(!window.L){$('map').textContent=tr('La carte ne s’est pas chargée.','The map did not load.');return null}
+    const m=L.map('map',{zoomControl:true,preferCanvas:true,worldCopyJump:false,minZoom:3,maxZoom:18,attributionControl:true,zoomSnap:.5});
+    m.attributionControl.setPrefix(false);
+    m.setView([50,8],4);m.setMaxBounds([[30,-30],[74,50]]);
+    // Fond de carte : pays et lacs dessinés à partir de Natural Earth (léger, aux couleurs du site).
+    m.createPane('base');m.getPane('base').style.zIndex=150;
+    const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+    const base={};
+    fetch('media/fond-carte.json').then(r=>r.json()).then(g=>{
+      const st1=()=>({pane:'base',color:css('--border'),weight:.8,fillColor:css('--land'),fillOpacity:1,interactive:false});
+      const st2=()=>({pane:'base',color:css('--lake'),weight:.6,opacity:.5,fillColor:css('--lakefill'),fillOpacity:1,interactive:false});
+      base.c=L.geoJSON({type:'GeometryCollection',geometries:g.c},{style:st1}).addTo(m);
+      base.l=L.geoJSON({type:'GeometryCollection',geometries:g.l},{style:st2}).addTo(m);
+      const re=()=>{base.c.setStyle(st1());base.l.setStyle(st2())};
+      matchMedia('(prefers-color-scheme: dark)').addEventListener('change',re);
+      new MutationObserver(re).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+    }).catch(()=>{});
+    m.attributionControl.addAttribution('Fond : Natural Earth');
+    // Vue satellite (Esri World Imagery) : s'affiche toute seule quand on zoome de près (niveau 11 et plus),
+    // ou à la demande avec le bouton Satellite. Noms des lieux par-dessus.
+    m.createPane('sat');m.getPane('sat').style.zIndex=200;
+    const sat=L.layerGroup([
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{pane:'sat',maxNativeZoom:18,maxZoom:18,attribution:'Imagerie © Esri, Maxar, Earthstar Geographics'}),
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',{pane:'sat',maxNativeZoom:18,maxZoom:18})
+    ]);
+    let mode='auto',satOK=true,errs=0,oks=0;
+    sat.eachLayer(l=>{l.on('tileerror',()=>{errs++;if(!oks&&errs>=4&&satOK){satOK=false;applyView()}});l.on('tileload',()=>{oks++})});
+    function applyView(){
+      const want=satOK&&(mode==='sat'||(mode==='auto'&&m.getZoom()>=11));
+      if(want&&!m.hasLayer(sat))sat.addTo(m);else if(!want&&m.hasLayer(sat))m.removeLayer(sat);
+      m.getContainer().classList.toggle('sat',want);
+      m.setMaxZoom(satOK?18:14);
+      const note=document.getElementById('satnote');
+      note.hidden=satOK||!(mode==='sat'||m.getZoom()>=11);
+      note.textContent=tr('Vue satellite indisponible dans cet aperçu, elle s\u2019affichera sur le site','Satellite view is not available in this preview; it will show on the website');
+      document.querySelectorAll('#view button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===mode));
+      document.getElementById('view').hidden=!satOK;
+    }
+    document.querySelectorAll('#view button').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.v;if(mode==='sat'&&m.getZoom()<11&&satOK)m.setZoom(11);applyView()}));
+    m.on('zoomend',applyView);
+    m.whenReady(applyView);
+    return m;
+  }
+  // Noms des grandes villes pour se repérer quand on zoome
+  if(map){
+    const cities=L.layerGroup();
+    VILLES.forEach(c=>L.marker([c[2],c[3]],{interactive:false,keyboard:false,icon:L.divIcon({className:'city',html:'<span>'+((lang==='en'&&EN_NAMES[c[0]])||c[0])+'</span>',iconSize:[0,0]})}).addTo(cities));
+    const tog=()=>{if(map.getZoom()>=6&&!map.getContainer().classList.contains('sat'))cities.addTo(map);else cities.remove()};
+    map.on('zoomend',tog);tog();
+  }
+  let cluster=null,alrLayer=null;const markers={};
+  function icon(s){
+    const on=st.sel===s.i;
+    if(s.i===ALR_ID)return L.divIcon({className:'',html:'<div class="mk alr'+(on?' on':'')+'">ALR</div>',iconSize:[30,30],iconAnchor:[15,15]});
+    return L.divIcon({className:'',html:'<div class="mk'+(s.ac==='libre'?' libre':'')+(on?' on':'')+'"></div>',iconSize:[14,14],iconAnchor:[7,7]});
+  }
+  function popup(s){
+    const d=el('div');d.append(el('h4',null,s.n));
+    d.append(el('p',null,[s.v,pays(s.p)].filter(Boolean).join(' · ')+(s.d!=null&&isFinite(s.d)?' · '+fmtKm(s.d):'')));
+    const a=el('div','acts');a.append(link(gmaps(s),tr('Itinéraire','Directions'),'pill ink small'));
+    const b=el('button','pill line small',tr('Voir la fiche','Details'));b.type='button';b.addEventListener('click',()=>select(s.i,false,true));a.append(b);
+    d.append(a);return d;
+  }
+  function drawMarkers(){
+    if(!map)return;
+    if(cluster)map.removeLayer(cluster);
+    if(alrLayer){map.removeLayer(alrLayer);alrLayer=null}
+    cluster=L.markerClusterGroup({showCoverageOnHover:false,maxClusterRadius:44,spiderfyOnMaxZoom:true,disableClusteringAtZoom:13,
+      iconCreateFunction:c=>{const n=c.getChildCount();return L.divIcon({className:'',html:'<div class="cl'+(n>20?' big':'')+'">'+n+'</div>',iconSize:n>20?[46,46]:[38,38]})}});
+    for(const k in markers)delete markers[k];
+    filtered().forEach(s=>{if(s.la==null)return;
+      const m=L.marker([s.la,s.lo],{icon:icon(s),title:s.n,zIndexOffset:s.i===ALR_ID?1000:0,keyboard:true});
+      m.bindPopup(()=>popup(s),{closeButton:true,autoPanPadding:[30,30]});
+      m.on('click',()=>{select(s.i,false,true,true)});
+      markers[s.i]=m;if(s.i===ALR_ID){alrLayer=m.addTo(map)}else cluster.addLayer(m)});
+    map.addLayer(cluster);
+  }
+  function fitTo(a){if(!map)return;const pts=a.filter(s=>s.la!=null).map(s=>[s.la,s.lo]);if(!pts.length)return;
+    if(pts.length===1)map.setView(pts[0],12);else map.fitBounds(pts,{padding:[40,40],maxZoom:11})}
+  function select(id,fromList,scroll,fromMap){
+    const prev=st.sel;st.sel=id;
+    const s=SPOTS.find(x=>x.i===id);
+    // Si le spot est plus bas dans la liste, l'afficher
+    if(s){const idx=filtered().indexOf(s);if(idx>=st.shown)st.shown=idx+1}
+    render();
+    [prev,id].forEach(k=>{const sp=SPOTS.find(x=>x.i===k);if(sp&&markers[k])markers[k].setIcon(icon(sp))});
+    if(s&&map&&s.la!=null&&!fromMap){
+      const m=markers[s.i];
+      if(m&&s.i===ALR_ID){map.setView([s.la,s.lo],12);m.openPopup()}
+      else if(m)cluster.zoomToShowLayer(m,()=>{if(map.getZoom()<11)map.setView([s.la,s.lo],11);m.openPopup()});
+    }
+    if(scroll||fromList){const li=document.querySelector('.it[data-id="'+id+'"]');if(li){const box=$('list');
+      if(getComputedStyle(box).overflowY==='auto'&&box.scrollHeight>box.clientHeight)box.scrollTo({top:li.offsetTop-box.offsetTop-8,behavior:'smooth'});
+      else if(!fromList)li.scrollIntoView({block:'nearest',behavior:'smooth'})}}
+  }
+
+  // ---------- Point de départ (lieu choisi ou position) ----------
+  let originLayer=null;
+  function setOrigin(o,zoomNear){
+    st.origin=o;st.sel=null;st.shown=PAGE;
+    if(map){if(originLayer)map.removeLayer(originLayer);
+      originLayer=L.marker([o.lat,o.lon],{icon:L.divIcon({className:'',html:'<div class="'+(o.me?'me':'pin')+'"></div>',iconSize:[18,18],iconAnchor:[9,9]}),interactive:false,zIndexOffset:2000}).addTo(map)}
+    render();drawMarkers();
+    if(map&&zoomNear!==false){const a=filtered().filter(s=>s.la!=null).slice(0,6);
+      const pts=[[o.lat,o.lon]].concat(a.map(s=>[s.la,s.lo]));map.fitBounds(pts,{padding:[50,50],maxZoom:12})}
+  }
+  function clearOrigin(){st.origin=null;if(originLayer&&map)map.removeLayer(originLayer);originLayer=null;$('msg').textContent='';render();drawMarkers();fitTo(filtered())}
+  $('all').addEventListener('click',()=>{st.sel=null;if(map)map.closePopup();if(st.origin)clearOrigin();else fitTo(filtered())});
+
+  $('near').addEventListener('click',()=>{
+    const b=$('near');$('msg').textContent='';
+    if(!navigator.geolocation){$('msg').textContent=tr('Ce navigateur ne donne pas sa position. Tapez votre ville.','This browser does not share its location. Type your town.');return}
+    b.setAttribute('aria-busy','true');
+    navigator.geolocation.getCurrentPosition(p=>{b.removeAttribute('aria-busy');
+      setOrigin({lat:p.coords.latitude,lon:p.coords.longitude,label:tr('vous','you'),me:true});
+    },()=>{b.removeAttribute('aria-busy');
+      $('msg').textContent=tr('Position non disponible. Tapez votre ville dans la recherche.','Location unavailable. Type your town in the search box.');$('q').focus()},
+    {enableHighAccuracy:false,timeout:9000,maximumAge:600000});
+  });
+
+  // ---------- Recherche ----------
+  const q=$('q'),sug=$('sugg');let items=[],act=-1,remoteT=null;
+  const KIND={ville:['Ville','Town'],eau:["Plan d'eau",'Water'],region:['Région','Region'],pays:['Pays','Country'],spot:['Spot','Spot'],web:['Lieu','Place']};
+  function suggest(){
+    const t=norm(q.value);$('q-clr').hidden=!q.value;
+    if(t.length<2){close();return}
+    const words=t.split(' ');
+    const match=k=>words.every(w=>k.includes(w));
+    const score=(k,name)=>{const n=norm(name);return n.startsWith(t)?0:k.split(' ').some(w=>w.startsWith(words[0]))?1:2};
+    const P=PLACES.filter(p=>match(p.key)).map(p=>({type:'place',p,s:score(p.key,p.name)+({ville:0,eau:.2,pays:.1,region:.3}[p.kind])})).sort((a,b)=>a.s-b.s).slice(0,5);
+    const S=SPOTS.filter(s=>match(s.key)).map(s=>({type:'spot',s,sc:score(s.key,s.n)})).sort((a,b)=>a.sc-b.sc).slice(0,6);
+    items=P.concat(S);act=items.length?0:-1;draw();
+    // Sur le site en ligne : si rien ne correspond, recherche du lieu sur OpenStreetMap (Nominatim).
+    clearTimeout(remoteT);
+    if(!P.length&&t.length>2)remoteT=setTimeout(()=>remote(q.value),350);
+  }
+  function remote(text){
+    fetch('https://nominatim.openstreetmap.org/search?format=json&limit=4&accept-language='+lang+'&q='+encodeURIComponent(text)).then(r=>r.json()).then(r=>{
+      if(norm(q.value)!==norm(text)||!r.length)return;
+      items=items.concat(r.map(x=>({type:'place',p:{name:x.display_name.split(',').slice(0,2).join(','),kind:'web',lat:+x.lat,lon:+x.lon}})));draw();
+    }).catch(()=>{});
+  }
+  function draw(){
+    sug.textContent='';
+    if(!items.length){const li=el('li','none',tr('Aucun lieu ni spot trouvé. Essayez une grande ville proche.','No place or spot found. Try a nearby city.'));sug.append(li)}
+    items.forEach((it,i)=>{
+      const li=el('li');li.id='sg'+i;li.setAttribute('role','option');li.setAttribute('aria-selected',i===act);
+      if(it.type==='place'){li.append(el('b',null,(lang==='en'&&EN_NAMES[it.p.name])||it.p.name));li.append(el('span',null,tr(KIND[it.p.kind][0],KIND[it.p.kind][1])+(it.p.extra&&it.p.kind!=='pays'?' · '+it.p.extra:'')))}
+      else{li.append(el('b',null,it.s.n));li.append(el('span',null,'Spot · '+it.s.p))}
+      li.addEventListener('mousedown',e=>{e.preventDefault();pick(i)});
+      sug.append(li);
+    });
+    sug.hidden=false;q.setAttribute('aria-expanded','true');
+    if(act>=0)q.setAttribute('aria-activedescendant','sg'+act);
+  }
+  function close(){sug.hidden=true;q.setAttribute('aria-expanded','false');q.removeAttribute('aria-activedescendant')}
+  function pick(i){
+    const it=items[i];if(!it)return;close();
+    $('msg').textContent='';
+    if(it.type==='spot'){
+      q.value=it.s.n;
+      if(st.cat&&st.cat!==it.s.c)st.cat='';if(st.pays&&st.pays!==it.s.p)st.pays='';if(st.libre&&it.s.ac!=='libre')st.libre=false;
+      buildChips();drawMarkers();select(it.s.i,false,true);
+      document.querySelector('.finder').scrollIntoView({behavior:'smooth',block:'start'});
+    }else{
+      const name=(lang==='en'&&EN_NAMES[it.p.name])||it.p.name;q.value=name;
+      if(it.p.kind==='pays'&&PAYS[it.p.extra]){st.pays=it.p.extra;st.origin=null;if(originLayer&&map)map.removeLayer(originLayer);update(true);return}
+      setOrigin({lat:it.p.lat,lon:it.p.lon,label:name});
+    }
+  }
+  q.addEventListener('input',suggest);
+  q.addEventListener('focus',()=>{if(q.value)suggest()});
+  q.addEventListener('blur',()=>setTimeout(close,120));
+  q.addEventListener('keydown',e=>{
+    if(sug.hidden&&e.key!=='Enter')return;
+    if(e.key==='ArrowDown'){e.preventDefault();act=Math.min(items.length-1,act+1);draw()}
+    else if(e.key==='ArrowUp'){e.preventDefault();act=Math.max(0,act-1);draw()}
+    else if(e.key==='Enter'){e.preventDefault();if(sug.hidden)suggest();if(act>=0)pick(act)}
+    else if(e.key==='Escape'){close()}
+  });
+  $('q-clr').addEventListener('click',()=>{q.value='';$('q-clr').hidden=true;close();if(st.origin)clearOrigin();q.focus()});
+
+  // ---------- Copier l'e-mail ----------
+  $('copy').addEventListener('click',()=>{
+    const done=()=>{const b=$('copy');b.textContent=tr('Copié','Copied');setTimeout(()=>b.textContent=tr('Copier','Copy'),1600)};
+    const sel=()=>{const r=document.createRange();r.selectNodeContents($('mail'));const s=getSelection();s.removeAllRanges();s.addRange(r)};
+    try{navigator.clipboard.writeText($('mail').textContent).then(done,sel)}catch(e){sel()}
+  });
+
+  applyLang();drawMarkers();fitTo(SPOTS);
+};
+</script>
+</body>
+</html>
