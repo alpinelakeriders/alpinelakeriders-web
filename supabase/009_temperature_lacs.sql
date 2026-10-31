@@ -47,3 +47,6 @@ create or replace view public.lake_temperature_latest with (security_invoker = t
 -- pg_cron (job « filtre-valeurs-aberrantes ») 10 min après chaque relevé. Le site ignore rejected = true.
 alter table public.lake_temperature add column rejected boolean not null default false;
 alter table public.lakes add column outlier_c numeric;
+-- Lacs : lakes.cold_outlier_c = 3.5 → seules les chutes froides isolées sont écartées
+-- (un voile nuageux non détecté refroidit la mesure ; les coups de chaud réels sont conservés).
+alter table public.lakes add column cold_outlier_c numeric;
