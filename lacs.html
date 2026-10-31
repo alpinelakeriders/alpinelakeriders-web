@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Météo des spots · Alpine Lake Riders</title>
+<meta name="description" content="Température de l'eau, prévision AROME Météo-France, nuages en direct par satellite et webcams des spots de pumpfoil autour du lac de la Terrasse.">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="media/logo-alr-noir.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="css/meteo.css?v=1">
+<style>
+:root{
+  --paper:#ffffff;
+  --ink:#0d1111;
+  --grey:#6d7574;
+  --hair:#e6e9e8;
+  --lake:#16757a;
+  --bg:var(--paper); --fg:var(--ink); --muted:var(--grey); --line:var(--hair); --tint:#f4f6f6; --danger:#c2410c;
+  --sans:"Geist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono:"Geist Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0a0d0d; --fg:#eef1f0; --muted:#8e9897; --line:#1f2625; --tint:#121717; --lake:#4fb3b0; --danger:#fb923c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0a0d0d; --fg:#eef1f0; --muted:#8e9897; --line:#1f2625; --tint:#121717; --lake:#4fb3b0; --danger:#fb923c; color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{overflow-x:clip;background:var(--bg);color:var(--fg);font:400 16px/1.6 var(--sans);-webkit-font-smoothing:antialiased;letter-spacing:-.005em}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--lake);outline-offset:3px}
+p{margin:0}
+h1,h2{margin:0;font-weight:500;letter-spacing:-.035em;text-wrap:balance}
+.wrap{max-width:1100px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+@media (min-width:800px){.wrap{padding-left:48px;padding-right:48px}}
+.label{font:500 12px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.top{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-block:14px}
+.top a{font-size:14px;color:var(--muted)}.top a:hover{color:var(--fg)}
+header.intro{padding-block:40px 24px}
+header.intro h1{font-size:clamp(30px,4.4vw,52px);line-height:1.05}
+header.intro p{color:var(--muted);max-width:62ch;margin-top:14px}
+.nav{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.nav a{font-size:13px;padding:6px 12px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--line);display:inline-flex;gap:6px;align-items:center}
+.nav a:hover{box-shadow:inset 0 0 0 1px var(--fg)}
+.spot{border-top:1px solid var(--fg);padding-block:22px 34px;scroll-margin-top:70px}
+.sp-head{display:flex;align-items:baseline;justify-content:space-between;gap:6px 20px;flex-wrap:wrap}
+.sp-head h2{font-size:clamp(22px,2.6vw,30px)}
+.sp-head span{color:var(--muted);font-size:14px}
+.sp-eau{display:flex;align-items:baseline;gap:6px 16px;flex-wrap:wrap;margin-top:12px}
+.sp-eau b{font-size:clamp(24px,2.4vw,32px);font-weight:400;letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
+.sp-eau small{font-size:13px;color:var(--muted)}
+.sp-eau .lt-btn{margin-top:0}
+.spot .mt-bloc{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.sp-cam{margin-top:14px;font-size:14px}
+.sp-cam a{color:var(--lake)}.sp-cam a:hover{color:var(--fg)}
+.sp-cam span{color:var(--muted)}
+.vide{color:var(--muted);padding-block:40px}
+footer{padding-block:30px 50px;color:var(--muted);font-size:13px;border-top:1px solid var(--line)}
+footer p+p{margin-top:8px}
+.lt-btn{display:inline-block;text-decoration:none;flex-basis:100%;text-align:left;margin-top:6px;background:none;border:0;padding:4px 0;font:500 11px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);cursor:pointer}
+.lt-btn:hover{color:var(--fg)}
+.lt-btn span{display:inline-block;margin-left:4px}
+.lt-hist{list-style:none;margin:10px 0 2px;padding:0;display:grid;gap:2px;max-width:520px}
+.lt-hist li{display:grid;grid-template-columns:110px 1fr 104px;align-items:center;gap:14px;padding-block:5px;font-size:13px;color:var(--muted)}
+.lt-hist b{font-size:13px;color:var(--fg);text-align:right}
+.lt-bar{height:3px;border-radius:2px;background:var(--line);overflow:hidden}
+.lt-bar i{display:block;height:100%;background:var(--lake);opacity:.7}
+@media (max-width:560px){.lt-hist li{grid-template-columns:96px 1fr 96px;gap:10px}}
+</style>
+</head>
+<body>
+<div class="top"><div class="wrap"><a href="/">← Alpine Lake Riders</a><span class="label">Météo des spots</span></div></div>
+<main class="wrap">
+<header class="intro">
+  <h1>Température de l'eau et météo des spots</h1>
+  <p>Pour chaque spot de pumpfoil : la dernière température de l'eau, la prévision du jour (modèle AROME de Météo-France), la meilleure heure pour rider, les nuages en direct vus par satellite et, quand il y en a, les webcams.</p>
+  <nav class="nav" id="nav" aria-label="Aller à un spot"></nav>
+</header>
+<div id="spots"><p class="vide">Chargement des spots…</p></div>
+</main>
+<footer><div class="wrap">
+  <p>Température de l'eau : Landsat 8-9 via Copernicus (pellicule de surface vers 10h30, ±2 °C) et sonde du Grand Port d'Aix-les-Bains (lac-du-bourget.com). Prévision : AROME Météo-France via Open-Meteo, mise à jour toutes les heures. Nuages en direct : satellites Meteosat (EUMETSAT), nouvelle image toutes les 10 à 15 minutes.</p>
+  <p>La meilleure heure privilégie le vent faible (plan d'eau lisse), puis le soleil. Pastille verte : vent jusqu'à 8 km/h ; orange : jusqu'à 14 km/h ; rouge au-delà.</p>
+</div></footer>
+<script src="js/config.js?v=50"></script>
+<script src="js/meteo.js?v=1"></script>
+<script>
+(function(){
+  var c=window.ALR_CONFIG,M=window.ALR_METEO,box=document.getElementById('spots'),nav=document.getElementById('nav');
+  if(!c||!M||!window.fetch)return;
+  var H={headers:{apikey:c.anonKey,Authorization:'Bearer '+c.anonKey}};
+  var MOIS=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  var MC=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+  var fmt=function(t){return t<0.5?'≈ 0 °C':t.toFixed(1).replace('.',',')+' °C'};
+  var el=function(t,cl,tx){var e=document.createElement(t);if(cl)e.className=cl;if(tx!=null)e.textContent=tx;return e};
+  var since=new Date();since.setFullYear(since.getFullYear()-1);since.setDate(since.getDate()-7);
+  var get=function(p){return fetch(c.url+'/rest/v1/'+p,H).then(function(r){return r.ok?r.json():[]}).catch(function(){return []})};
+  Promise.all([
+    get('lakes?select=slug,name,commune,ordre,lat,lon&order=ordre'),
+    get('lake_temperature?select=lake,acquired_on,temp_c&rejected=is.false&acquired_on=gte.'+since.toISOString().slice(0,10)+'&order=acquired_on.desc&limit=2000'),
+    get('lake_live?select=lake,measured_at,temp_c&order=measured_at.desc&limit=20')
+  ]).then(function(r){
+    var lakes=(r[0]||[]).filter(function(L){return L.lat!=null}),sat=r[1]||[],live=r[2]||[];
+    box.textContent='';
+    if(!lakes.length){box.append(el('p','vide','Spots indisponibles pour le moment.'));return}
+    var secs={};
+    lakes.forEach(function(L){
+      var s=el('section','spot');s.id='spot-'+L.slug;secs[L.slug]=s;
+      var hd=el('div','sp-head');hd.append(el('h2',null,L.name),el('span',null,L.commune||''));s.append(hd);
+      // Température de l'eau
+      var rows=sat.filter(function(x){return x.lake===L.slug}).map(function(x){return {t:Number(x.temp_c),d:new Date(x.acquired_on+'T12:00:00')}}).filter(function(x){return isFinite(x.t)});
+      var lv=live.filter(function(x){return x.lake===L.slug})[0],fresh=lv&&(Date.now()-new Date(lv.measured_at).getTime())<48*3600e3;
+      var eau=el('div','sp-eau');eau.append(el('span','label','Eau'));
+      if(fresh){var md=new Date(lv.measured_at);eau.append(el('b',null,fmt(Number(lv.temp_c))),el('small',null,'Sonde, '+md.getDate()+' '+MOIS[md.getMonth()]+' à '+md.getHours()+'h'+String(md.getMinutes()).padStart(2,'0')))}
+      else if(rows.length){eau.append(el('b',null,fmt(rows[0].t)),el('small',null,'Satellite, passage sans nuage du '+rows[0].d.getDate()+' '+MOIS[rows[0].d.getMonth()]))}
+      else eau.append(el('small',null,'Pas encore de mesure.'));
+      s.append(eau);
+      var hist=fresh?rows:rows.slice(1);
+      if(hist.length){
+        var b=el('button','lt-btn');b.type='button';b.setAttribute('aria-expanded','false');b.append(document.createTextNode('Historique '));var ar=el('span',null,'↓');ar.setAttribute('aria-hidden','true');b.append(ar);
+        var ol=el('ol','lt-hist');ol.hidden=true;
+        hist.forEach(function(x){var li=el('li');var bar=el('span','lt-bar');bar.setAttribute('aria-hidden','true');var f=el('i');f.style.width=Math.max(3,Math.min(100,x.t/30*100))+'%';bar.append(f);
+          li.append(el('span',null,x.d.getDate()+' '+MC[x.d.getMonth()]+' '+x.d.getFullYear()),bar,el('b',null,x.t<0.5?'≈ 0 °C · glace':fmt(x.t)));ol.append(li)});
+        b.addEventListener('click',function(){var o=ol.hidden;ol.hidden=!o;b.setAttribute('aria-expanded',o?'true':'false');ar.textContent=o?'↑':'↓'});
+        eau.append(b);s.append(ol);
+      }
+      s.append(el('div','mt-slot'));
+      var cam=M.WEBCAMS[L.slug],cp=el('p','sp-cam');
+      if(cam){var a=el('a',null,cam[1]+' ↗');a.href=cam[0];a.target='_blank';a.rel='noopener';cp.append(a)}else cp.append(el('span',null,'Pas de webcam publique connue sur ce spot.'));
+      s.append(cp);
+      box.append(s);
+      var n=el('a');n.href='#spot-'+L.slug;n.append(el('span',null,L.name));nav.append(n);
+    });
+    var fill=function(ans){lakes.forEach(function(L,k){
+      var b=M.bloc({name:L.name,lat:L.lat,lon:L.lon,an:ans[k],open:true,hourOpen:true,nuages:true,terrasse:L.slug==='terrasse'});
+      secs[L.slug].querySelector('.mt-slot').replaceWith(b);
+      var a=nav.querySelector('a[href="#spot-'+L.slug+'"]'),ic=ans[k]&&ans[k].prev;if(a&&ic){var i=el('span',null,ic[0]);i.setAttribute('aria-hidden','true');a.prepend(i)}
+    })};
+    M.forecast(lakes).then(function(d){fill(lakes.map(function(L,k){return M.analyse(d[k])}))}).catch(function(){fill(lakes.map(function(){return null}))});
+    if(location.hash){var t=document.querySelector(location.hash);if(t)t.scrollIntoView()}
+  });
+})();
+</script>
+</body>
+</html>
