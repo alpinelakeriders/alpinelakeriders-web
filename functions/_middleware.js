@@ -26,6 +26,7 @@ function logVisite(request, url) {
   let source = '';
   try { const r = new URL(request.headers.get('referer') || ''); if (!r.hostname.endsWith('alpinelakeriders.com')) source = r.hostname.replace(/^www\./, ''); } catch (e) {}
   if (!source && url.searchParams.get('source') === 'appli') source = 'icône écran d\'accueil';
+  if (!source && url.searchParams.has('avis')) source = 'questionnaire avis' + ({ mail: ' (e-mail)', whatsapp: ' (WhatsApp)' }[url.searchParams.get('avis')] || '');
   const body = { p_pays: request.headers.get('cf-ipcountry') || '', p_appareil: appareil, p_source: source, p_sortie: url.searchParams.get('sortie') || '' };
   return fetch(SB + '/rest/v1/rpc/log_visite', {
     method: 'POST',
@@ -137,6 +138,13 @@ export async function onRequest(context) {
       const k = e.getAttribute('data-k');
       if (!SKIP.has(k) && txt(k)) e.setInnerContent(txt(k));
     } });
+    // Lien du questionnaire d'avis (e-mail, WhatsApp) : aperçu dédié
+    if (!so && url.searchParams.has('avis')) {
+      const t = 'Donnez votre avis sur Alpine Lake Riders', d = '2 minutes pour noter l\'asso, le spot et l\'ambiance. Plus on est nombreux, plus on pèse auprès des communes pour garder nos spots de pumpfoil ouverts.';
+      rw = rw.on('meta[property="og:title"]', setContent(t)).on('meta[name="twitter:title"]', setContent(t))
+             .on('meta[property="og:description"]', setContent(d)).on('meta[name="twitter:description"]', setContent(d))
+             .on('meta[property="og:url"]', setContent('https://alpinelakeriders.com/?avis'));
+    }
     return rw.transform(res);
   } catch (e) {
     return res;
