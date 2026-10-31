@@ -47,6 +47,8 @@
     async like(sortie,visiteur,aime){const {data,error}=await sb.rpc('aimer_cr',{p_sortie:sortie,p_visiteur:visiteur,p_aime:!!aime});if(error)throw fail(error);return data},
     async stats(j){const {data,error}=await sb.rpc('stats_visites',{p_jours:j});if(error)throw fail(error);return data},
     async countMembers(){const {data,error}=await sb.rpc('nb_membres');if(error)throw fail(error);return data},
+    async lakes(){const {data,error}=await sb.from('lakes').select('slug,name,commune,ordre,en_resume').neq('slug','terrasse').order('ordre');if(error)throw fail(error);return data||[]},
+    async saveLakes(items){const {data,error}=await sb.rpc('save_lakes_layout',{p_items:items});if(error)throw fail(error);return data},
     async clearCollection(c){const {error}=await sb.from('docs').delete().eq('collection',c);if(error)throw fail(error);touch(c)},
     collection(c){return{
       async get(){return snapCol(await fetchCol(c))},

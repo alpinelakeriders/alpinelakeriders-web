@@ -305,7 +305,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .lk.compact{display:grid;column-gap:48px}
 @media (min-width:860px){.lk.compact{grid-template-columns:1fr 1fr}}
 .lk.compact .lk-row{padding-block:10px}
-.lk.compact .lk-row:nth-child(n+7){display:none}
+.lk.compact .lk-row.lk-more{display:none}
 .lk.compact .lk-main{grid-template-columns:1fr auto auto;align-items:baseline;gap:4px 14px}
 .lk.compact .lk-name h3{font-size:16px;letter-spacing:-.01em}
 .lk.compact .lk-name span,.lk.compact .lk-meta .ag-tag,.lk.compact .lt-btn,.lk.compact .lt-hist{display:none!important}
@@ -608,6 +608,11 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 .ct-it.new summary b::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--lake,#2a8c89);margin-right:8px;vertical-align:1px}
 .ct-body{display:grid;gap:10px;padding:0 16px 16px}.ct-body p{margin:0;white-space:pre-wrap}
 @media (max-width:600px){.ct-it summary{grid-template-columns:minmax(0,1fr) auto}.ct-it summary span{display:none}}
+.lac-row{align-items:center}
+.lac-name b{font-weight:500;margin-right:2px;font-variant-numeric:tabular-nums}
+.lac-name small{display:block;color:var(--muted);font-size:12px;margin-left:22px}
+.lac-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.lac-bar .check{font-size:13px;margin-right:6px}
 .adm-nav .all{background:transparent;box-shadow:none;color:var(--muted);text-decoration:underline;text-underline-offset:3px}
 .pv-stage{user-select:none;-webkit-user-select:none}
 .pv-ov{position:absolute;overflow:hidden;touch-action:none}
@@ -723,7 +728,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script src="js/config.js?v=50"></script>
-<script src="js/backend.js?v=50"></script>
+<script src="js/backend.js?v=51"></script>
 </head>
 <body>
 
@@ -924,7 +929,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   var iso=since.toISOString().slice(0,10);
   var get=function(path){return fetch(c.url+'/rest/v1/'+path,H).then(function(r){return r.ok?r.json():[]})};
   Promise.all([
-    get('lakes?select=slug,name,commune,ordre&slug=neq.terrasse&order=ordre'),
+    get('lakes?select=slug,name,commune,ordre,en_resume&slug=neq.terrasse&order=ordre'),
     get('lake_temperature?select=lake,acquired_on,temp_c&lake=neq.terrasse&rejected=is.false&acquired_on=gte.'+iso+'&order=acquired_on.desc&limit=1000'),
     get('lake_live?select=lake,measured_at,temp_c&order=measured_at.desc&limit=20')
   ]).then(function(r){
@@ -935,7 +940,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       var rows=sat.filter(function(x){return x.lake===L.slug}).map(function(x){return {t:Number(x.temp_c),d:new Date(x.acquired_on+'T12:00:00')}}).filter(function(x){return isFinite(x.t)});
       var lv=live.filter(function(x){return x.lake===L.slug})[0];
       var fresh=lv&&(Date.now()-new Date(lv.measured_at).getTime())<48*3600e3;
-      var row=document.createElement('article');row.className='lk-row';
+      var row=document.createElement('article');row.className='lk-row'+(L.en_resume?'':' lk-more');
       var main=document.createElement('div');main.className='lk-main';
       var nm=document.createElement('div');nm.className='lk-name';
       var h=document.createElement('h3');h.textContent=L.name;var cm=document.createElement('span');cm.textContent=L.commune||'';nm.append(h,cm);
@@ -977,14 +982,15 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   // automatiquement quand on la quitte en faisant défiler la page.
   function setupToggle(){
     var wrap=document.getElementById('lk-wrap'),tg=document.getElementById('lk-toggle');
-    var n=box.querySelectorAll('.lk-row').length;
+    var n=box.querySelectorAll('.lk-row').length,more=box.querySelectorAll('.lk-row.lk-more').length;
+    if(more===n){box.querySelectorAll('.lk-row').forEach(function(r,i){if(i<6)r.classList.remove('lk-more')});more=Math.max(0,n-6)}
     tg.hidden=false;
-    if(n>6)tg.firstChild.textContent='Voir les '+n+' spots et les historiques ';
+    if(more)tg.firstChild.textContent='Voir les '+n+' spots et les historiques ';
     var setOpen=function(open){
       var sec=document.getElementById('lacs'),r=sec.getBoundingClientRect(),h0=sec.offsetHeight,above=r.bottom<0;
       wrap.classList.toggle('compact',!open);box.classList.toggle('compact',!open);
       tg.setAttribute('aria-expanded',open?'true':'false');
-      tg.firstChild.textContent=open?'Réduire ':(n>6?'Voir les '+n+' spots et les historiques ':'Détails et historiques ');
+      tg.firstChild.textContent=open?'Réduire ':(more?'Voir les '+n+' spots et les historiques ':'Détails et historiques ');
       tg.querySelector('span').textContent=open?'↑':'↓';
       if(!open){
         box.querySelectorAll('.lt-hist').forEach(function(o){o.hidden=true});
@@ -1108,7 +1114,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 
 <div class="admin" id="admin" hidden role="dialog" aria-modal="true" aria-labelledby="admin-title"><div class="wrap">
   <div class="admin-head"><h2 id="admin-title">Administration</h2><div style="display:flex;gap:8px"><button class="pill line small" id="logout" type="button" hidden>Se déconnecter</button><button class="pill line small" id="close-admin" type="button">Fermer</button></div>
-    <nav class="adm-nav" id="adm-nav" aria-label="Rubriques de l'administration"><button type="button" data-go="sec-visites">Visites</button><button type="button" data-go="sec-agenda">Agenda</button><button type="button" data-go="sec-cr">Comptes rendus</button><button type="button" data-go="sec-contact">Reçus<b class="nav-n" id="ct-n" hidden></b></button><button type="button" data-go="sec-msg">Messages</button><button type="button" data-go="sec-membres">Membres</button><button type="button" data-go="sec-textes">Textes</button><button type="button" data-go="sec-photos">Photos</button><button type="button" data-go="sec-apero-ph">Photos apéro</button><button type="button" data-go="sec-admins">Administrateurs</button><button type="button" data-go="sec-seo">Référencement</button><button type="button" class="all" id="adm-all">Tout déplier</button></nav></div>
+    <nav class="adm-nav" id="adm-nav" aria-label="Rubriques de l'administration"><button type="button" data-go="sec-visites">Visites</button><button type="button" data-go="sec-agenda">Agenda</button><button type="button" data-go="sec-cr">Comptes rendus</button><button type="button" data-go="sec-contact">Reçus<b class="nav-n" id="ct-n" hidden></b></button><button type="button" data-go="sec-msg">Messages</button><button type="button" data-go="sec-membres">Membres</button><button type="button" data-go="sec-textes">Textes</button><button type="button" data-go="sec-photos">Photos</button><button type="button" data-go="sec-apero-ph">Photos apéro</button><button type="button" data-go="sec-lacs">Lacs</button><button type="button" data-go="sec-admins">Administrateurs</button><button type="button" data-go="sec-seo">Référencement</button><button type="button" class="all" id="adm-all">Tout déplier</button></nav></div>
   <button class="pill ink small adm-top" id="adm-top" type="button">↑ Menu</button>
   <div class="gate" id="gate">
     <p class="msg" id="gate-msg">Vérification de l'accès…</p>
@@ -1326,6 +1332,12 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       <div class="sel-bar" id="sel-bar" hidden><span id="sel-n"></span><span class="sel-acts">Déplacer vers <button type="button" class="pill ink small" data-to="bandeau">Bandeau</button><button type="button" class="pill ink small" data-to="apero">Apéro</button><button type="button" class="pill ink small" data-to="spot">Lac</button><button type="button" class="pill line small" id="sel-ret">Retirer</button><button type="button" class="pill line small" id="sel-bib">Changer de bibliothèque</button><button type="button" class="pill line small" id="sel-clear">Tout désélectionner</button></span></div>
     </section>
     <dialog class="vw" id="vw" aria-label="Photo en grand"><img id="vw-img" alt=""><p id="vw-cap"></p><div class="vw-act vw-keep" id="vw-keep" hidden><button type="button" id="vw-keep-b" tabindex="-1"></button><span>Espace : garder / écarter · ← → : photo suivante</span></div><div class="vw-act" id="vw-act" hidden><span>Afficher dans</span><button type="button" data-to="bandeau">Bandeau</button><button type="button" data-to="apero">Apéro</button><button type="button" data-to="spot">Lac</button></div><button type="button" class="vw-b vw-p" id="vw-prev" aria-label="Photo précédente">←</button><button type="button" class="vw-b vw-n" id="vw-next" aria-label="Photo suivante">→</button><button type="button" class="vw-b vw-x" id="vw-close" aria-label="Fermer">✕</button></dialog>
+    <section class="adm-sec" id="sec-lacs">
+      <h3>Lacs environnants</h3>
+      <p class="adm-intro">Ordre d'affichage des lacs dans la rubrique « Lacs environnants ». Les lacs cochés « Vue réduite » sont ceux visibles quand la rubrique est repliée ; les autres n'apparaissent qu'en dépliant.</p>
+      <div id="lac-list"><p class="msg">Chargement…</p></div>
+      <div class="bar" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:16px"><button class="pill ink small" type="button" id="lac-save" disabled>Enregistrer l'ordre</button><span class="msg" id="lac-msg" role="status"></span></div>
+    </section>
     <section class="adm-sec" id="sec-admins">
       <h3>Administrateurs</h3>
       <p class="adm-intro">Les administrateurs peuvent modifier tout le site. Un nouvel administrateur reçoit un e-mail de confirmation à valider avant sa première connexion.</p>
@@ -1782,7 +1794,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       $('gate').hidden=false;$('login').hidden=false;$('admin-body').hidden=true;$('logout').hidden=true;return;
     }
     $('gate').hidden=true;$('admin-body').hidden=false;$('logout').hidden=false;
-    fillTextForm();renderEditor();renderAnEditor();loadInscriptions();loadContacts();loadAdmins();loadStats();
+    fillTextForm();renderEditor();renderAnEditor();loadInscriptions();loadContacts();loadAdmins();loadStats();loadLakes();
     try{assets=window.claude&&await window.claude.use('assets')}catch(e){}
     renderPhEditor();phCleanDupes();
   });
@@ -1865,6 +1877,43 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     box.append(lists);
   }
   // Administrateurs
+  // ---------- Lacs environnants : ordre et vue réduite ----------
+  let lacs=[];
+  function renderLakes(){
+    const box=$('lac-list');box.textContent='';
+    const nb=lacs.filter(l=>l.en_resume).length;
+    lacs.forEach((l,i)=>{
+      const row=document.createElement('div');row.className='adm-row lac-row';
+      const t=document.createElement('span');t.className='lac-name';
+      const num=document.createElement('b');num.textContent=(i+1)+'.';
+      t.append(num,document.createTextNode(' '+l.name));
+      const cm=document.createElement('small');cm.textContent=l.commune||'';t.append(cm);
+      const bar=document.createElement('span');bar.className='lac-bar';
+      const ck=document.createElement('label');ck.className='check';
+      const cb=document.createElement('input');cb.type='checkbox';cb.checked=!!l.en_resume;
+      cb.addEventListener('change',()=>{l.en_resume=cb.checked;dirty();renderLakes();const c=$('lac-list').children[i].querySelector('input');if(c)c.focus()});
+      ck.append(cb,document.createTextNode(' Vue réduite'));
+      const up=document.createElement('button');up.type='button';up.className='pill line small';up.textContent='↑';up.setAttribute('aria-label','Monter '+l.name);up.disabled=i===0;
+      const dn=document.createElement('button');dn.type='button';dn.className='pill line small';dn.textContent='↓';dn.setAttribute('aria-label','Descendre '+l.name);dn.disabled=i===lacs.length-1;
+      const mv=d=>{const j=i+d;[lacs[i],lacs[j]]=[lacs[j],lacs[i]];dirty();renderLakes();const b=$('lac-list').children[j].querySelectorAll('button')[d<0?0:1];if(b&&!b.disabled)b.focus()};
+      up.addEventListener('click',()=>mv(-1));dn.addEventListener('click',()=>mv(1));
+      bar.append(ck,up,dn);row.append(t,bar);box.append(row);
+    });
+    const info=document.createElement('p');info.className='msg';info.style.marginTop='10px';
+    info.textContent=nb+' lac'+(nb>1?'s':'')+' en vue réduite sur '+lacs.length+(nb>6?' (conseil : 6 au maximum pour garder la rubrique compacte)':'');
+    box.append(info);
+  }
+  function dirty(){$('lac-save').disabled=false;say($('lac-msg'),'Modifications non enregistrées.')}
+  async function loadLakes(){
+    if(!db||!db.lakes)return;
+    try{lacs=await db.lakes();renderLakes();$('lac-save').disabled=true;say($('lac-msg'),'')}
+    catch(e){$('lac-list').innerHTML='<p class="msg err">Liste des lacs indisponible.</p>'}
+  }
+  $('lac-save').addEventListener('click',async()=>{
+    const m=$('lac-msg'),b=$('lac-save');b.disabled=true;say(m,'Enregistrement…');
+    try{await db.saveLakes(lacs.map((l,i)=>({slug:l.slug,ordre:i+1,en_resume:!!l.en_resume})));say(m,'Ordre enregistré, visible sur le site.','ok')}
+    catch(err){b.disabled=false;say(m,'Enregistrement refusé ('+(err&&err.code||'erreur')+').','err')}
+  });
   async function loadAdmins(){
     const box=$('adm-list');let list=[],me='';
     try{list=await user.listAdmins();me=await user.email()}catch(e){box.innerHTML='<p class="msg err">Liste indisponible : lancez le fichier supabase/002_admins.sql dans Supabase.</p>';return}

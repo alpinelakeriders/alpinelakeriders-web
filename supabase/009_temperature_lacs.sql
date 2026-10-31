@@ -50,3 +50,18 @@ alter table public.lakes add column outlier_c numeric;
 -- Lacs : lakes.cold_outlier_c = 3.5 → seules les chutes froides isolées sont écartées
 -- (un voile nuageux non détecté refroidit la mesure ; les coups de chaud réels sont conservés).
 alter table public.lakes add column cold_outlier_c numeric;
+
+-- Ordre et vue réduite gérés depuis l'administration du site (rubrique « Lacs »)
+alter table public.lakes add column en_resume boolean not null default false;
+create or replace function public.save_lakes_layout(p_items jsonb) returns integer
+language plpgsql security definer set search_path = public as $$
+declare n integer;
+begin
+  if not public.is_admin() then raise exception 'reserve aux administrateurs'; end if;
+  update public.lakes l set ordre = (x->>'ordre')::int, en_resume = coalesce((x->>'en_resume')::boolean, false)
+  from jsonb_array_elements(p_items) x where l.slug = x->>'slug';
+  get diagnostics n = row_count;
+  return n;
+end $$;
+revoke execute on function public.save_lakes_layout(jsonb) from public, anon;
+grant execute on function public.save_lakes_layout(jsonb) to authenticated;
