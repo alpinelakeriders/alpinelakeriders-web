@@ -857,6 +857,12 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .fiche dd{margin:0;min-width:0;overflow-wrap:anywhere}
 .fiche .rm{font-size:14px;color:var(--muted);border-left:2px solid var(--line);padding-left:12px}
 .fiche .acts{display:flex;gap:8px;flex-wrap:wrap}
+.edform{display:grid;gap:10px;font-size:14px}
+.edform label{display:grid;gap:4px;color:var(--muted);font-size:12px}
+.edform input,.edform select,.edform textarea{font:inherit;font-size:14px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;width:100%;box-sizing:border-box}
+.edform textarea{min-height:90px;resize:vertical}
+.edform .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.edform .err{color:#c0392b;font-size:13px;margin:0}
 .more{padding:20px 0}
 .empty{padding:40px 0;color:var(--muted)}
 .empty b{display:block;color:var(--fg);font-weight:500;font-size:18px;margin-bottom:6px}
@@ -1111,6 +1117,10 @@ window.ALR_SPOTS_START=function(){
   // Positions corrigées par les admins (glisser-déposer), enregistrées dans la base : collection spots_pos.
   function applyPos(s,pts){if(!pts||!pts.length)return;s.la=pts[0][0];s.lo=pts[0][1];s.pts=pts;s.ap=0}
   let db=null,me='';
+  const MAXPTS=3,RAYON=0.3; // jusqu'à 3 départs, tous à moins de 300 m du départ 1
+  // Infos corrigées par les admins : collection spots_info
+  const CHAMPS=['n','v','rg','p','e','c','t','a','ac','st','f','s','li','ph','so','rm'];
+  function applyInfo(s,c){if(!c)return;CHAMPS.forEach(k=>{if(k in c)s[k]=c[k]})}
   const ALR_ID=6;
 
   // ---------- Langue ----------
@@ -1188,7 +1198,8 @@ window.ALR_SPOTS_START=function(){
   Object.entries(groups('e')).forEach(([n,a])=>{const c=centroid(a);addPlace(n.replace(/\s*\(.*\)$/,''),'eau',c[0],c[1],a[0].p)});
   Object.entries(groups('rg')).forEach(([n,a])=>{const c=centroid(a);n.split('/').forEach(p=>addPlace(p.trim(),'region',c[0],c[1],a[0].p))});
   Object.keys(PAYS).forEach(c=>{const a=SPOTS.filter(s=>s.p===c&&s.la!=null);if(a.length){const k=centroid(a);addPlace(PAYS[c][0],'pays',k[0],k[1],c,PAYS[c][1])}});
-  SPOTS.forEach(s=>{s.key=norm([s.n,s.v,s.rg,s.e,s.st,PAYS[s.p]&&PAYS[s.p].join(' ')].join(' '))});
+  const reKey=s=>{s.key=norm([s.n,s.v,s.rg,s.e,s.st,PAYS[s.p]&&PAYS[s.p].join(' ')].join(' '))};
+  SPOTS.forEach(reKey);
 
   // ---------- État ----------
   const PAGE=matchMedia('(max-width: 959px)').matches?10:30;
@@ -1239,6 +1250,7 @@ window.ALR_SPOTS_START=function(){
     return t;
   }
   function fiche(s){
+    if(st.edInfo===s.i)return infoForm(s);
     const f=el('div','fiche'),dl=el('dl');
     const row=(k,v)=>{if(!v)return;dl.append(el('dt',null,k),el('dd',null,v))};
     row(tr("Plan d'eau",'Water'),s.e);row(tr('Type','Type'),s.t);row(tr('Accès','Access'),s.a);row(tr('Géré par','Run by'),s.st);
@@ -1252,7 +1264,8 @@ window.ALR_SPOTS_START=function(){
     if(s.li)a.append(link(s.li,tr('Site du spot','Spot website')));
     if(s.ph)a.append(link(s.ph,tr('Photos','Photos')));
     if(s.so&&s.so!==s.li)a.append(link(s.so,'Source'));
-    if(db){const b=el('button','pill line small',tr('Modifier la position','Edit position'));b.type='button';b.addEventListener('click',()=>editPos(s));a.append(b)}
+    if(db){const b=el('button','pill line small',tr('Modifier la position','Edit position'));b.type='button';b.addEventListener('click',()=>editPos(s));a.append(b);
+      const c=el('button','pill line small',tr('Modifier les infos','Edit details'));c.type='button';c.addEventListener('click',()=>{st.edInfo=s.i;render()});a.append(c)}
     f.append(a);return f;
   }
   function render(){
@@ -1513,19 +1526,54 @@ window.ALR_SPOTS_START=function(){
   function drawEd(msg,err){
     ed.lay.clearLayers();ed.mk=ed.pts.map((q,k)=>{
       const m=L.marker(q,{draggable:true,autoPan:true,zIndexOffset:3000,title:tr('Départ ','Start ')+(k+1),icon:L.divIcon({className:'',html:'<div class="mk ed">'+(k+1)+'</div>',iconSize:[26,26],iconAnchor:[13,13]})});
-      m.on('dragend',()=>{const p=m.getLatLng();ed.pts[k]=[p.lat,p.lng]});
+      m.on('dragend',()=>{const p=m.getLatLng(),o=ed.pts[0];
+        if(k>0&&dist(o[0],o[1],p.lat,p.lng)>RAYON){m.setLatLng(ed.pts[k]);drawEd(tr('Trop loin : les départs doivent rester à moins de 300 m du départ 1.','Too far: starts must stay within 300 m of start 1.'),true);return}
+        if(k===0){const dx=p.lat-o[0],dy=p.lng-o[1];ed.pts=ed.pts.map((q,j)=>j===0?[p.lat,p.lng]:[q[0]+dx,q[1]+dy]);drawEd();return} // le départ 1 emmène les autres
+        ed.pts[k]=[p.lat,p.lng]});
       return m.addTo(ed.lay)});
     const bar=$('editbar');bar.textContent='';bar.hidden=false;
     bar.append(el('b',null,ed.s.n));
     const btn=(t,fn,cls)=>{const b=el('button',cls||'pill line small',t);b.type='button';b.addEventListener('click',fn);bar.append(b);return b};
-    btn(tr('+ Ajouter un départ','+ Add a start'),()=>{const c=map.getCenter(),l=ed.pts[ed.pts.length-1],off=map.containerPointToLatLng(map.latLngToContainerPoint(l).add([40,0]));ed.pts.push([off.lat,off.lng]);drawEd()});
+    if(ed.pts.length<MAXPTS)btn(tr('+ Ajouter un départ','+ Add a start'),()=>{const c=map.getCenter(),l=ed.pts[ed.pts.length-1],off=map.containerPointToLatLng(map.latLngToContainerPoint(l).add([40,0]));ed.pts.push([off.lat,off.lng]);drawEd()});
     if(ed.pts.length>1)btn(tr('Retirer le départ ','Remove start ')+ed.pts.length,()=>{ed.pts.pop();drawEd()});
     btn(tr('Annuler','Cancel'),stopEdit);
     btn(tr('Valider','Save'),savePos,'pill ink small');
-    const p=el('p',err?'err':null,msg||tr('Glissez chaque point numéroté à l’endroit exact du départ.','Drag each numbered point to the exact start spot.'));bar.append(p);
+    const p=el('p',err?'err':null,msg||tr('Glissez chaque point numéroté à l’endroit exact du départ (3 au plus, à moins de 300 m du n° 1).','Drag each numbered point to the exact start spot (up to 3, within 300 m of no. 1).'));bar.append(p);
+  }
+  function infoForm(s){
+    const f=el('form','fiche edform');
+    const inp=(k,label,ph)=>{const l=el('label',null,label);const i=el('input');i.name=k;i.value=s[k]||'';if(ph)i.placeholder=ph;l.append(i);return l};
+    const sel=(k,label,opts)=>{const l=el('label',null,label);const x=el('select');x.name=k;opts.forEach(([v,t])=>{const o=el('option',null,t);o.value=v;if((s[k]||'')===v)o.selected=true;x.append(o)});l.append(x);return l};
+    const two=(a,b)=>{const d=el('div','two');d.append(a,b);return d};
+    f.append(inp('n',tr('Nom du spot','Spot name')));
+    f.append(two(inp('v',tr('Ville','Town')),inp('rg',tr('Région','Region'))));
+    f.append(two(sel('p',tr('Pays','Country'),Object.keys(PAYS).map(c=>[c,pays(c)])),inp('e',tr("Plan d'eau",'Water'))));
+    f.append(two(sel('c',tr('Catégorie','Category'),Object.keys(CATS).map(c=>[c,tr(CATS[c][2],CATS[c][3])])),inp('t',tr('Type de ponton','Dock type'),tr('ponton flottant, quai, plage…','floating dock, quay, beach…'))));
+    f.append(two(sel('ac',tr('Accès','Access'),Object.keys(ACC).map(c=>[c,tr(ACC[c][0],ACC[c][1])])),inp('a',tr('Accès (détail)','Access (details)'),tr('public, privé, demander l’autorisation…','public, private, ask permission…'))));
+    f.append(inp('st',tr('Géré par','Run by')));
+    f.append(two(inp('f',tr('Fréquentation','Crowd')),inp('s',tr('Saison, horaires','Season, hours'))));
+    const l=el('label',null,tr('Description','Description'));const t=el('textarea');t.name='rm';t.value=s.rm||'';l.append(t);f.append(l);
+    f.append(inp('li',tr('Site du spot (lien)','Spot website (link)'),'https://'));
+    f.append(two(inp('ph',tr('Photos (lien)','Photos (link)'),'https://'),inp('so',tr('Source (lien)','Source (link)'),'https://')));
+    const msg=el('p','err');msg.hidden=true;f.append(msg);
+    const a=el('div','acts');
+    const ok=el('button','pill ink small',tr('Enregistrer','Save'));ok.type='submit';
+    const no=el('button','pill line small',tr('Annuler','Cancel'));no.type='button';no.addEventListener('click',()=>{st.edInfo=null;render()});
+    a.append(ok,no);f.append(a);
+    f.addEventListener('submit',async e=>{e.preventDefault();
+      const c={};CHAMPS.forEach(k=>{const x=f.elements[k];if(x)c[k]=x.value.trim()});
+      if(!c.n){msg.textContent=tr('Le nom est obligatoire.','The name is required.');msg.hidden=false;return}
+      ok.disabled=true;ok.textContent=tr('Enregistrement…','Saving…');
+      try{await db.doc('spots_info/'+s.i).set({champs:c,par:me,le:new Date().toISOString()})}
+      catch(err){ok.disabled=false;ok.textContent=tr('Enregistrer','Save');msg.textContent=tr('Pas enregistré, réessayez. ','Not saved, try again. ')+(err&&err.message||'');msg.hidden=false;return}
+      applyInfo(s,c);reKey(s);st.edInfo=null;buildChips();render();drawMarkers();
+      $('msg').textContent=tr('Infos enregistrées.','Details saved.');
+    });
+    return f;
   }
   async function savePos(){
-    const pts=ed.pts.map(q=>[+q[0].toFixed(6),+q[1].toFixed(6)]),s=ed.s;
+    const pts=ed.pts.slice(0,MAXPTS).map(q=>[+q[0].toFixed(6),+q[1].toFixed(6)]),s=ed.s;
+    if(pts.some(q=>dist(pts[0][0],pts[0][1],q[0],q[1])>RAYON)){drawEd(tr('Un départ est à plus de 300 m du départ 1 : rapprochez-le.','A start is more than 300 m from start 1: move it closer.'),true);return}
     drawEd(tr('Enregistrement…','Saving…'));
     try{await db.doc('spots_pos/'+s.i).set({pts,par:me,le:new Date().toISOString()})}
     catch(e){drawEd(tr('Pas enregistré, réessayez. ','Not saved, try again. ')+(e&&e.message||''),true);return}
@@ -1545,6 +1593,9 @@ window.ALR_SPOTS_START=function(){
     try{const u=await window.claude.use('user');me=await u.email()}catch(e){}
     const snap=await db.collection('spots_pos').get();
     snap.docs.forEach(d=>{const s=SPOTS.find(x=>String(x.i)===d.id),v=d.data();if(s&&v&&Array.isArray(v.pts))applyPos(s,v.pts)});
+    const inf=await db.collection('spots_info').get();
+    inf.docs.forEach(d=>{const s=SPOTS.find(x=>String(x.i)===d.id),v=d.data();if(s&&v&&v.champs){applyInfo(s,v.champs);reKey(s)}});
+    buildChips();
     render();drawMarkers();
   }catch(e){}})();
 };
