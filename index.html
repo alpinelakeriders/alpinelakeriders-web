@@ -295,11 +295,11 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .lt-btn:hover{color:var(--fg)}
 .lt-btn span{display:inline-block;margin-left:4px}
 .lt-hist{list-style:none;margin:10px 0 2px;padding:0;display:grid;gap:2px;max-width:520px}
-.lt-hist li{display:grid;grid-template-columns:110px 1fr 64px;align-items:center;gap:14px;padding-block:5px;font-size:13px;color:var(--muted)}
+.lt-hist li{display:grid;grid-template-columns:110px 1fr 104px;align-items:center;gap:14px;padding-block:5px;font-size:13px;color:var(--muted)}
 .lt-hist b{font-size:13px;color:var(--fg);text-align:right}
 .lt-bar{height:3px;border-radius:2px;background:var(--line);overflow:hidden}
 .lt-bar i{display:block;height:100%;background:var(--lake);opacity:.7}
-@media (max-width:560px){.lt-hist li{grid-template-columns:96px 1fr 56px;gap:10px}}
+@media (max-width:560px){.lt-hist li{grid-template-columns:96px 1fr 96px;gap:10px}}
 .spot-dots button{width:26px;height:20px;padding:0;border:0;background:none;cursor:pointer;position:relative}
 .spot-dots button::before{content:"";position:absolute;left:0;right:0;top:9px;height:2px;background:rgba(255,255,255,.45)}
 .spot-dots button[aria-current="true"]::before{background:#fff}
@@ -812,7 +812,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     <small id="lake-temp-m"></small>
     <button class="lt-btn" id="lake-temp-btn" type="button" aria-expanded="false" aria-controls="lake-temp-h" hidden>Historique <span aria-hidden="true">↓</span></button>
   </div>
-  <ol class="lt-hist" id="lake-temp-h" hidden aria-label="Mesures précédentes"></ol>
+  <ol class="lt-hist" id="lake-temp-h" hidden aria-label="Mesures des 12 derniers mois"></ol>
 </div></div>
 <script>
 // Température de surface du lac : passages satellite sans nuage (Landsat 8-9 via Copernicus),
@@ -821,9 +821,9 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   var c=window.ALR_CONFIG;if(!c||!window.fetch)return;
   var MOIS=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
   var MC=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
-  var fmt=function(t){return t.toFixed(1).replace('.',',')+' °C'};
+  var fmt=function(t){return t<0.5?'≈ 0 °C · glace':t.toFixed(1).replace('.',',')+' °C'};
   var $=function(id){return document.getElementById(id)};
-  fetch(c.url+'/rest/v1/lake_temperature?select=acquired_on,temp_c&order=acquired_on.desc&limit=13',{headers:{apikey:c.anonKey,Authorization:'Bearer '+c.anonKey}})
+  fetch(c.url+'/rest/v1/lake_temperature?select=acquired_on,temp_c&order=acquired_on.desc&limit=60',{headers:{apikey:c.anonKey,Authorization:'Bearer '+c.anonKey}})
     .then(function(r){return r.ok?r.json():[]})
     .then(function(rows){
       rows=(rows||[]).map(function(r){return {t:Number(r.temp_c),d:new Date(r.acquired_on+'T12:00:00')}})
@@ -833,13 +833,14 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       $('lake-temp-v').textContent=fmt(last.t);
       $('lake-temp-m').textContent='Mesure satellite du '+last.d.getDate()+' '+MOIS[last.d.getMonth()]+' (dernier passage sans nuage) · surface vers 10h30 · ±2 °C';
       $('lake-temp').hidden=false;
-      var prev=rows.slice(1);if(!prev.length)return;
+      var since=new Date(last.d);since.setFullYear(since.getFullYear()-1);since.setDate(since.getDate()-7);
+      var prev=rows.slice(1).filter(function(r){return r.d>=since});if(!prev.length)return;
       var list=$('lake-temp-h'),btn=$('lake-temp-btn');
       prev.forEach(function(r){
         var li=document.createElement('li');
         var d=document.createElement('span');d.className='lt-d';d.textContent=r.d.getDate()+' '+MC[r.d.getMonth()]+' '+r.d.getFullYear();
         var bar=document.createElement('span');bar.className='lt-bar';bar.setAttribute('aria-hidden','true');
-        var fill=document.createElement('i');fill.style.width=Math.max(4,Math.min(100,r.t/30*100))+'%';bar.append(fill);
+        var fill=document.createElement('i');fill.style.width=Math.max(3,Math.min(100,r.t/30*100))+'%';bar.append(fill);
         var v=document.createElement('b');v.textContent=fmt(r.t);
         li.append(d,bar,v);list.append(li);
       });
