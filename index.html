@@ -832,7 +832,9 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 <script src="js/backend.js?v=52"></script>
 <script>
 // Lien « Spots » (annuaire des spots, page en préparation) : visible seulement pour un administrateur connecté
-(function(){function go(){if(!window.claude)return;window.claude.use('user').then(u=>u&&u.canEdit()).then(ok=>{if(ok)document.querySelectorAll('[data-admin-only]').forEach(e=>e.hidden=false)}).catch(()=>{})}
+(function(){function show(){document.querySelectorAll('[data-admin-only]').forEach(e=>e.hidden=false)}
+function go(){var f=null;try{f=localStorage.getItem('alr-admin')}catch(e){}if(f)show(); // appareil déjà utilisé par un admin : lien gardé, la page Spots redemande la connexion si besoin
+if(!window.claude)return;window.claude.use('user').then(u=>u&&u.canEdit()).then(ok=>{if(ok){show();try{localStorage.setItem('alr-admin','1')}catch(e){}}}).catch(()=>{})}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',go);else go()})();
 </script>
 <script src="js/i18n.js?v=4"></script>
@@ -2139,6 +2141,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
     }
     $('gate').hidden=true;$('admin-body').hidden=false;$('logout').hidden=false;
     document.querySelectorAll('[data-admin-only]').forEach(e=>e.hidden=false);
+    try{localStorage.setItem('alr-admin','1')}catch(e){}
     fillTextForm();renderEditor();renderAnEditor();loadInscriptions();loadContacts();loadAvis();loadAdmins();loadStats();loadLakes();
     try{assets=window.claude&&await window.claude.use('assets')}catch(e){}
     renderPhEditor();phCleanDupes();
@@ -2384,7 +2387,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
       e.target.reset();loadAdmins();
     }catch(err){say(m,/rate|limit/i.test(err&&err.message||'')?'Trop d\'envois d\'e-mails, réessayez dans une heure.':'Ajout refusé ('+(err&&err.code||'erreur')+').','err')}
   });
-  $('logout').addEventListener('click',async()=>{await user.logout();isAdmin=false;$('close-admin').click()});
+  $('logout').addEventListener('click',async()=>{await user.logout();try{localStorage.removeItem('alr-admin')}catch(e){}document.querySelectorAll('[data-admin-only]').forEach(e=>e.hidden=true);isAdmin=false;$('close-admin').click()});
   // Rubriques repliables (fermées par défaut, état mémorisé sur cet appareil)
   let admOpen={};try{admOpen=JSON.parse(localStorage.getItem('alr-adm-open')||'{}')||{}}catch(e){}
   const secs=[...document.querySelectorAll('.adm-sec')];
