@@ -137,7 +137,7 @@
       det.append(el('p','label mt-titre','Météo '+(an.demain?'de demain':'du jour')+' · '+o.name+' · '+JOURS[dt.getDay()]+' '+dt.getDate()+' '+MOIS[dt.getMonth()]));
       var sun=el('p','mt-sun');sun.append(el('span',null,'🌅 Lever du soleil '),el('b',null,hm(an.sr)),el('span',null,' · 🌇 Coucher '),el('b',null,hm(an.ss)));det.append(sun);
       det.append(grille(an));
-      var hb=arrowBtn('lt-btn','Heure par heure'),ol=heures(an);ol.hidden=!o.hourOpen;
+      var hb=arrowBtn('lt-btn','Heure par heure : vent et température'),ol=heures(an);ol.hidden=!o.hourOpen;
       if(o.hourOpen){hb.setAttribute('aria-expanded','true');hb.querySelector('[aria-hidden]').textContent='↑'}
       toggle(hb,ol);det.append(hb,ol);
       src.textContent='Prévision AROME Météo-France (maille 1,3 km) via Open-Meteo · vent moyen à 10 m en km/h · plus le vent est faible, plus le plan d\'eau est lisse. Nuages en direct : satellites Meteosat (EUMETSAT).';
@@ -203,8 +203,9 @@
     an.jourH.forEach(function(x){
       var li=el('li',(x===an.best?'mt-best ':'')+(!x.futur?'mt-past ':'')+(x.v<=8?'mt-calme':x.v>14?'mt-vente':''));
       var c=el('span','mt-pic',x.pr>=.3?'🌧️':x.sf>=.6?'☀️':x.sf>=.4?'🌤️':x.sf>=.15?'⛅':'☁️');c.setAttribute('aria-hidden','true');
-      li.title=x.h+'h : vent '+Math.round(x.v)+' km/h, rafales '+Math.round(x.g)+' km/h';li.setAttribute('aria-label',li.title);
-      li.append(el('span',null,x.h+'h'),el('b',null,Math.round(x.v)),c);ol.append(li);
+      li.title=x.h+'h : vent '+Math.round(x.v)+' km/h, rafales '+Math.round(x.g)+' km/h'+(x.t!=null?', '+Math.round(x.t)+' °C':'');li.setAttribute('aria-label',li.title);
+      var w=el('b',null,Math.round(x.v));w.append(el('small','mt-u',' km/h'));
+      li.append(el('span',null,x.h+'h'),w,c,el('span','mt-tp',x.t!=null?Math.round(x.t)+' °C':''));ol.append(li);
     });
     return ol;
   }
