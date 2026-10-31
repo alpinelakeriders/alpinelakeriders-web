@@ -828,6 +828,8 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 #map.sat .mk.libre{box-shadow:0 0 0 2.5px #fff,0 1px 4px rgba(0,0,0,.5)}
 #map.sat .mk.alr{box-shadow:0 0 0 3px #fff,0 2px 8px rgba(0,0,0,.6)}
 #map.sat .pin{box-shadow:0 0 0 2px #fff}
+#map.tiles:not(.sat) .mk:not(.alr){box-shadow:inset 0 0 0 2.5px var(--fg),0 0 0 2px var(--bg),0 1px 4px rgba(0,0,0,.35)}
+#map.tiles:not(.sat) .mk.libre{box-shadow:0 0 0 2.5px var(--bg),0 1px 4px rgba(0,0,0,.35)}
 .reset .pill{background:var(--bg);box-shadow:0 0 0 1px var(--line)}
 .list{min-height:0;overflow:auto;overscroll-behavior:contain}
 @media (min-width:960px){.list{order:1}}
@@ -1288,25 +1290,42 @@ window.ALR_SPOTS_START=function(){
       new MutationObserver(re).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
     }).catch(()=>{});
     m.attributionControl.addAttribution('Fond : Natural Earth');
-    // Vue satellite (Esri World Imagery) : s'affiche toute seule quand on zoome de près (niveau 11 et plus),
-    // ou à la demande avec le bouton Satellite. Noms des lieux par-dessus.
+    // Trois niveaux de fond quand on zoome (mode Auto) :
+    //  - vue d'ensemble : pays et lacs dessinés (Natural Earth) ;
+    //  - zoom 6 à 12 : plan détaillé avec routes, villes et lacs (CARTO / OpenStreetMap) ;
+    //  - zoom 13 et plus : satellite (Esri) avec les noms des lieux.
+    // Les boutons Plan et Satellite forcent l'un ou l'autre.
+    const ROAD=6,SAT=13;
+    m.createPane('road');m.getPane('road').style.zIndex=190;
     m.createPane('sat');m.getPane('sat').style.zIndex=200;
+    const dark=()=>document.documentElement.dataset.theme==='dark'||(document.documentElement.dataset.theme!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches);
+    const roadUrl=()=>'https://{s}.basemaps.cartocdn.com/rastertiles/'+(dark()?'dark_all':'voyager')+'/{z}/{x}/{y}{r}.png';
+    const road=L.tileLayer(roadUrl(),{pane:'road',subdomains:'abcd',maxNativeZoom:19,maxZoom:18,attribution:'© OpenStreetMap · © CARTO'});
     const sat=L.layerGroup([
       L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{pane:'sat',maxNativeZoom:18,maxZoom:18,attribution:'Imagerie © Esri, Maxar, Earthstar Geographics'}),
       L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',{pane:'sat',maxNativeZoom:18,maxZoom:18})
     ]);
-    let mode='auto',satOK=true,errs=0,oks=0;
+    let mode='auto',satOK=true,roadOK=true,errs=0,oks=0,rerrs=0,roks=0;
     sat.eachLayer(l=>{l.on('tileerror',()=>{errs++;if(!oks&&errs>=4&&satOK){satOK=false;applyView()}});l.on('tileload',()=>{oks++})});
+    road.on('tileerror',()=>{rerrs++;if(!roks&&rerrs>=4&&roadOK){roadOK=false;applyView()}});road.on('tileload',()=>{roks++});
+    const reTheme=()=>road.setUrl(roadUrl());
+    matchMedia('(prefers-color-scheme: dark)').addEventListener('change',reTheme);
+    new MutationObserver(reTheme).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
     function applyView(){
-      const want=satOK&&(mode==='sat'||(mode==='auto'&&m.getZoom()>=11));
-      if(want&&!m.hasLayer(sat))sat.addTo(m);else if(!want&&m.hasLayer(sat))m.removeLayer(sat);
-      m.getContainer().classList.toggle('sat',want);
-      m.setMaxZoom(satOK?18:14);
+      const z=m.getZoom();
+      const wantSat=satOK&&(mode==='sat'||(mode==='auto'&&z>=SAT));
+      const wantRoad=roadOK&&!wantSat&&((mode==='plan'&&z>=5)||(mode==='auto'&&z>=ROAD)||(mode==='sat'&&!satOK&&z>=ROAD));
+      if(wantSat&&!m.hasLayer(sat))sat.addTo(m);else if(!wantSat&&m.hasLayer(sat))m.removeLayer(sat);
+      if(wantRoad&&!m.hasLayer(road))road.addTo(m);else if(!wantRoad&&m.hasLayer(road))m.removeLayer(road);
+      m.getContainer().classList.toggle('sat',wantSat);
+      m.getContainer().classList.toggle('tiles',wantSat||wantRoad);
+      m.setMaxZoom(satOK||roadOK?18:14);
       const note=document.getElementById('satnote');
-      note.hidden=satOK||!(mode==='sat'||m.getZoom()>=11);
-      note.textContent=tr('Vue satellite indisponible dans cet aperçu, elle s\u2019affichera sur le site','Satellite view is not available in this preview; it will show on the website');
+      note.hidden=satOK||!(mode==='sat'||z>=SAT);
+      note.textContent=tr('Vue satellite indisponible dans cet aperçu, elle s’affichera sur le site','Satellite view is not available in this preview; it will show on the website');
       document.querySelectorAll('#view button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===mode));
-      document.getElementById('view').hidden=!satOK;
+      document.getElementById('view').hidden=!satOK&&!roadOK;
+      if(window.ALR_CITIES)window.ALR_CITIES();
     }
     document.querySelectorAll('#view button').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.v;if(mode==='sat'&&m.getZoom()<11&&satOK)m.setZoom(11);applyView()}));
     m.on('zoomend',applyView);
@@ -1317,7 +1336,8 @@ window.ALR_SPOTS_START=function(){
   if(map){
     const cities=L.layerGroup();
     VILLES.forEach(c=>L.marker([c[2],c[3]],{interactive:false,keyboard:false,icon:L.divIcon({className:'city',html:'<span>'+((lang==='en'&&EN_NAMES[c[0]])||c[0])+'</span>',iconSize:[0,0]})}).addTo(cities));
-    const tog=()=>{if(map.getZoom()>=6&&!map.getContainer().classList.contains('sat'))cities.addTo(map);else cities.remove()};
+    const tog=()=>{if(map.getZoom()>=6&&!map.getContainer().classList.contains('tiles'))cities.addTo(map);else cities.remove()};
+    window.ALR_CITIES=tog;
     map.on('zoomend',tog);tog();
   }
   let cluster=null,alrLayer=null;const markers={};
