@@ -201,12 +201,12 @@
     var ol=el('ol','mt-h');ol.setAttribute('aria-label','Vent moyen en km/h, heure par heure');
     an.jourH.forEach(function(x){
       var li=el('li',(x===an.best?'mt-best ':'')+(!x.futur?'mt-past ':'')+(x.v<=8?'mt-calme':x.v>14?'mt-vente':''));
-      var c=el('span',null,x.pr>=.3?'☂':x.sf>=.6?'☀':x.sf>=.25?'⛅':'☁');c.setAttribute('aria-hidden','true');
+      var c=el('span','mt-pic',x.pr>=.3?'🌧️':x.sf>=.6?'☀️':x.sf>=.4?'🌤️':x.sf>=.15?'⛅':'☁️');c.setAttribute('aria-hidden','true');
       li.title=x.h+'h : vent '+Math.round(x.v)+' km/h, rafales '+Math.round(x.g)+' km/h';li.setAttribute('aria-label',li.title);
       li.append(el('span',null,x.h+'h'),el('b',null,Math.round(x.v)),c);ol.append(li);
     });
     return ol;
   }
 
-  window.ALR_METEO={forecast:forecast,analyse:analyse,nuages:nuages,icSat:icSat,bloc:bloc,WEBCAMS:WEBCAMS};
+  window.ALR_METEO={forecast:forecast,analyse:analyse,nuages:nuages,icSat:icSat,bloc:bloc,WEBCAMS:WEBCAMS,WEBCAMS_ON:false};
 })();
