@@ -1243,6 +1243,7 @@ window.ALR_SPOTS_START=function(){
   function tags(s){
     const t=el('div','tags');
     if(s.i===ALR_ID)t.append(el('span','tag alr',tr('Notre spot','Our spot')));
+    if(s.neuf)t.append(el('span','tag alr',tr('Nouveau · à vérifier','New · to check')));
     t.append(el('span','tag',tr(CATS[s.c][2],CATS[s.c][3])));
     if(s.ac)t.append(el('span','tag'+(s.ac==='libre'?' libre':''),tr(ACC[s.ac][0],ACC[s.ac][1])));
     if(s.la==null)t.append(el('span','tag',tr('Position non publiée','No public position')));
@@ -1586,11 +1587,22 @@ window.ALR_SPOTS_START=function(){
     drawMarkers();
   }
 
+  function addNew(v,quiet){
+    if(!v||v.la==null||v.lo==null)return;
+    const sp=Object.assign({},v);if(sp.i==null)sp.i=Date.now();
+    if(SPOTS.some(x=>x.i===sp.i))return;
+    if(!CATS[sp.c])sp.c='ponton';if(sp.ac&&!ACC[sp.ac])sp.ac='';if(!sp.p)sp.p='FR';
+    sp.neuf=sp.statut==='nouveau';SPOTS.push(sp);reKey(sp);
+    if(!quiet){buildChips();render();drawMarkers()}
+  }
+  window.ALR_SPOT_AJOUTE=v=>addNew(v);
   applyLang();drawMarkers();fitTo(SPOTS);
   // Charge les positions déjà corrigées
   (async()=>{try{
     db=window.claude&&await window.claude.use('db');if(!db)return;
     try{const u=await window.claude.use('user');me=await u.email()}catch(e){}
+    // Spots ajoutés par photos (collection spots_new, fil « Ajouter un spot à partir de photos »)
+    try{const nw=await db.collection('spots_new').get();nw.docs.forEach(d=>addNew(d.data(),true))}catch(e){}
     const snap=await db.collection('spots_pos').get();
     snap.docs.forEach(d=>{const s=SPOTS.find(x=>String(x.i)===d.id),v=d.data();if(s&&v&&Array.isArray(v.pts))applyPos(s,v.pts)});
     const inf=await db.collection('spots_info').get();
