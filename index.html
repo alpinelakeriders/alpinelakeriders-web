@@ -77,10 +77,18 @@ section{padding-block:clamp(96px,14vw,200px)}
 /* Barre + vidéo */
 .topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:31;background:var(--bg)}
-.topbar .wrap{display:flex;justify-content:space-between;align-items:center;gap:20px;padding-block:14px}
-.topbar ul{display:flex;gap:32px;list-style:none;margin:0;padding:0;font-size:14px;color:var(--muted)}
-.topbar ul a:hover{color:var(--fg)}
-@media (max-width:860px){.topbar ul{display:none}}
+.topbar .wrap{position:relative;display:flex;justify-content:flex-start;align-items:center;gap:12px;padding-block:14px}
+.topbar .label{margin-right:auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* Menu déroulant (bouton « Menu ») */
+.menu-btn{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 16px 0 14px;border:0;border-radius:999px;background:transparent;box-shadow:inset 0 0 0 1px var(--line);color:var(--fg);font:500 14px/1 var(--sans);cursor:pointer;flex:none}
+.menu-btn:hover,.menu-btn[aria-expanded="true"]{background:var(--tint)}
+.menu-btn .x{display:none}.menu-btn[aria-expanded="true"] .x{display:block}.menu-btn[aria-expanded="true"] .b{display:none}
+.menu-pop{position:absolute;top:calc(100% + 6px);right:max(48px,env(safe-area-inset-right,0px));width:260px;list-style:none;margin:0;padding:8px;background:var(--bg);border:1px solid var(--line);border-radius:16px;box-shadow:0 14px 40px rgba(0,0,0,.14);display:grid;gap:2px;z-index:40}
+.menu-pop[hidden]{display:none}
+.menu-pop a{display:block;padding:12px 14px;border-radius:10px;font-size:15px;color:var(--fg)}
+.menu-pop a:hover,.menu-pop a:focus-visible{background:var(--tint)}
+@media (max-width:860px){.topbar .label{font-size:11px}.topbar .pill{height:40px;padding:0 16px}.menu-btn{height:40px;width:40px;padding:0;justify-content:center}.menu-btn span{display:none}.menu-pop{left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));width:auto;max-height:calc(100dvh - 90px);overflow:auto}.menu-pop a{padding:14px 16px;font-size:16px}}
+@media (max-width:420px){.topbar .label{display:none}.topbar .lang-sw{margin-left:0!important}}
 .hero{position:relative;width:100%;aspect-ratio:16/9;max-width:100%;overflow:hidden;background:var(--bg);color:#fff}
 .hero video,.hero .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 @media (max-width:760px){.hero{aspect-ratio:4/3.4}.hero video,.hero .poster{object-position:47% 50%}}
@@ -572,6 +580,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 .admin:has(#admin-body[hidden]) .adm-nav{display:none}
 .adm-nav button{font:500 13px var(--sans);padding:7px 12px;border-radius:999px;border:0;background:var(--bg);box-shadow:inset 0 0 0 1px var(--line);color:var(--fg);cursor:pointer}
 .adm-nav button:hover{box-shadow:inset 0 0 0 1px var(--fg)}
+.adm-nav .go-spots{font:500 13px var(--sans);padding:7px 12px;border-radius:999px;background:var(--fg);color:var(--bg)}
 .adm-sec,.admin .gate{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:clamp(18px,3vw,28px);scroll-margin-top:130px;min-width:0;max-width:none}
 .admin h3{font-size:22px;margin-bottom:6px}
 .adm-intro{font-size:14px;color:var(--muted);margin:0 0 18px;max-width:70ch}
@@ -821,6 +830,11 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script src="js/config.js?v=50"></script>
 <script src="js/backend.js?v=52"></script>
+<script>
+// Lien « Spots » (annuaire des spots, page en préparation) : visible seulement pour un administrateur connecté
+(function(){function go(){if(!window.claude)return;window.claude.use('user').then(u=>u&&u.canEdit()).then(ok=>{if(ok)document.querySelectorAll('[data-admin-only]').forEach(e=>e.hidden=false)}).catch(()=>{})}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',go);else go()})();
+</script>
 <script src="js/i18n.js?v=4"></script>
 <script src="js/meteo.js?v=5"></script>
 </head>
@@ -829,9 +843,19 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 
 <nav class="topbar"><div class="wrap">
   <span class="label">Alpine Lake Riders Association</span>
-  <ul><li><a href="#asso">L'asso</a></li><li><a href="#agenda">Agenda</a></li><li><a href="#debuter">Débuter</a></li><li><a href="#apero">Apéros Pumpfoil</a></li><li><a href="#spot">Le spot</a></li><li><a href="#lacs">Lacs</a></li><li><a href="#avis">Avis</a></li><li><a href="#rejoindre">Rejoindre</a></li><li><a href="#contact">Contact</a></li></ul>
   <button class="a2hs-top" type="button" data-a2hs hidden><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="6" y="2.5" width="12" height="19" rx="2.6"/><path d="M12 8.5v6M9 11.5h6"/></svg></button>
   <a class="pill ink" href="#rejoindre">Adhérer</a>
+  <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu-pop" aria-label="Menu"><svg class="b" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg><svg class="x" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg><span>Menu</span></button>
+  <ul class="menu-pop" id="menu-pop" hidden><li><a href="#asso">L'asso</a></li><li><a href="#agenda">Agenda</a></li><li><a href="#debuter">Débuter</a></li><li><a href="#apero">Apéros Pumpfoil</a></li><li><a href="#spot">Le spot</a></li><li><a href="#lacs">Lacs</a></li><li data-admin-only hidden><a href="spots-pumpfoil.html">Spots</a></li><li><a href="#avis">Avis</a></li><li><a href="#rejoindre">Rejoindre</a></li><li><a href="#contact">Contact</a></li></ul>
+<script>
+(function(){var b=document.querySelector('.menu-btn'),m=document.getElementById('menu-pop');if(!b||!m)return;
+function set(o){m.hidden=!o;b.setAttribute('aria-expanded',o?'true':'false')}
+b.addEventListener('click',function(e){e.stopPropagation();set(m.hidden)});
+m.addEventListener('click',function(e){if(e.target.closest('a'))set(false)});
+document.addEventListener('click',function(e){if(!m.hidden&&!m.contains(e.target))set(false)});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){set(false);b.focus()}});
+})();
+</script>
 </div></nav>
 <header class="hero" id="top">
   <img class="poster" src="media/hero-hd-poster.jpg" alt="">
@@ -1335,7 +1359,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 
 <div class="admin" id="admin" hidden role="dialog" aria-modal="true" aria-labelledby="admin-title"><div class="wrap">
   <div class="admin-head"><h2 id="admin-title">Administration</h2><div style="display:flex;gap:8px"><button class="pill line small" id="logout" type="button" hidden>Se déconnecter</button><button class="pill line small" id="close-admin" type="button">Fermer</button></div>
-    <nav class="adm-nav" id="adm-nav" aria-label="Rubriques de l'administration"><button type="button" data-go="sec-visites">Visites</button><button type="button" data-go="sec-agenda">Agenda</button><button type="button" data-go="sec-cr">Comptes rendus</button><button type="button" data-go="sec-contact">Reçus<b class="nav-n" id="ct-n" hidden></b></button><button type="button" data-go="sec-avis">Avis<b class="nav-n" id="av-n" hidden></b></button><button type="button" data-go="sec-msg">Messages</button><button type="button" data-go="sec-membres">Membres</button><button type="button" data-go="sec-textes">Textes</button><button type="button" data-go="sec-photos">Photos</button><button type="button" data-go="sec-apero-ph">Photos apéro</button><button type="button" data-go="sec-lacs">Lacs</button><button type="button" data-go="sec-admins">Administrateurs</button><button type="button" data-go="sec-seo">Référencement</button><button type="button" class="all" id="adm-all">Tout déplier</button></nav></div>
+    <nav class="adm-nav" id="adm-nav" aria-label="Rubriques de l'administration"><button type="button" data-go="sec-visites">Visites</button><button type="button" data-go="sec-agenda">Agenda</button><button type="button" data-go="sec-cr">Comptes rendus</button><button type="button" data-go="sec-contact">Reçus<b class="nav-n" id="ct-n" hidden></b></button><button type="button" data-go="sec-avis">Avis<b class="nav-n" id="av-n" hidden></b></button><button type="button" data-go="sec-msg">Messages</button><button type="button" data-go="sec-membres">Membres</button><button type="button" data-go="sec-textes">Textes</button><button type="button" data-go="sec-photos">Photos</button><button type="button" data-go="sec-apero-ph">Photos apéro</button><button type="button" data-go="sec-lacs">Lacs</button><button type="button" data-go="sec-admins">Administrateurs</button><a class="go-spots" href="spots-pumpfoil.html">Annuaire des spots ↗</a><button type="button" data-go="sec-seo">Référencement</button><button type="button" class="all" id="adm-all">Tout déplier</button></nav></div>
   <button class="pill ink small adm-top" id="adm-top" type="button">↑ Menu</button>
   <div class="gate" id="gate">
     <p class="msg" id="gate-msg">Vérification de l'accès…</p>
@@ -2114,6 +2138,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
       $('gate').hidden=false;$('login').hidden=false;$('admin-body').hidden=true;$('logout').hidden=true;return;
     }
     $('gate').hidden=true;$('admin-body').hidden=false;$('logout').hidden=false;
+    document.querySelectorAll('[data-admin-only]').forEach(e=>e.hidden=false);
     fillTextForm();renderEditor();renderAnEditor();loadInscriptions();loadContacts();loadAvis();loadAdmins();loadStats();loadLakes();
     try{assets=window.claude&&await window.claude.use('assets')}catch(e){}
     renderPhEditor();phCleanDupes();
