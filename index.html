@@ -28,7 +28,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="css/meteo.css?v=1">
+<link rel="stylesheet" href="css/meteo.css?v=2">
 <style>
 /* Layout : vidéo 16:9 sous une barre blanche, puis peu de blocs et beaucoup d'air.
    Une seule famille de caractères, noir et blanc, le vert du lac en touche. */
@@ -741,7 +741,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script src="js/config.js?v=50"></script>
 <script src="js/backend.js?v=51"></script>
-<script src="js/meteo.js?v=1"></script>
+<script src="js/meteo.js?v=2"></script>
 </head>
 <body>
 
@@ -939,7 +939,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
   <div class="head"><h2>Lacs environnants</h2><span class="label">Température de l'eau</span></div>
   <p class="lk-intro">La dernière température de surface mesurée sur les plans d'eau autour du lac de la Terrasse. Relevés automatiques à chaque passage satellite sans nuage ; au lac du Bourget, la sonde du Grand Port d'Aix-les-Bains prend le relais lorsqu'elle transmet.</p>
   <div class="lk compact" id="lk-list"><div class="ag-empty">Chargement des mesures…</div></div>
-  <div class="lk-bar"><button class="lt-btn lk-toggle" id="lk-toggle" type="button" aria-expanded="false" aria-controls="lk-list" hidden>Détails et historiques <span aria-hidden="true">↓</span></button><a class="lk-all" href="lacs.html" target="_blank" rel="noopener">Toute la météo, les satellites et les webcams ↗</a></div>
+  <div class="lk-bar"><button class="lt-btn lk-toggle" id="lk-toggle" type="button" aria-expanded="false" aria-controls="lk-list" hidden>Détails et historiques <span aria-hidden="true">↓</span></button><a class="lk-all" href="lacs.html" target="_blank" rel="noopener">Toute la météo et les satellites ↗</a></div>
   <p class="lk-note">Satellite : Landsat 8-9 via Copernicus, température de la pellicule de surface vers 10h30, ±2 °C ; moins précis sur les petits plans d'eau (Chartreuse, Lônes, Passy), où les berges influencent la mesure. Sonde : Grand Port d'Aix-les-Bains, 1,70 m sous le ponton (source lac-du-bourget.com).</p>
 </div></section>
 <script>

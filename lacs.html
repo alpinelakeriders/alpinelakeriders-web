@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Météo des spots · Alpine Lake Riders</title>
-<meta name="description" content="Température de l'eau, prévision AROME Météo-France, nuages en direct par satellite et webcams des spots de pumpfoil autour du lac de la Terrasse.">
+<meta name="description" content="Température de l'eau, prévision AROME Météo-France, nuages en direct par satellite des spots de pumpfoil autour du lac de la Terrasse.">
 <meta name="theme-color" content="#ffffff">
 <link rel="icon" href="media/logo-alr-noir.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="css/meteo.css?v=1">
+<link rel="stylesheet" href="css/meteo.css?v=2">
 <style>
 :root{
   --paper:#ffffff;
@@ -27,6 +27,7 @@
   --bg:#0a0d0d; --fg:#eef1f0; --muted:#8e9897; --line:#1f2625; --tint:#121717; --lake:#4fb3b0; --danger:#fb923c; color-scheme:dark}
 
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html,body{margin:0;padding:0}
 body{overflow-x:clip;background:var(--bg);color:var(--fg);font:400 16px/1.6 var(--sans);-webkit-font-smoothing:antialiased;letter-spacing:-.005em}
 img{display:block;max-width:100%}
@@ -77,7 +78,7 @@ footer p+p{margin-top:8px}
 <main class="wrap">
 <header class="intro">
   <h1>Température de l'eau et météo des spots</h1>
-  <p>Pour chaque spot de pumpfoil : la dernière température de l'eau, la prévision du jour (modèle AROME de Météo-France), la meilleure heure pour rider, les nuages en direct vus par satellite et, quand il y en a, les webcams.</p>
+  <p>Pour chaque spot de pumpfoil : la dernière température de l'eau, la prévision du jour (modèle AROME de Météo-France), la meilleure heure pour rider, et les nuages en direct vus par satellite.</p>
   <nav class="nav" id="nav" aria-label="Aller à un spot"></nav>
 </header>
 <div id="spots"><p class="vide">Chargement des spots…</p></div>
@@ -87,7 +88,7 @@ footer p+p{margin-top:8px}
   <p>La meilleure heure privilégie le vent faible (plan d'eau lisse), puis le soleil. Pastille verte : vent jusqu'à 8 km/h ; orange : jusqu'à 14 km/h ; rouge au-delà.</p>
 </div></footer>
 <script src="js/config.js?v=50"></script>
-<script src="js/meteo.js?v=1"></script>
+<script src="js/meteo.js?v=2"></script>
 <script>
 (function(){
   var c=window.ALR_CONFIG,M=window.ALR_METEO,box=document.getElementById('spots'),nav=document.getElementById('nav');
@@ -129,9 +130,10 @@ footer p+p{margin-top:8px}
         eau.append(b);s.append(ol);
       }
       s.append(el('div','mt-slot'));
-      var cam=M.WEBCAMS[L.slug],cp=el('p','sp-cam');
+      // Webcams masquées pour le moment (M.WEBCAMS garde les liens trouvés)
+      if(M.WEBCAMS_ON){var cam=M.WEBCAMS[L.slug],cp=el('p','sp-cam');
       if(cam){var a=el('a',null,cam[1]+' ↗');a.href=cam[0];a.target='_blank';a.rel='noopener';cp.append(a)}else cp.append(el('span',null,'Pas de webcam publique connue sur ce spot.'));
-      s.append(cp);
+      s.append(cp);}
       box.append(s);
       var n=el('a');n.href='#spot-'+L.slug;n.append(el('span',null,L.name));nav.append(n);
     });
