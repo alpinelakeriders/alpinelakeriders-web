@@ -287,9 +287,19 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .spot .spot-logo{position:absolute;inset:auto max(20px,env(safe-area-inset-right,0px)) 36px auto;z-index:3;width:clamp(84px,11vw,170px);height:auto;object-fit:contain;opacity:.92;filter:drop-shadow(0 2px 10px rgba(0,0,0,.35));pointer-events:none}
 @media (min-width:800px){.spot-dots,.spot .spot-logo{right:max(48px,(100vw - 1320px)/2 + 48px)}.spot-dots{top:auto;bottom:calc(36px + clamp(84px,11vw,170px) * .59 + 18px)}}
 @media (max-width:799px){.spot .wrap{padding-right:calc(84px + 36px)}}
-.lake-temp .wrap{display:flex;align-items:baseline;gap:8px 16px;flex-wrap:wrap;padding-block:16px;border-bottom:1px solid var(--line)}
+.lake-temp .wrap{padding-block:16px;border-bottom:1px solid var(--line)}
+.lt-now{display:flex;align-items:baseline;gap:8px 16px;flex-wrap:wrap}
 .lake-temp b{font-weight:500;font-size:15px;font-variant-numeric:tabular-nums}
 .lake-temp small{font-size:13px;color:var(--muted)}
+.lt-btn{flex-basis:100%;text-align:left;margin-top:6px;background:none;border:0;padding:4px 0;font:500 11px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);cursor:pointer}
+.lt-btn:hover{color:var(--fg)}
+.lt-btn span{display:inline-block;margin-left:4px}
+.lt-hist{list-style:none;margin:10px 0 2px;padding:0;display:grid;gap:2px;max-width:520px}
+.lt-hist li{display:grid;grid-template-columns:110px 1fr 64px;align-items:center;gap:14px;padding-block:5px;font-size:13px;color:var(--muted)}
+.lt-hist b{font-size:13px;color:var(--fg);text-align:right}
+.lt-bar{height:3px;border-radius:2px;background:var(--line);overflow:hidden}
+.lt-bar i{display:block;height:100%;background:var(--lake);opacity:.7}
+@media (max-width:560px){.lt-hist li{grid-template-columns:96px 1fr 56px;gap:10px}}
 .spot-dots button{width:26px;height:20px;padding:0;border:0;background:none;cursor:pointer;position:relative}
 .spot-dots button::before{content:"";position:absolute;left:0;right:0;top:9px;height:2px;background:rgba(255,255,255,.45)}
 .spot-dots button[aria-current="true"]::before{background:#fff}
@@ -795,26 +805,49 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     <p data-k="spot">Base de loisirs intercommunale, 38660 La Terrasse. Une eau verte et calme au cœur du Grésivaudan.</p>
   </div>
 </section>
-<div class="lake-temp" id="lake-temp" hidden aria-live="polite"><div class="wrap">
-  <span class="label">Température de l'eau</span>
-  <b id="lake-temp-v"></b>
-  <small id="lake-temp-m"></small>
+<div class="lake-temp" id="lake-temp" hidden><div class="wrap">
+  <div class="lt-now" aria-live="polite">
+    <span class="label">Température de l'eau</span>
+    <b id="lake-temp-v"></b>
+    <small id="lake-temp-m"></small>
+    <button class="lt-btn" id="lake-temp-btn" type="button" aria-expanded="false" aria-controls="lake-temp-h" hidden>Historique <span aria-hidden="true">↓</span></button>
+  </div>
+  <ol class="lt-hist" id="lake-temp-h" hidden aria-label="Mesures précédentes"></ol>
 </div></div>
 <script>
-// Température de surface du lac : dernier passage satellite sans nuage (Landsat 8-9 via Copernicus),
-// relevée automatiquement par la fonction Supabase « lake-temperature ».
+// Température de surface du lac : passages satellite sans nuage (Landsat 8-9 via Copernicus),
+// relevés automatiquement par la fonction Supabase « lake-temperature ».
 (function(){
   var c=window.ALR_CONFIG;if(!c||!window.fetch)return;
   var MOIS=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
-  fetch(c.url+'/rest/v1/lake_temperature_latest?select=acquired_on,temp_c',{headers:{apikey:c.anonKey,Authorization:'Bearer '+c.anonKey}})
+  var MC=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+  var fmt=function(t){return t.toFixed(1).replace('.',',')+' °C'};
+  var $=function(id){return document.getElementById(id)};
+  fetch(c.url+'/rest/v1/lake_temperature?select=acquired_on,temp_c&order=acquired_on.desc&limit=13',{headers:{apikey:c.anonKey,Authorization:'Bearer '+c.anonKey}})
     .then(function(r){return r.ok?r.json():[]})
     .then(function(rows){
-      if(!rows||!rows.length)return;
-      var t=Number(rows[0].temp_c),d=new Date(rows[0].acquired_on+'T12:00:00');
-      if(!isFinite(t)||isNaN(d))return;
-      document.getElementById('lake-temp-v').textContent=t.toFixed(1).replace('.',',')+' °C';
-      document.getElementById('lake-temp-m').textContent='Mesure satellite du '+d.getDate()+' '+MOIS[d.getMonth()]+' (dernier passage sans nuage) · surface vers 10h30 · ±2 °C';
-      document.getElementById('lake-temp').hidden=false;
+      rows=(rows||[]).map(function(r){return {t:Number(r.temp_c),d:new Date(r.acquired_on+'T12:00:00')}})
+        .filter(function(r){return isFinite(r.t)&&!isNaN(r.d)});
+      if(!rows.length)return;
+      var last=rows[0];
+      $('lake-temp-v').textContent=fmt(last.t);
+      $('lake-temp-m').textContent='Mesure satellite du '+last.d.getDate()+' '+MOIS[last.d.getMonth()]+' (dernier passage sans nuage) · surface vers 10h30 · ±2 °C';
+      $('lake-temp').hidden=false;
+      var prev=rows.slice(1);if(!prev.length)return;
+      var list=$('lake-temp-h'),btn=$('lake-temp-btn');
+      prev.forEach(function(r){
+        var li=document.createElement('li');
+        var d=document.createElement('span');d.className='lt-d';d.textContent=r.d.getDate()+' '+MC[r.d.getMonth()]+' '+r.d.getFullYear();
+        var bar=document.createElement('span');bar.className='lt-bar';bar.setAttribute('aria-hidden','true');
+        var fill=document.createElement('i');fill.style.width=Math.max(4,Math.min(100,r.t/30*100))+'%';bar.append(fill);
+        var v=document.createElement('b');v.textContent=fmt(r.t);
+        li.append(d,bar,v);list.append(li);
+      });
+      btn.hidden=false;
+      btn.addEventListener('click',function(){
+        var open=list.hidden;list.hidden=!open;btn.setAttribute('aria-expanded',open?'true':'false');
+        btn.querySelector('span').textContent=open?'↑':'↓';
+      });
     }).catch(function(){});
 })();
 </script>
