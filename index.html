@@ -287,10 +287,9 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .spot .spot-logo{position:absolute;inset:auto max(20px,env(safe-area-inset-right,0px)) 36px auto;z-index:3;width:clamp(84px,11vw,170px);height:auto;object-fit:contain;opacity:.92;filter:drop-shadow(0 2px 10px rgba(0,0,0,.35));pointer-events:none}
 @media (min-width:800px){.spot-dots,.spot .spot-logo{right:max(48px,(100vw - 1320px)/2 + 48px)}.spot-dots{top:auto;bottom:calc(36px + clamp(84px,11vw,170px) * .59 + 18px)}}
 @media (max-width:799px){.spot .wrap{padding-right:calc(84px + 36px)}}
-.spot-temp{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-top:22px;padding-top:18px;border-top:1px solid rgba(255,255,255,.28);max-width:46ch}
-.spot-temp b{font-size:clamp(34px,4.4vw,56px);font-weight:400;letter-spacing:-.05em;line-height:1;font-variant-numeric:tabular-nums}
-.spot-temp .label{margin:0;color:rgba(255,255,255,.75)}
-.spot-temp small{flex-basis:100%;font-size:13px;color:rgba(255,255,255,.8);line-height:1.4;text-shadow:0 1px 6px rgba(0,0,0,.45)}
+.lake-temp .wrap{display:flex;align-items:baseline;gap:8px 16px;flex-wrap:wrap;padding-block:16px;border-bottom:1px solid var(--line)}
+.lake-temp b{font-weight:500;font-size:15px;font-variant-numeric:tabular-nums}
+.lake-temp small{font-size:13px;color:var(--muted)}
 .spot-dots button{width:26px;height:20px;padding:0;border:0;background:none;cursor:pointer;position:relative}
 .spot-dots button::before{content:"";position:absolute;left:0;right:0;top:9px;height:2px;background:rgba(255,255,255,.45)}
 .spot-dots button[aria-current="true"]::before{background:#fff}
@@ -794,13 +793,13 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     <p class="label">Le spot</p>
     <h2>Lac de la Terrasse</h2>
     <p data-k="spot">Base de loisirs intercommunale, 38660 La Terrasse. Une eau verte et calme au cœur du Grésivaudan.</p>
-    <div class="spot-temp" id="lake-temp" hidden aria-live="polite">
-      <span class="label">Température de l'eau</span>
-      <b id="lake-temp-v"></b>
-      <small id="lake-temp-m"></small>
-    </div>
   </div>
 </section>
+<div class="lake-temp" id="lake-temp" hidden aria-live="polite"><div class="wrap">
+  <span class="label">Température de l'eau</span>
+  <b id="lake-temp-v"></b>
+  <small id="lake-temp-m"></small>
+</div></div>
 <script>
 // Température de surface du lac : dernier passage satellite sans nuage (Landsat 8-9 via Copernicus),
 // relevée automatiquement par la fonction Supabase « lake-temperature ».
