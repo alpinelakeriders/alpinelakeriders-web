@@ -2694,7 +2694,8 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
     fig.tabIndex=0;fig.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'){show(i-1);restart()}if(e.key==='ArrowRight'){show(i+1);restart()}});
     let io=null;if('IntersectionObserver' in window){io=new IntersectionObserver(es=>{vis=es.some(e=>e.isIntersecting);restart()},{threshold:.35});io.observe(fig)}else{vis=true}
     crCars.push(()=>{clearInterval(timer);io&&io.disconnect()});
-    show(0);restart();
+    // Photo de départ tirée au hasard à chaque chargement de la page
+    show(Math.floor(Math.random()*sls.length));restart();
     a.append(t,fig);return a;
   }
   // Lien « Voir le compte rendu » depuis l'agenda (ouvre les comptes rendus précédents si besoin)
