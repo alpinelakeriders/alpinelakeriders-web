@@ -881,6 +881,14 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .editbar b{font-weight:500}.editbar p{margin:0;width:100%;text-align:center;color:var(--muted);font-size:12px}
 .editbar .err{color:#c0392b}
 .map-box.editing .reset,.map-box.editing .legend{display:none}
+.map-box.full{position:fixed!important;inset:0;z-index:9000;height:auto!important;max-height:none!important;border:0}
+body.mapfull{overflow:hidden}body.mapfull .badge{display:none}
+.leaflet-bar a.fs{font-size:16px;line-height:30px;cursor:pointer}
+.editbar .find{position:relative;flex:1 1 220px;min-width:180px}
+.editbar .find input{width:100%;box-sizing:border-box;font:inherit;font-size:13px;height:32px;border:1px solid var(--line);border-radius:999px;padding:0 12px;background:var(--bg);color:var(--fg)}
+.editbar .find ul{position:absolute;left:0;right:0;bottom:36px;margin:0;padding:4px;list-style:none;background:var(--bg);border-radius:12px;box-shadow:0 0 0 1px var(--line),0 12px 30px -8px rgba(0,0,0,.35);max-height:220px;overflow:auto}
+.editbar .find li{padding:7px 10px;border-radius:8px;cursor:pointer;font-size:13px}.editbar .find li:hover,.editbar .find li[aria-selected="true"]{background:var(--soft,rgba(0,0,0,.06))}
+.editbar .find li span{color:var(--muted);font-size:11px;margin-left:6px}
 .cl{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--fg);color:var(--bg);font:500 13px/1 var(--mono);font-variant-numeric:tabular-nums;box-shadow:0 0 0 4px color-mix(in srgb,var(--fg) 18%,transparent)}
 .cl.big{width:46px;height:46px;font-size:14px}
 .me{width:18px;height:18px;border-radius:50%;background:#2f7de1;box-shadow:0 0 0 4px rgba(47,125,225,.25),0 0 0 2px #fff inset}
@@ -1300,8 +1308,16 @@ window.ALR_SPOTS_START=function(){
   const map=L_map();
   function L_map(){
     if(!window.L){$('map').textContent=tr('La carte ne s’est pas chargée.','The map did not load.');return null}
-    const m=L.map('map',{zoomControl:true,preferCanvas:true,worldCopyJump:false,minZoom:2,maxZoom:18,attributionControl:true,zoomSnap:.5});
+    const m=L.map('map',{zoomControl:true,preferCanvas:true,worldCopyJump:false,minZoom:2,maxZoom:21,attributionControl:true,zoomSnap:.5});
     m.attributionControl.setPrefix(false);
+    // Bouton plein écran (sous le zoom). Échap pour sortir.
+    const FS=L.Control.extend({options:{position:'topleft'},onAdd(){
+      const d=L.DomUtil.create('div','leaflet-bar'),a=L.DomUtil.create('a','fs',d);a.href='#';a.setAttribute('role','button');
+      const set=()=>{const on=document.querySelector('.map-box').classList.contains('full');a.textContent=on?'✕':'⛶';a.title=on?tr('Quitter le plein écran','Exit full screen'):tr('Plein écran','Full screen');a.setAttribute('aria-label',a.title)};
+      L.DomEvent.disableClickPropagation(d);
+      L.DomEvent.on(a,'click',e=>{L.DomEvent.preventDefault(e);toggleFull()});
+      window.ALR_FS_SYNC=set;set();return d}});
+    m.addControl(new FS());
     m.setView([50,8],4);m.setMaxBounds([[-75,-200],[85,200]]);
     // Fond de carte : pays et lacs dessinés à partir de Natural Earth (léger, aux couleurs du site).
     m.createPane('base');m.getPane('base').style.zIndex=150;
@@ -1327,10 +1343,10 @@ window.ALR_SPOTS_START=function(){
     m.createPane('sat');m.getPane('sat').style.zIndex=200;
     const dark=()=>document.documentElement.dataset.theme==='dark'||(document.documentElement.dataset.theme!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches);
     // Plan OpenStreetMap (sans clé). En thème sombre, on assombrit les tuiles en CSS.
-    const road=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{pane:'road',maxNativeZoom:19,maxZoom:18,attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'});
+    const road=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{pane:'road',maxNativeZoom:19,maxZoom:21,attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'});
     const sat=L.layerGroup([
-      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{pane:'sat',maxNativeZoom:18,maxZoom:18,attribution:'Imagerie © Esri, Maxar, Earthstar Geographics'}),
-      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',{pane:'sat',maxNativeZoom:18,maxZoom:18})
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{pane:'sat',maxNativeZoom:19,maxZoom:21,attribution:'Imagerie © Esri, Maxar, Earthstar Geographics'}),
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',{pane:'sat',maxNativeZoom:18,maxZoom:21})
     ]);
     let mode='auto',satOK=true,roadOK=true,errs=0,oks=0,rerrs=0,roks=0;
     sat.eachLayer(l=>{l.on('tileerror',()=>{errs++;if(!oks&&errs>=4&&satOK){satOK=false;applyView()}});l.on('tileload',()=>{oks++})});
@@ -1346,7 +1362,7 @@ window.ALR_SPOTS_START=function(){
       if(wantRoad&&!m.hasLayer(road))road.addTo(m);else if(!wantRoad&&m.hasLayer(road))m.removeLayer(road);
       m.getContainer().classList.toggle('sat',wantSat);
       m.getContainer().classList.toggle('tiles',wantSat||wantRoad);
-      m.setMaxZoom(satOK||roadOK?18:14);
+      m.setMaxZoom(satOK||roadOK?21:14);
       const note=document.getElementById('satnote');
       note.hidden=satOK||!(mode==='sat'||z>=SAT);
       note.textContent=tr('Vue satellite indisponible dans cet aperçu, elle s’affichera sur le site','Satellite view is not available in this preview; it will show on the website');
@@ -1513,6 +1529,40 @@ window.ALR_SPOTS_START=function(){
   // ---------- Correction de position (admins) ----------
   // Bouton « Modifier » : on glisse le ou les points de départ à leur place exacte, on peut en ajouter, puis « Valider » enregistre.
   let ed=null;
+  function toggleFull(force){
+    const box=document.querySelector('.map-box'),on=force!=null?force:!box.classList.contains('full');
+    box.classList.toggle('full',on);document.body.classList.toggle('mapfull',on);
+    if(window.ALR_FS_SYNC)window.ALR_FS_SYNC();
+    if(map)setTimeout(()=>map.invalidateSize(),60);
+  }
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.querySelector('.map-box.full'))toggleFull(false)});
+  // Recherche d'un lieu pendant la correction : lieux connus, coordonnées GPS collées, puis OpenStreetMap.
+  function findBox(onPick){
+    const w=el('div','find'),i=el('input'),ul=el('ul');ul.hidden=true;
+    i.type='search';i.placeholder=tr('Aller à un lieu ou coller des coordonnées GPS…','Go to a place or paste GPS coordinates…');i.setAttribute('aria-label',i.placeholder);
+    let res=[],act=0,t=null;
+    const show=()=>{ul.textContent='';ul.hidden=!res.length;res.forEach((r,k)=>{const li=el('li',null,r.name);li.setAttribute('aria-selected',k===act);if(r.kind)li.append(el('span',null,r.kind));li.addEventListener('mousedown',e=>{e.preventDefault();go(k)});ul.append(li)})};
+    const go=k=>{const r=res[k];if(!r)return;i.value=r.name;res=[];show();onPick(r.lat,r.lon,r.z)};
+    i.addEventListener('input',()=>{
+      const v=i.value.trim(),g=v.match(/^(-?\d+(?:[.,]\d+)?)\s*[,; ]\s*(-?\d+(?:[.,]\d+)?)$/);
+      clearTimeout(t);act=0;
+      if(g){res=[{name:v,kind:'GPS',lat:+g[1].replace(',','.'),lon:+g[2].replace(',','.'),z:19}];show();return}
+      const n=norm(v);if(n.length<2){res=[];show();return}
+      const words=n.split(' ');
+      res=PLACES.filter(p=>words.every(w=>p.key.includes(w))).slice(0,4).map(p=>({name:p.name,kind:tr(KIND[p.kind][0],KIND[p.kind][1]),lat:p.lat,lon:p.lon,z:p.kind==='pays'?6:p.kind==='region'?9:14}))
+        .concat(SPOTS.filter(s=>s.la!=null&&s.key.includes(n)).slice(0,3).map(s=>({name:s.n,kind:'Spot',lat:s.la,lon:s.lo,z:18})));
+      show();
+      if(n.length>2)t=setTimeout(()=>fetch('https://nominatim.openstreetmap.org/search?format=json&limit=5&accept-language='+lang+'&q='+encodeURIComponent(v)).then(r=>r.json()).then(r=>{
+        if(i.value.trim()!==v)return;res=res.concat(r.map(x=>({name:x.display_name.split(',').slice(0,3).join(','),kind:tr('Lieu','Place'),lat:+x.lat,lon:+x.lon,z:17})));show()}).catch(()=>{}),400);
+    });
+    i.addEventListener('keydown',e=>{
+      if(e.key==='ArrowDown'){e.preventDefault();act=Math.min(res.length-1,act+1);show()}
+      else if(e.key==='ArrowUp'){e.preventDefault();act=Math.max(0,act-1);show()}
+      else if(e.key==='Enter'){e.preventDefault();go(act)}
+      else if(e.key==='Escape'){res=[];show()}});
+    i.addEventListener('blur',()=>setTimeout(()=>{ul.hidden=true},150));
+    w.append(ul,i);return w;
+  }
   function editPos(s){
     if(!map||!db)return;if(ed)stopEdit();
     map.closePopup();
@@ -1520,7 +1570,7 @@ window.ALR_SPOTS_START=function(){
     ed={s,lay:L.layerGroup().addTo(map),pts:start,mk:[]};
     if(cluster)map.removeLayer(cluster);if(alrLayer)map.removeLayer(alrLayer);
     document.querySelector('.map-box').classList.add('editing');
-    map.setView(start[0],Math.max(map.getZoom(),17));
+    map.setView(start[0],Math.max(map.getZoom(),18));
     drawEd();
     document.querySelector('.map-box').scrollIntoView({behavior:'smooth',block:'center'});
   }
@@ -1534,6 +1584,7 @@ window.ALR_SPOTS_START=function(){
       return m.addTo(ed.lay)});
     const bar=$('editbar');bar.textContent='';bar.hidden=false;
     bar.append(el('b',null,ed.s.n));
+    bar.append(findBox((la,lo,z)=>{const o=ed.pts[0],dx=la-o[0],dy=lo-o[1];ed.pts=ed.pts.map(q=>[q[0]+dx,q[1]+dy]);drawEd(tr('Point déplacé ici : finissez de le placer à la main.','Point moved here: finish placing it by hand.'));map.setView([la,lo],Math.max(z||17,16))}));
     const btn=(t,fn,cls)=>{const b=el('button',cls||'pill line small',t);b.type='button';b.addEventListener('click',fn);bar.append(b);return b};
     if(ed.pts.length<MAXPTS)btn(tr('+ Ajouter un départ','+ Add a start'),()=>{const c=map.getCenter(),l=ed.pts[ed.pts.length-1],off=map.containerPointToLatLng(map.latLngToContainerPoint(l).add([40,0]));ed.pts.push([off.lat,off.lng]);drawEd()});
     if(ed.pts.length>1)btn(tr('Retirer le départ ','Remove start ')+ed.pts.length,()=>{ed.pts.pop();drawEd()});
