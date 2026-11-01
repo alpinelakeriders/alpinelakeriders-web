@@ -1373,6 +1373,12 @@ window.ALR_SPOTS_START=function(){
     document.querySelectorAll('#view button').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.v;if(mode==='sat'&&m.getZoom()<11&&satOK)m.setZoom(11);applyView()}));
     m.on('zoomend',applyView);
     m.whenReady(applyView);
+    // Mode détail (pendant « Modifier ») : plan OpenStreetMap avec noms des rues, commerces, restaurants, entreprises ;
+    // en satellite, on ajoute les noms des rues (Esri Transportation).
+    const trans=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}',{pane:'sat',maxNativeZoom:19,maxZoom:21});
+    m.alrDetail=on=>{mode=on?'plan':'auto';if(on)m.removeLayer(trans);applyView()};
+    m.alrStreets=on=>{if(on&&satOK)trans.addTo(m);else m.removeLayer(trans)};
+    m.alrMode=()=>mode;
     return m;
   }
   // Noms des grandes villes pour se repérer quand on zoome
@@ -1537,23 +1543,38 @@ window.ALR_SPOTS_START=function(){
   }
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.querySelector('.map-box.full'))toggleFull(false)});
   // Recherche d'un lieu pendant la correction : lieux connus, coordonnées GPS collées, puis OpenStreetMap.
+  // Recherche d'un lieu pendant la correction : adresses et lieux (commerces, écoles, plages…) via OpenStreetMap (Photon),
+  // coordonnées GPS collées, ou lien Google Maps collé (bouton « Google Maps » pour le trouver).
   function findBox(onPick){
     const w=el('div','find'),i=el('input'),ul=el('ul');ul.hidden=true;
-    i.type='search';i.placeholder=tr('Aller à un lieu ou coller des coordonnées GPS…','Go to a place or paste GPS coordinates…');i.setAttribute('aria-label',i.placeholder);
+    i.type='search';i.placeholder=tr('Lieu, adresse, lien Google Maps ou GPS…','Place, address, Google Maps link or GPS…');i.setAttribute('aria-label',i.placeholder);
     let res=[],act=0,t=null;
-    const show=()=>{ul.textContent='';ul.hidden=!res.length;res.forEach((r,k)=>{const li=el('li',null,r.name);li.setAttribute('aria-selected',k===act);if(r.kind)li.append(el('span',null,r.kind));li.addEventListener('mousedown',e=>{e.preventDefault();go(k)});ul.append(li)})};
-    const go=k=>{const r=res[k];if(!r)return;i.value=r.name;res=[];show();onPick(r.lat,r.lon,r.z)};
+    const show=()=>{ul.textContent='';ul.hidden=!res.length;res.forEach((r,k)=>{const li=el('li',null,r.name);li.setAttribute('aria-selected',k===act);if(r.kind)li.append(el('span',null,r.kind));
+      if(r.link){li.addEventListener('mousedown',e=>{e.preventDefault();window.open(r.link,'_blank','noopener')})}else li.addEventListener('mousedown',e=>{e.preventDefault();go(k)});ul.append(li)})};
+    const go=k=>{const r=res[k];if(!r)return;if(r.link){window.open(r.link,'_blank','noopener');return}if(r.lat==null)return;i.value=r.name;res=[];show();onPick(r.lat,r.lon,r.z)};
+    const gm=v=>({name:tr('Chercher « ','Search “')+v+tr(' » sur Google Maps ↗','” on Google Maps ↗'),kind:tr('puis copiez le lien ici','then paste the link here'),link:'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(v)});
+    const msg=t=>[{name:t,kind:''}];
     i.addEventListener('input',()=>{
       const v=i.value.trim(),g=v.match(/^(-?\d+(?:[.,]\d+)?)\s*[,; ]\s*(-?\d+(?:[.,]\d+)?)$/);
       clearTimeout(t);act=0;
       if(g){res=[{name:v,kind:'GPS',lat:+g[1].replace(',','.'),lon:+g[2].replace(',','.'),z:19}];show();return}
-      const n=norm(v);if(n.length<2){res=[];show();return}
-      const words=n.split(' ');
-      res=PLACES.filter(p=>words.every(w=>p.key.includes(w))).slice(0,4).map(p=>({name:p.name,kind:tr(KIND[p.kind][0],KIND[p.kind][1]),lat:p.lat,lon:p.lon,z:p.kind==='pays'?6:p.kind==='region'?9:14}))
-        .concat(SPOTS.filter(s=>s.la!=null&&s.key.includes(n)).slice(0,3).map(s=>({name:s.n,kind:'Spot',lat:s.la,lon:s.lo,z:18})));
-      show();
-      if(n.length>2)t=setTimeout(()=>fetch('https://nominatim.openstreetmap.org/search?format=json&limit=5&accept-language='+lang+'&q='+encodeURIComponent(v)).then(r=>r.json()).then(r=>{
-        if(i.value.trim()!==v)return;res=res.concat(r.map(x=>({name:x.display_name.split(',').slice(0,3).join(','),kind:tr('Lieu','Place'),lat:+x.lat,lon:+x.lon,z:17})));show()}).catch(()=>{}),400);
+      if(/google\.[a-z.]+\/maps|maps\.app\.goo\.gl|goo\.gl\/maps|maps\.google\./i.test(v)){
+        res=msg(tr('Lecture du lien Google Maps…','Reading the Google Maps link…'));show();
+        fetch('/api/lieu?url='+encodeURIComponent(v)).then(r=>r.json()).then(r=>{if(i.value.trim()!==v)return;
+          if(r.lat!=null){res=[{name:r.nom||tr('Lieu du lien Google Maps','Google Maps link place'),kind:'Google Maps',lat:r.lat,lon:r.lon,z:19}];show();go(0)}
+          else{res=msg(tr('Position introuvable dans ce lien. Sur Google Maps : Partager → Copier le lien.','No position in this link. In Google Maps: Share → Copy link.'));show()}})
+          .catch(()=>{res=msg(tr('Lien non lu, réessayez.','Link not read, try again.'));show()});
+        return}
+      if(v.length<3){res=[];show();return}
+      t=setTimeout(()=>{
+        const c=map.getCenter();
+        fetch('https://photon.komoot.io/api/?limit=6&lang='+(lang==='en'?'en':'fr')+'&lat='+c.lat.toFixed(3)+'&lon='+c.lng.toFixed(3)+'&q='+encodeURIComponent(v)).then(r=>r.json()).then(r=>{
+          if(i.value.trim()!==v)return;
+          res=(r.features||[]).map(f=>{const p=f.properties||{},x=f.geometry.coordinates;
+            return{name:p.name||[p.street,p.housenumber].filter(Boolean).join(' ')||p.city||v,kind:[p.city&&p.city!==p.name?p.city:null,p.country].filter(Boolean).join(' · '),lat:x[1],lon:x[0],z:p.type==='city'||p.type==='county'?13:18}});
+          res.push(gm(v));show();
+        }).catch(()=>{res=[gm(v)];show()});
+      },350);
     });
     i.addEventListener('keydown',e=>{
       if(e.key==='ArrowDown'){e.preventDefault();act=Math.min(res.length-1,act+1);show()}
@@ -1571,6 +1592,7 @@ window.ALR_SPOTS_START=function(){
     if(cluster)map.removeLayer(cluster);if(alrLayer)map.removeLayer(alrLayer);
     document.querySelector('.map-box').classList.add('editing');
     map.setView(start[0],Math.max(map.getZoom(),18));
+    map.alrStreets(true);
     drawEd();
     document.querySelector('.map-box').scrollIntoView({behavior:'smooth',block:'center'});
   }
@@ -1588,6 +1610,9 @@ window.ALR_SPOTS_START=function(){
     const btn=(t,fn,cls)=>{const b=el('button',cls||'pill line small',t);b.type='button';b.addEventListener('click',fn);bar.append(b);return b};
     if(ed.pts.length<MAXPTS)btn(tr('+ Ajouter un départ','+ Add a start'),()=>{const c=map.getCenter(),l=ed.pts[ed.pts.length-1],off=map.containerPointToLatLng(map.latLngToContainerPoint(l).add([40,0]));ed.pts.push([off.lat,off.lng]);drawEd()});
     if(ed.pts.length>1)btn(tr('Retirer le départ ','Remove start ')+ed.pts.length,()=>{ed.pts.pop();drawEd()});
+    const det=ed.detail;
+    const db2=btn(det?tr('Satellite','Satellite'):tr('Mode détail (noms des rues, commerces)','Detail mode (street and shop names)'),()=>{ed.detail=!ed.detail;map.alrDetail(ed.detail);map.alrStreets(!ed.detail);if(ed.detail&&map.getZoom()<18)map.setZoom(18);drawEd()});
+    db2.setAttribute('aria-pressed',!!det);
     btn(tr('Annuler','Cancel'),stopEdit);
     btn(tr('Valider','Save'),savePos,'pill ink small');
     const p=el('p',err?'err':null,msg||tr('Glissez chaque point numéroté à l’endroit exact du départ (3 au plus, à moins de 300 m du n° 1).','Drag each numbered point to the exact start spot (up to 3, within 300 m of no. 1).'));bar.append(p);
@@ -1633,7 +1658,7 @@ window.ALR_SPOTS_START=function(){
     const sp=$('msg');sp.textContent=tr('Position enregistrée.','Position saved.');setTimeout(()=>{if(sp.textContent===tr('Position enregistrée.','Position saved.'))sp.textContent=''},4000);
   }
   function stopEdit(){
-    if(!ed)return;map.removeLayer(ed.lay);ed=null;$('editbar').hidden=true;
+    if(!ed)return;map.removeLayer(ed.lay);if(ed.detail)map.alrDetail(false);map.alrStreets(false);ed=null;$('editbar').hidden=true;
     document.querySelector('.map-box').classList.remove('editing');
     drawMarkers();
   }
