@@ -3,7 +3,8 @@
   "include": [
     "/",
     "/index.html",
-    "/api/nuages"
+    "/api/nuages",
+    "/api/spot-ia"
   ],
   "exclude": []
 }

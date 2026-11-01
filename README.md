@@ -25,3 +25,7 @@ Site statique (HTML, CSS, JS) hébergé sur Cloudflare Pages. Les données modif
 ## Mises à jour
 - Textes, horaires, agenda, messages, photos, administrateurs : depuis le site, lien « Administration » en bas de page.
 - Design ou nouvelles sections : demander à Claude, qui modifie ce dépôt. Cloudflare republie automatiquement en une minute.
+
+## Ajout de spot par photos (annuaire, admins)
+Bouton « Ajouter un spot par photos » sur /spots-pumpfoil. La vérification de l'eau sur les photos et la mise en forme de la dictée passent par Claude (fonction `functions/api/spot-ia.js`).
+Secret à ajouter dans Cloudflare Pages > Réglages > Variables et secrets : `ANTHROPIC_API_KEY` (clé créée sur console.anthropic.com). Sans clé, l'admin confirme lui-même la présence d'eau et le texte est repris tel quel.
