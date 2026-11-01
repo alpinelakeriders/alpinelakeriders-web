@@ -26,6 +26,31 @@
     carnon:['https://www.windfinder.com/webcams/port-de-carnon','Webcams du port de Carnon']
   };
 
+  // Unité du vent : km/h ou nœuds, choix mémorisé pour chaque visiteur
+  var UK='alr-vent-unite',KT=false;
+  try{KT=localStorage.getItem(UK)==='kt'}catch(e){}
+  function W(v){return Math.round(KT?v/1.852:v)}
+  function U(){return KT?L(' nds',' kn'):' km/h'}
+  function WU(v){return W(v)+U()}
+  var BLOCS=[];
+  function setUnit(kt){
+    KT=!!kt;try{localStorage.setItem(UK,KT?'kt':'kmh')}catch(e){}
+    BLOCS=BLOCS.filter(function(b){return b.root.isConnected});
+    BLOCS.forEach(function(b){
+      var d=b.root.querySelector('.mt-det'),h=b.root.querySelector('.mt-h');
+      b.o.open=d&&!d.hidden;b.o.hourOpen=h&&!h.hidden;
+      var nb=bloc(b.o,true);b.root.replaceWith(nb);b.root=nb;
+    });
+  }
+  function unitSwitch(){
+    var w=el('span','mt-unit');w.setAttribute('role','group');w.setAttribute('aria-label',L('Unité du vent','Wind unit'));
+    [['km/h',false],[L('nœuds','knots'),true]].forEach(function(u){
+      var b=el('button',null,u[0]);b.type='button';b.setAttribute('aria-pressed',KT===u[1]?'true':'false');
+      b.addEventListener('click',function(){if(KT!==u[1])setUnit(u[1])});w.append(b);
+    });
+    return w;
+  }
+
   function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
   function nowParis(){
     var p={};new Intl.DateTimeFormat('fr-FR',{timeZone:TZ,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'})
@@ -122,11 +147,11 @@
     if(shortLabel!=null){b.setAttribute('aria-label',label);b.append(el('span','mt-mt',label+' '))}else b.append(document.createTextNode(label+' '));
     var a=el('span',null,'↓');a.setAttribute('aria-hidden','true');b.append(a);return b;
   }
-  function pourquoi(x){var r=[Math.round(x.v)+' km/h'];r.push(x.sf>=.6?L('ensoleillé','sunny'):x.sf>=.25?L('quelques éclaircies','some sunny spells'):L('couvert','overcast'));if(x.pr>=.3)r.push(L('averses','showers'));if(x.t!=null)r.push(Math.round(x.t)+' °C');return r.join(', ')}
+  function pourquoi(x){var r=[WU(x.v)];r.push(x.sf>=.6?L('ensoleillé','sunny'):x.sf>=.25?L('quelques éclaircies','some sunny spells'):L('couvert','overcast'));if(x.pr>=.3)r.push(L('averses','showers'));if(x.t!=null)r.push(Math.round(x.t)+' °C');return r.join(', ')}
 
   // Bloc complet d'un spot : ligne résumée + détails (prévision, heure par heure, satellite).
   // o = {name, lat, lon, an (analyse ou null), open (détails dépliés), hourOpen, nuages (true pour charger le direct)}
-  function bloc(o){
+  function bloc(o,again){
     var root=el('div','mt-bloc'),line=el('div','mt-line'),det=el('div','mt-det');
     line.setAttribute('aria-live','polite');
     var an=o.an,vb=el('span','mt-verdict'),ip=el('span','mt-ic'),is=el('span','mt-ic'),bh=el('span','mt-bh');
@@ -142,16 +167,16 @@
       var dot=el('i');dot.setAttribute('aria-hidden','true');var vs=el('span');vs.append(el('span','mt-l',an.txt),el('span','mt-s',an.court));
       vb.className='mt-verdict'+(an.cls?' '+an.cls:'');vb.append(dot,vs);vb.hidden=false;
       setIc(ip,an.prev,L('Prévision','Forecast'));
-      bh.append(el('small','mt-l',L('Meilleure heure','Best time')),el('b','mt-l',hh(an.best.h)+'–'+hh(an.best.h+1)),el('b','mt-s',hh(an.best.h)),el('span','mt-bw',Math.round(an.best.v)+' km/h'));
-      bh.title=L('Vent prévu entre '+an.best.h+'h et '+(an.best.h+1)+'h : '+Math.round(an.best.v)+' km/h, rafales '+Math.round(an.best.g)+' km/h','Wind forecast between '+hh(an.best.h)+' and '+hh(an.best.h+1)+': '+Math.round(an.best.v)+' km/h, gusts '+Math.round(an.best.g)+' km/h');bh.hidden=false;
+      bh.append(el('small','mt-l',L('Meilleure heure','Best time')),el('b','mt-l',hh(an.best.h)+'–'+hh(an.best.h+1)),el('b','mt-s',hh(an.best.h)),el('span','mt-bw',WU(an.best.v)));
+      bh.title=L('Vent prévu entre '+an.best.h+'h et '+(an.best.h+1)+'h : '+WU(an.best.v)+', rafales '+WU(an.best.g),'Wind forecast between '+hh(an.best.h)+' and '+hh(an.best.h+1)+': '+WU(an.best.v)+', gusts '+WU(an.best.g));bh.hidden=false;
       var dt=new Date(an.day+'T12:00:00');
       det.append(el('p','label mt-titre',L('Météo '+(an.demain?'de demain':'du jour'),(an.demain?'Tomorrow\'s':'Today\'s')+' weather')+' · '+o.name+' · '+JOURS[dt.getDay()]+' '+dt.getDate()+' '+MOIS[dt.getMonth()]));
-      var sun=el('p','mt-sun');sun.append(el('span',null,L('🌅 Lever du soleil ','🌅 Sunrise ')),el('b',null,hm(an.sr)),el('span',null,L(' · 🌇 Coucher ',' · 🌇 Sunset ')),el('b',null,hm(an.ss)));det.append(sun);
+      var sun=el('p','mt-sun');sun.append(el('span',null,L('🌅 Lever du soleil ','🌅 Sunrise ')),el('b',null,hm(an.sr)),el('span',null,L(' · 🌇 Coucher ',' · 🌇 Sunset ')),el('b',null,hm(an.ss)));sun.append(unitSwitch());det.append(sun);
       det.append(grille(an));
       var hb=arrowBtn('lt-btn',L('Heure par heure : vent et température','Hour by hour: wind and temperature')),ol=heures(an);ol.hidden=!o.hourOpen;
       if(o.hourOpen){hb.setAttribute('aria-expanded','true');hb.querySelector('[aria-hidden]').textContent='↑'}
       toggle(hb,ol);det.append(hb,ol);
-      src.textContent=L('Prévision AROME Météo-France (maille 1,3 km) via Open-Meteo · vent moyen à 10 m en km/h · plus le vent est faible, plus le plan d\'eau est lisse. Nuages en direct : satellites Meteosat (EUMETSAT).','AROME Météo-France forecast (1.3 km grid) via Open-Meteo · average wind at 10 m in km/h · the lighter the wind, the smoother the water. Live clouds: Meteosat satellites (EUMETSAT).');
+      src.textContent=L('Prévision AROME Météo-France (maille 1,3 km) via Open-Meteo · vent moyen à 10 m · plus le vent est faible, plus le plan d\'eau est lisse. Nuages en direct : satellites Meteosat (EUMETSAT).','AROME Météo-France forecast (1.3 km grid) via Open-Meteo · average wind at 10 m · the lighter the wind, the smoother the water. Live clouds: Meteosat satellites (EUMETSAT).');
     }else src.textContent=L('Nuages en direct : satellites Meteosat (EUMETSAT).','Live clouds: Meteosat satellites (EUMETSAT).');
     // Satellite
     var sat=el('div','mt-sat');sat.hidden=true;
@@ -179,7 +204,9 @@
       if(d.heure){var t=new Date(d.heure);if(!isNaN(t))m+=EN?' · image from '+t.toLocaleTimeString('en-GB',{timeZone:TZ,hour:'numeric',minute:'2-digit',hour12:true}).replace(/\s/g,''):' · image de '+t.toLocaleTimeString('fr-FR',{timeZone:TZ,hour:'numeric',minute:'2-digit'}).replace(':','h')}
       sm.textContent=m+'.';
     };
-    if(o.nuages)nuages(o.terrasse?null:o.lat,o.lon).then(root.liveSat);
+    if(o._sat)root.liveSat(o._sat);
+    else if(o.nuages&&!again)nuages(o.terrasse?null:o.lat,o.lon).then(function(d){o._sat=d;var b=BLOCS.filter(function(x){return x.o===o})[0];(b?b.root:root).liveSat(d)});
+    if(!again)BLOCS.push({o:o,root:root});
     return root;
   }
   function setIc(span,ic,quoi,plus){span.firstChild.textContent=ic[0];span.title=quoi+L(' : ',': ')+ic[1]+(plus?', '+plus:'');span.setAttribute('aria-label',span.title);span.hidden=false}
@@ -189,16 +216,16 @@
     function cell(lbl,b,s,cls){var d=el('div',cls);d.append(el('span','label',lbl),el('b',null,b),el('small',null,s));g.append(d)}
     function plage(a,b){var l=jourH.filter(function(x){return x.h>=a&&x.h<b});if(!l.length)return null;
       var vs=l.map(function(x){return x.v}),gs=l.map(function(x){return x.g});
-      return {min:Math.round(Math.min.apply(0,vs)),max:Math.round(Math.max.apply(0,vs)),g:Math.round(Math.max.apply(0,gs))}}
+      return {min:W(Math.min.apply(0,vs)),max:W(Math.max.apply(0,vs)),g:W(Math.max.apply(0,gs))}}
     var am=plage(0,12),pm=plage(12,24);
-    function txtV(p){return p.min===p.max?p.min+' km/h':p.min+'–'+p.max+' km/h'}
+    function txtV(p){return (p.min===p.max?p.min:p.min+'–'+p.max)+U()}
     var vm=[];if(am&&pm)vm.push(L('Matin ','Morning ')+txtV(am));
-    var gm=Math.max(am?am.g:0,pm?pm.g:0);if(gm>0)vm.push(L('rafales jusqu\'à ','gusts up to ')+gm+' km/h');
+    var gm=Math.max(am?am.g:0,pm?pm.g:0);if(gm>0)vm.push(L('rafales jusqu\'à ','gusts up to ')+gm+U());
     var dirs=an.cand.filter(function(x){return x.dir!=null});
-    if(dirs.length){var dm=dirs.reduce(function(a,b){return b.v>a.v?b:a}).dir;if(Math.max(am?am.max:0,pm?pm.max:0)>=6)vm.push(L('vent de ','wind from the ')+DIR[Math.round(dm/45)%8])}
+    if(dirs.length){var dm=dirs.reduce(function(a,b){return b.v>a.v?b:a}).dir;if(Math.max.apply(0,jourH.map(function(x){return x.v}))>=6)vm.push(L('vent de ','wind from the ')+DIR[Math.round(dm/45)%8])}
     cell(L('Vent','Wind'),pm?L('Après-midi ','Afternoon ')+txtV(pm):L('Matin ','Morning ')+txtV(am),vm.join(' · '));
     var best=an.best,bS=an.bestS,bm=pourquoi(best);
-    if(bS&&bS.h!==best.h)bm+=L('. Sur le créneau 15h–18h30 : ','. In the 3pm–6:30pm slot: ')+hh(bS.h)+' ('+Math.round(bS.v)+' km/h'+(bS.sf>=.6?L(', soleil',', sun'):'')+')';
+    if(bS&&bS.h!==best.h)bm+=L('. Sur le créneau 15h–18h30 : ','. In the 3pm–6:30pm slot: ')+hh(bS.h)+' ('+WU(bS.v)+(bS.sf>=.6?L(', soleil',', sun'):'')+')';
     cell(L('Meilleure heure','Best time'),hh(best.h)+' – '+hh(best.h+1),bm,'mt-top');
     function sol(a,b){var s=0,ok=false,j=0,c=0,n=0;jourH.concat(hrs.filter(function(x){return jourH.indexOf(x)<0&&x.jour>0})).forEach(function(x){if(x.h>=a&&x.h<b){j+=x.jour;if(x.sun!=null){s+=x.sun;ok=true}if(x.cc!=null){c+=x.cc;n++}}});
       return {s:s,ok:ok,j:j,cc:n?c/n:null}}
@@ -210,16 +237,16 @@
   }
   // Heure par heure (de jour seulement, 6 colonnes sur mobile : pas de défilement horizontal)
   function heures(an){
-    var ol=el('ol','mt-h');ol.setAttribute('aria-label',L('Vent moyen en km/h, heure par heure','Average wind in km/h, hour by hour'));
+    var ol=el('ol','mt-h');ol.setAttribute('aria-label',L('Vent moyen en','Average wind in')+U()+L(', heure par heure',', hour by hour'));
     an.jourH.forEach(function(x){
       var li=el('li',(x===an.best?'mt-best ':'')+(!x.futur?'mt-past ':'')+(x.v<=8?'mt-calme':x.v>14?'mt-vente':''));
       var c=el('span','mt-pic',x.pr>=.3?'🌧️':x.sf>=.6?'☀️':x.sf>=.4?'🌤️':x.sf>=.15?'⛅':'☁️');c.setAttribute('aria-hidden','true');
-      li.title=hh(x.h)+L(' : vent ',': wind ')+Math.round(x.v)+L(' km/h, rafales ',' km/h, gusts ')+Math.round(x.g)+' km/h'+(x.t!=null?', '+Math.round(x.t)+' °C':'');li.setAttribute('aria-label',li.title);
-      var w=el('b',null,Math.round(x.v));w.append(el('small','mt-u',' km/h'));
+      li.title=hh(x.h)+L(' : vent ',': wind ')+WU(x.v)+L(', rafales ',', gusts ')+WU(x.g)+(x.t!=null?', '+Math.round(x.t)+' °C':'');li.setAttribute('aria-label',li.title);
+      var w=el('b',null,W(x.v));w.append(el('small','mt-u',U()));
       li.append(el('span',null,hh(x.h)),w,c,el('span','mt-tp',x.t!=null?Math.round(x.t)+' °C':''));ol.append(li);
     });
     return ol;
   }
 
-  window.ALR_METEO={forecast:forecast,analyse:analyse,nuages:nuages,icSat:icSat,bloc:bloc,WEBCAMS:WEBCAMS,WEBCAMS_ON:false};
+  window.ALR_METEO={setUnit:setUnit,forecast:forecast,analyse:analyse,nuages:nuages,icSat:icSat,bloc:bloc,WEBCAMS:WEBCAMS,WEBCAMS_ON:false};
 })();

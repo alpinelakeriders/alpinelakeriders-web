@@ -46,3 +46,7 @@
 .mt-sun b{font-weight:500;color:var(--fg);font-variant-numeric:tabular-nums}
 .mt-h .mt-u{display:block;font-size:10px;font-weight:400;color:var(--muted);line-height:1}
 .mt-h .mt-tp{font-size:11px}
+.mt-sun{display:flex;align-items:center;gap:6px 4px;flex-wrap:wrap}
+.mt-unit{display:inline-flex;margin-left:auto;border-radius:999px;box-shadow:inset 0 0 0 1px var(--line);padding:2px}
+.mt-unit button{background:none;border:0;border-radius:999px;padding:4px 10px;font:500 11px/1 var(--mono);letter-spacing:.03em;color:var(--muted);cursor:pointer}
+.mt-unit button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
