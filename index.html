@@ -1579,6 +1579,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
             <label class="check"><input type="checkbox" id="lib-auto" checked> Retouche automatique</label>
             <div class="bar" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><label class="pill ink small" style="cursor:pointer"><span id="lib-add-l">Ajouter à la photothèque</span><input type="file" id="lib-file" accept="image/*,.heic,.heif" multiple hidden></label><span class="msg" id="lib-msg" role="status">ou glissez-les ici</span></div>
           </div>
+          <div class="bar" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px"><button type="button" class="pill line small" id="lib-slim">Alléger les photos déjà en ligne</button><span class="msg" id="lib-slim-msg" role="status"></span></div>
         </aside>
       </div>
       <div class="sel-bar" id="sel-bar" hidden><span id="sel-n"></span><span class="sel-acts">Déplacer vers <button type="button" class="pill ink small" data-to="bandeau">Bandeau</button><button type="button" class="pill ink small" data-to="apero">Apéro</button><button type="button" class="pill ink small" data-to="spot">Lac</button><button type="button" class="pill line small" id="sel-ret">Retirer</button><button type="button" class="pill line small" id="sel-bib">Changer de bibliothèque</button><button type="button" class="pill line small" id="sel-clear">Tout désélectionner</button></span></div>
@@ -1713,9 +1714,11 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
   const phDupes=()=>{const out=[];[...new Set((photos||[]).map(zoneOf))].filter(z=>z!=='lib').forEach(z=>{const seen=new Set();(photos||[]).filter(p=>zoneOf(p)===z).sort((a,b)=>(a.ordre||0)-(b.ordre||0)||String(a.id).localeCompare(String(b.id)))
     .forEach(p=>{const u=phSrc(p);if(seen.has(u))out.push(p);else seen.add(u)})});return out};
   // Carrousel de l'Apéro Pumpfoil : fondu toutes les 5 s, pause au survol
-  const apCar=$('ap-car');let apI=0,apHover=false,apTimer=null,apSig='';
+  const apCar=$('ap-car');let apI=0,apHover=false,apTimer=null,apSig='',apVis=false;
+  // Économie de bande passante : une image n'est téléchargée que lorsqu'elle va être affichée
+  const ldImg=im=>{if(im&&im.dataset.src){im.src=im.dataset.src;im.removeAttribute('data-src')}};
   function apShow(i){const ims=apCar.querySelectorAll('img');if(!ims.length)return;apI=(i+ims.length)%ims.length;
-    ims.forEach((im,k)=>im.classList.toggle('on',k===apI));
+    ims.forEach((im,k)=>im.classList.toggle('on',k===apI));ldImg(ims[apI]);if(apVis)ldImg(ims[(apI+1)%ims.length]);
     $('ap-bar').querySelectorAll('.ap-prog button').forEach((d,k)=>{d.classList.toggle('done',k<apI);d.removeAttribute('aria-current');if(k===apI){void d.offsetWidth;d.setAttribute('aria-current','true')}});
     const n=$('ap-n');if(n)n.textContent=String(apI+1).padStart(2,'0')}
   // Ordre aléatoire tiré une fois par chargement de page (stable pendant la visite)
@@ -1726,7 +1729,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
     const list=shuffled('apero');if(!list.length)return; // sinon on garde la photo par défaut
     const sig=list.map(p=>p.id+phSrc(p)+(p.alt||'')).join('|');if(sig===apSig)return;apSig=sig;
     apCar.textContent='';
-    list.forEach((p,k)=>{const im=document.createElement('img');im.src=phSrc(p);im.alt=p.alt||'Apéro Pumpfoil au lac de la Terrasse';im.decoding='async';if(p.pos)im.style.objectPosition=p.pos;if(k>0)im.loading='lazy';apCar.append(im)});
+    list.forEach((p,k)=>{const im=document.createElement('img');if(k>0)im.dataset.src=phSrc(p);else{im.loading='lazy';im.src=phSrc(p)}im.alt=p.alt||'Apéro Pumpfoil au lac de la Terrasse';im.decoding='async';if(p.pos)im.style.objectPosition=p.pos;apCar.append(im)});
     const bar=$('ap-bar');bar.textContent='';bar.hidden=list.length<2;
     if(list.length>1){
       const num=document.createElement('div');num.className='ap-num';num.innerHTML='<b id="ap-n" style="font-weight:500">01</b> <span>/ '+String(list.length).padStart(2,'0')+'</span>';
@@ -1739,8 +1742,10 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
     apShow(0);apRestart();
   }
   function apRestart(){clearInterval(apTimer);if(apCar.querySelectorAll('img').length<2||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
-    apTimer=setInterval(()=>{if(!apHover&&!document.hidden)apShow(apI+1)},5000)}
-  const apFig=$('ap-fig');apFig.addEventListener('mouseenter',()=>{apHover=true;apFig.classList.add('paused')});apFig.addEventListener('mouseleave',()=>{apHover=false;apFig.classList.remove('paused')});
+    apTimer=setInterval(()=>{if(apVis&&!apHover&&!document.hidden)apShow(apI+1)},5000)}
+  const apFig=$('ap-fig');
+  try{new IntersectionObserver(es=>{apVis=es.some(e=>e.isIntersecting);if(apVis){const ims=apCar.querySelectorAll('img');ldImg(ims[(apI+1)%ims.length])}},{rootMargin:'200px'}).observe(apFig)}catch(e){apVis=true}
+  apFig.addEventListener('mouseenter',()=>{apHover=true;apFig.classList.add('paused')});apFig.addEventListener('mouseleave',()=>{apHover=false;apFig.classList.remove('paused')});
   // Glisser au doigt (ou à la souris) : la photo suit le geste, puis on change si le geste est assez long
   let apX=null,apY=0,apD=0,apAxis=null;
   const apCur=()=>apCar.querySelectorAll('img')[apI];
@@ -1756,12 +1761,13 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
   apCar.addEventListener('mousedown',e=>{e.preventDefault();apStart(e.clientX,e.clientY)});
   addEventListener('mousemove',e=>apMove(e.clientX,e.clientY));addEventListener('mouseup',apEnd);
   // Carrousel du spot (Lac de la Terrasse) : fondu toutes les 6 s, ordre aléatoire à chaque visite, glisser au doigt
-  const spCar=$('spot-car');let spI=0,spTimer=null,spSig='';
-  function spShow(i){const ims=spCar.querySelectorAll('img');if(!ims.length)return;spI=(i+ims.length)%ims.length;ims.forEach((im,k)=>im.classList.toggle('on',k===spI));
+  const spCar=$('spot-car');let spI=0,spTimer=null,spSig='',spVis=false;
+  try{new IntersectionObserver(es=>{spVis=es.some(e=>e.isIntersecting);if(spVis){const ims=spCar.querySelectorAll('img');ldImg(ims[(spI+1)%ims.length])}},{rootMargin:'200px'}).observe(spCar)}catch(e){spVis=true}
+  function spShow(i){const ims=spCar.querySelectorAll('img');if(!ims.length)return;spI=(i+ims.length)%ims.length;ims.forEach((im,k)=>im.classList.toggle('on',k===spI));ldImg(ims[spI]);if(spVis)ldImg(ims[(spI+1)%ims.length]);
     $('spot-dots').querySelectorAll('button').forEach((d,k)=>d.setAttribute('aria-current',String(k===spI)))}
-  function spRestart(){clearInterval(spTimer);if(spCar.querySelectorAll('img').length<2||matchMedia('(prefers-reduced-motion: reduce)').matches)return;spTimer=setInterval(()=>{if(!document.hidden)spShow(spI+1)},6000)}
+  function spRestart(){clearInterval(spTimer);if(spCar.querySelectorAll('img').length<2||matchMedia('(prefers-reduced-motion: reduce)').matches)return;spTimer=setInterval(()=>{if(spVis&&!document.hidden)spShow(spI+1)},6000)}
   function renderSpot(){const list=shuffled('spot');if(!list.length)return;const sig=list.map(p=>p.id+phSrc(p)+(p.pos||'')).join('|');if(sig===spSig)return;spSig=sig;
-    spCar.textContent='';list.forEach((p,k)=>{const im=document.createElement('img');im.src=phSrc(p);im.alt=p.alt||'Le lac de la Terrasse';im.decoding='async';if(p.pos)im.style.objectPosition=p.pos;if(k>0)im.loading='lazy';spCar.append(im)});
+    spCar.textContent='';list.forEach((p,k)=>{const im=document.createElement('img');if(k>0)im.dataset.src=phSrc(p);else{im.loading='lazy';im.src=phSrc(p)}im.alt=p.alt||'Le lac de la Terrasse';im.decoding='async';if(p.pos)im.style.objectPosition=p.pos;spCar.append(im)});
     const d=$('spot-dots');d.textContent='';d.hidden=list.length<2;
     if(list.length>1)list.forEach((p,k)=>{const b=document.createElement('button');b.type='button';b.setAttribute('aria-label','Photo '+(k+1));b.addEventListener('click',()=>{spShow(k);spRestart()});d.append(b)});
     spShow(0);spRestart()}
@@ -1776,7 +1782,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
     const base=phSorted(),inB=new Set(base.map(phSrc)),ap=shuffled('apero').filter(p=>!inB.has(phSrc(p))),extra=(mixN?ap.slice(-mixN):[]).map(p=>Object.assign({},p,{tall:false}));
     const pool=base.filter(p=>!p.fixe).concat(extra).sort((a,b)=>rk(a.id+'s')-rk(b.id+'s')),out=[];
     for(let i=0;i<base.length+extra.length;i++)out.push(i<base.length&&base[i].fixe?base[i]:pool.shift());
-    out.filter(Boolean).forEach(p=>{const im=document.createElement('img');im.src=phSrc(p);im.alt=p.alt||'Session de pumpfoil au lac';im.decoding='async';if(p.pos)im.style.objectPosition=p.pos;if(p.tall)im.className='tall';
+    out.filter(Boolean).forEach((p,k)=>{const im=document.createElement('img');if(k>3)im.loading='lazy';im.src=phSrc(p);im.alt=p.alt||'Session de pumpfoil au lac';im.decoding='async';if(p.pos)im.style.objectPosition=p.pos;if(p.tall)im.className='tall';
       im.addEventListener('error',()=>im.remove());st.append(im)});
     st.scrollLeft=0;pos=0;loopify();setTimeout(edges,300);
   }
@@ -2907,12 +2913,33 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
     }
     cx.putImageData(id,0,0);return cv;
   }
+  // Taille des photos envoyées : 1600 px de large au plus, WebP qualité 0,72 (environ 150 à 250 Ko)
+  const PH_MAX=1600,PH_Q=.72;
   async function encode(cv){
     const toBlob=(t,q)=>new Promise(res=>cv.toBlob(res,t,q));
-    let out=await toBlob('image/webp',.8);
-    if(!out||out.type!=='image/webp')out=await toBlob('image/jpeg',.82);
+    let out=await toBlob('image/webp',PH_Q);
+    if(!out||out.type!=='image/webp')out=await toBlob('image/jpeg',.78);
     return {blob:out,tall:cv.height>cv.width*1.05};
   }
+  // Allège les photos déjà en ligne : chaque fichier de plus de 300 Ko est réduit (1600 px, WebP 0,72),
+  // remplacé dans tous les modules qui l'utilisent, puis l'ancien fichier est supprimé du stockage.
+  $('lib-slim').addEventListener('click',async()=>{
+    const m=$('lib-slim-msg'),b=$('lib-slim');if(!assets){say(m,'Connectez-vous en administrateur.','err');return}
+    if(!confirm('Réduire le poids des photos déjà en ligne ?\n\nLes photos de plus de 300 Ko sont recompressées en 1600 px. Cela peut prendre quelques minutes : gardez la page ouverte.'))return;
+    b.disabled=true;
+    const byUrl=new Map();(photos||[]).forEach(p=>{const u=phSrc(p);if(!/\/storage\/v1\/object\/public\/photos\//.test(u))return;if(!byUrl.has(u))byUrl.set(u,[]);byUrl.get(u).push(p)});
+    const used=JSON.stringify(contenu||{})+JSON.stringify(sorties||[]),L=[...byUrl];let n=0,done=0,saved=0,ko=0;
+    for(const [u,docs] of L){n++;say(m,'Photo '+n+' / '+L.length+'…');
+      try{const r=await fetch(u,{cache:'no-store'});if(!r.ok)throw new Error(String(r.status));const bl=await r.blob();if(bl.size<300*1024)continue;
+        const bmp=await createImageBitmap(bl);const cv=draw(bmp,PH_MAX,null);if(bmp.close)bmp.close();
+        const {blob}=await encode(cv);if(blob.size>bl.size*.8)continue;
+        const res=await assets.upload(blob,{type:blob.type});
+        for(const d of docs){const data=Object.assign({},d);delete data.id;await db.doc('photos/'+d.id).set(Object.assign(data,{url:res.url,asset:res.id}))}
+        const old=docs.map(d=>d.asset).find(Boolean)||decodeURIComponent(u.split('/object/public/photos/')[1]||'');
+        if(old&&!used.includes(u))await assets.delete(old).catch(()=>{});
+        done++;saved+=bl.size-blob.size}catch(e){ko++}}
+    b.disabled=false;
+    say(m,(done?done+' photo'+(done>1?'s allégées':' allégée')+' ('+Math.round(saved/1048576)+' Mo gagnés).':'Rien à alléger.')+(ko?' '+ko+' en échec.':''),ko&&!done?'err':'ok')});
   const errTxt=e=>{const c=e&&e.code;const m=(e&&e.message)||'';
     if(c==='too_large'||c===413||/too large|exceeded/i.test(m))return 'fichier trop lourd';
     if(c==='decode')return 'format non lu (photo HEIC d\'iPhone ? exportez-la en JPEG)';
@@ -3025,7 +3052,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
   $('pv-ok').addEventListener('click',async()=>{
     if(pvw.busy||!pvw.bmp)return;pvw.busy=true;const b=$('pv-ok'),m=$('pv-msg'),f=pvw.queue[pvw.i];b.disabled=true;b.textContent='Envoi…';
     try{
-      const {blob,tall}=await encode(draw(pvw.bmp,2000,pvOpts(),pvw.crop));
+      const {blob,tall}=await encode(draw(pvw.bmp,PH_MAX,pvOpts(),pvw.crop));
       const res=await assets.upload(blob,{type:blob.type});const prise=await exifDate(f);
       const id='ph-'+Date.now().toString(36)+pvw.i;
       await db.doc('photos/'+id).set(Object.assign({asset:res.id,url:res.url,alt:'',tall,ordre:++pvw.base,actif:true,cree:new Date().toISOString()},pvw.z!=='bandeau'?{zone:pvw.z}:{},pvw.z==='lib'&&libBib==='cr'?{bib:'cr'}:{},(pvw.pos.x!==50||pvw.pos.y!==50)?{pos:pvw.pos.x+'% '+pvw.pos.y+'%'}:{},prise?{prise}:{}));
@@ -3276,7 +3303,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
     if(!list.length)return;crTri.busy=true;crPaint();
     let base=Math.max(0,...phSorted(z,true).map(p=>p.ordre||0)),ok=0,ko=0;const alt=(s.titre||'Sortie')+' · '+crDateLong(s.date);
     for(const x of list){x.up=true;crPaint();say(m,'Envoi '+(ok+ko+1)+' / '+list.length+'…');
-      try{const bmp=await decode(x.f);const cv=draw(bmp,2000,$('cr-auto').checked?{auto:true}:null);if(bmp.close)bmp.close();
+      try{const bmp=await decode(x.f);const cv=draw(bmp,PH_MAX,$('cr-auto').checked?{auto:true}:null);if(bmp.close)bmp.close();
         const {blob,tall}=await encode(cv);const res=await assets.upload(blob,{type:blob.type});
         const id='ph-'+Date.now().toString(36)+Math.floor(Math.random()*1e4);
         await db.doc('photos/'+id).set(Object.assign({asset:res.id,url:res.url,alt,tall,ordre:++base,actif:true,zone:z,bib:'cr',fixe:false,score:Math.round((x.score||0)*100)/100,cree:new Date().toISOString()},x.m.prise?{prise:x.m.prise}:{}));
