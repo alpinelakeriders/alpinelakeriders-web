@@ -87,6 +87,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .menu-pop[hidden]{display:none}
 .menu-pop a{display:block;padding:12px 14px;border-radius:10px;font-size:15px;color:var(--fg)}
 .menu-pop a:hover,.menu-pop a:focus-visible{background:var(--tint)}
+.menu-pop .menu-adm{margin-top:6px;padding-top:6px;border-top:1px solid var(--line)}.menu-pop .menu-adm a{font-size:14px;color:var(--muted)}
 @media (max-width:860px){.topbar .label{font-size:11px}.topbar .pill{height:40px;padding:0 16px}.menu-btn{height:40px;width:40px;padding:0;justify-content:center}.menu-btn span{display:none}.menu-pop{left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));width:auto;max-height:calc(100dvh - 90px);overflow:auto}.menu-pop a{padding:14px 16px;font-size:16px}}
 @media (max-width:420px){.topbar .label{display:none}.topbar .lang-sw{margin-left:0!important}}
 .hero{position:relative;width:100%;aspect-ratio:16/9;max-width:100%;overflow:hidden;background:var(--bg);color:#fff}
@@ -837,7 +838,7 @@ function go(){var f=null;try{f=localStorage.getItem('alr-admin')}catch(e){}if(f)
 if(!window.claude)return;window.claude.use('user').then(u=>u&&u.canEdit()).then(ok=>{if(ok){show();try{localStorage.setItem('alr-admin','1')}catch(e){}}}).catch(()=>{})}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',go);else go()})();
 </script>
-<script src="js/i18n.js?v=4"></script>
+<script src="js/i18n.js?v=5"></script>
 <script src="js/meteo.js?v=6"></script>
 </head>
 <body>
@@ -848,7 +849,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   <button class="a2hs-top" type="button" data-a2hs hidden><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="6" y="2.5" width="12" height="19" rx="2.6"/><path d="M12 8.5v6M9 11.5h6"/></svg></button>
   <a class="pill ink" href="#rejoindre">Adhérer</a>
   <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu-pop" aria-label="Menu"><svg class="b" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg><svg class="x" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg><span>Menu</span></button>
-  <ul class="menu-pop" id="menu-pop" hidden><li><a href="#asso">L'asso</a></li><li><a href="#agenda">Agenda</a></li><li><a href="#debuter">Débuter</a></li><li><a href="#apero">Apéros Pumpfoil</a></li><li><a href="#spot">Le spot</a></li><li><a href="#lacs">Lacs</a></li><li data-admin-only hidden><a href="spots-pumpfoil.html">Spots</a></li><li><a href="#avis">Avis</a></li><li><a href="#rejoindre">Rejoindre</a></li><li><a href="#contact">Contact</a></li></ul>
+  <ul class="menu-pop" id="menu-pop" hidden><li><a href="#asso">L'asso</a></li><li><a href="#agenda">Agenda</a></li><li><a href="#debuter">Débuter</a></li><li><a href="#apero">Apéros Pumpfoil</a></li><li><a href="#spot">Le spot</a></li><li><a href="#lacs">Lacs</a></li><li data-admin-only hidden><a href="spots-pumpfoil.html">Spots</a></li><li><a href="#avis">Avis</a></li><li><a href="#rejoindre">Rejoindre</a></li><li><a href="#contact">Contact</a></li><li class="menu-adm"><a href="#" id="menu-admin" data-noi18n>Administration</a></li></ul>
 <script>
 (function(){var b=document.querySelector('.menu-btn'),m=document.getElementById('menu-pop');if(!b||!m)return;
 function set(o){m.hidden=!o;b.setAttribute('aria-expanded',o?'true':'false')}
@@ -2136,6 +2137,8 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
 
   // ---------- Administration ----------
   const admin=$('admin');let isAdmin=false;
+  // Accès rapide à l'administration depuis le menu (évite de descendre en bas de page)
+  $('menu-admin').addEventListener('click',e=>{e.preventDefault();$('open-admin').click()});
   $('open-admin').addEventListener('click',async()=>{
     admin.hidden=false;document.body.style.overflow='hidden';
     const gm=$('gate-msg');
@@ -3144,7 +3147,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
       try{n=await db.like(s.id,v,want);let L=crLiked().filter(x=>x!==s.id);if(want)L.push(s.id);try{localStorage.setItem('alr-likes',JSON.stringify(L))}catch(e){}}
       catch(e){on=!want;n=Math.max(0,n+(want?-1:1));msg.textContent='Impossible pour le moment, réessayez plus tard.'}
       like.disabled=false;paint()});
-    const txt=L((s.titre||'Sortie')+' · '+crDateLong(s.date)+' : le compte rendu et les photos d\'Alpine Lake Riders',(window.ALR_I18N?ALR_I18N.t((s.titre||'Sortie')+' · '+crDateLong(s.date)):s.titre)+': the Alpine Lake Riders session report and photos');
+    const txt=L((s.titre||'Sortie')+' · '+crDateLong(s.date)+' : le compte rendu et les photos d\'Alpine Lake Riders',(window.ALR_I18N&&typeof ALR_I18N.t==='function'?ALR_I18N.t((s.titre||'Sortie')+' · '+crDateLong(s.date)):s.titre)+': the Alpine Lake Riders session report and photos');
     mk('WhatsApp','Partager sur WhatsApp').addEventListener('click',()=>window.open('https://wa.me/?text='+encodeURIComponent(txt+' '+crUrl(s)),'_blank','noopener'));
     mk('Facebook','Partager sur Facebook').addEventListener('click',()=>window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(crUrl(s)),'_blank','noopener,width=640,height=560'));
     // Instagram n'a pas de lien de partage web : sur téléphone, on passe par le partage du téléphone avec la photo ; sinon on copie le lien
