@@ -1580,7 +1580,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
             <label class="check"><input type="checkbox" id="lib-auto" checked> Retouche automatique</label>
             <div class="bar" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><label class="pill ink small" style="cursor:pointer"><span id="lib-add-l">Ajouter à la photothèque</span><input type="file" id="lib-file" accept="image/*,.heic,.heif" multiple hidden></label><span class="msg" id="lib-msg" role="status">ou glissez-les ici</span></div>
           </div>
-          <div class="bar" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px"><button type="button" class="pill line small" id="lib-slim">Alléger les photos déjà en ligne</button><span class="msg" id="lib-slim-msg" role="status"></span></div>
+          <div class="bar" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px"><button type="button" class="pill line small" id="lib-slim">Alléger les photos déjà en ligne</button><button type="button" class="pill line small" id="lib-unslim" hidden>Revenir aux originaux</button><button type="button" class="pill line small" id="lib-purge" hidden>Purger les originaux</button><span class="msg" id="lib-slim-msg" role="status"></span></div>
         </aside>
       </div>
       <div class="sel-bar" id="sel-bar" hidden><span id="sel-n"></span><span class="sel-acts">Déplacer vers <button type="button" class="pill ink small" data-to="bandeau">Bandeau</button><button type="button" class="pill ink small" data-to="apero">Apéro</button><button type="button" class="pill ink small" data-to="spot">Lac</button><button type="button" class="pill line small" id="sel-ret">Retirer</button><button type="button" class="pill line small" id="sel-bib">Changer de bibliothèque</button><button type="button" class="pill line small" id="sel-clear">Tout désélectionner</button></span></div>
@@ -2113,7 +2113,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
     db.collection('annonces').onSnapshot(q=>{annonces=q.docs.map(d=>Object.assign({id:d.id},d.data()));renderAnnonces();renderAnEditor()},()=>{});
     refreshCount();
     loadAvisPub();
-    db.collection('photos').onSnapshot(q=>{photos=q.docs.map(d=>Object.assign({id:d.id},d.data()));renderStrip();renderPhEditor();try{renderCrPublic();renderAgenda()}catch(e){}try{phCleanDupes()}catch(e){}},()=>{});
+    db.collection('photos').onSnapshot(q=>{photos=q.docs.map(d=>Object.assign({id:d.id},d.data()));renderStrip();renderPhEditor();try{slimUi()}catch(e){}try{renderCrPublic();renderAgenda()}catch(e){}try{phCleanDupes()}catch(e){}},()=>{});
     db.collection('presences').onSnapshot(q=>{presences=q.docs.map(d=>Object.assign({id:d.id},d.data()));renderAgenda();renderEditor()},()=>{});
   })();
 
@@ -2635,7 +2635,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
       mk('+ Band.',()=>libAdd(it,'bandeau'));mk('+ Apéro',()=>libAdd(it,'apero'));mk('+ Lac',()=>libAdd(it,'spot'));
       mk(it.bib==='cr'?'→ Générale':'→ C. rendus',()=>bibSwitch([it.url],it.bib==='cr'?'gen':'cr').catch(()=>say($('lib-msg'),'Changement refusé.','err'))).title=it.bib==='cr'?'Passer dans la bibliothèque générale':'Passer dans la bibliothèque des comptes rendus';
       let armed=false;mk('Supprimer',async b=>{if(!armed){armed=true;b.textContent=it.uses.length?'Supprimer partout ?':'Confirmer';setTimeout(()=>{armed=false;b.textContent='Supprimer'},4000);return}
-        try{await Promise.all(it.docs.map(d=>db.doc('photos/'+d.id).delete()));if(assets)await Promise.all([...new Set(it.docs.map(d=>d.asset).filter(Boolean))].map(a=>assets.delete(a).catch(()=>{})))}catch(e){say($('lib-msg'),'Suppression refusée.','err')}});
+        try{await Promise.all(it.docs.map(d=>db.doc('photos/'+d.id).delete()));if(assets)await Promise.all([...new Set(it.docs.flatMap(d=>[d.asset,d.orig&&d.orig.asset]).filter(Boolean))].map(a=>assets.delete(a).catch(()=>{})))}catch(e){say($('lib-msg'),'Suppression refusée.','err')}});
       c.append(im,tags,act);
       c.dataset.sel='u:'+it.url;
       c.addEventListener('click',e=>{if(e.target.closest('button'))return;if(selClick(e,'u:'+it.url))return;if(Date.now()-libDragged<400)return;vwOpenLib(it.url);return;const on=!c.classList.contains('sel');box.querySelectorAll('.lib-it.sel').forEach(x=>x.classList.remove('sel'));c.classList.toggle('sel',on)});
@@ -2924,25 +2924,51 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
     if(!out||out.type!=='image/webp')out=await toBlob('image/jpeg',.78);
     return {blob:out,tall:cv.height>cv.width*1.05};
   }
-  // Allège les photos déjà en ligne : chaque fichier de plus de 300 Ko est réduit (1600 px, WebP 0,72),
-  // remplacé dans tous les modules qui l'utilisent, puis l'ancien fichier est supprimé du stockage.
-  $('lib-slim').addEventListener('click',async()=>{
-    const m=$('lib-slim-msg'),b=$('lib-slim');if(!assets){say(m,'Connectez-vous en administrateur.','err');return}
-    if(!confirm('Réduire le poids des photos déjà en ligne ?\n\nLes photos de plus de 300 Ko sont recompressées en 1600 px. Cela peut prendre quelques minutes : gardez la page ouverte.'))return;
-    b.disabled=true;
-    const byUrl=new Map();(photos||[]).forEach(p=>{const u=phSrc(p);if(!/\/storage\/v1\/object\/public\/photos\//.test(u))return;if(!byUrl.has(u))byUrl.set(u,[]);byUrl.get(u).push(p)});
-    const used=JSON.stringify(contenu||{})+JSON.stringify(sorties||[]),L=[...byUrl];let n=0,done=0,saved=0,ko=0;
-    for(const [u,docs] of L){n++;say(m,'Photo '+n+' / '+L.length+'…');
-      try{const r=await fetch(u,{cache:'no-store'});if(!r.ok)throw new Error(String(r.status));const bl=await r.blob();if(bl.size<300*1024)continue;
-        const bmp=await createImageBitmap(bl);const cv=draw(bmp,PH_MAX,null);if(bmp.close)bmp.close();
-        const {blob}=await encode(cv);if(blob.size>bl.size*.8)continue;
-        const res=await assets.upload(blob,{type:blob.type});
-        for(const d of docs){const data=Object.assign({},d);delete data.id;await db.doc('photos/'+d.id).set(Object.assign(data,{url:res.url,asset:res.id}))}
-        const old=docs.map(d=>d.asset).find(Boolean)||decodeURIComponent(u.split('/object/public/photos/')[1]||'');
-        if(old&&!used.includes(u))await assets.delete(old).catch(()=>{});
-        done++;saved+=bl.size-blob.size}catch(e){ko++}}
-    b.disabled=false;
-    say(m,(done?done+' photo'+(done>1?'s allégées':' allégée')+' ('+Math.round(saved/1048576)+' Mo gagnés).':'Rien à alléger.')+(ko?' '+ko+' en échec.':''),ko&&!done?'err':'ok')});
+  // Allègement des photos déjà en ligne, en trois temps :
+  // 1) « Alléger » : chaque fichier de plus de 300 Ko est recompressé (1600 px, WebP 0,72) et le site affiche la version légère.
+  //    L'original reste dans le stockage (champ « orig » de la photo) : il n'est plus servi aux visiteurs, donc plus de bande passante.
+  // 2) « Revenir aux originaux » : remet les fichiers d'origine et supprime les versions légères.
+  // 3) « Purger les originaux » : une fois le résultat validé, supprime les originaux pour libérer l'espace.
+  const PH_STORE=/\/storage\/v1\/object\/public\/photos\//;
+  const assetOf=u=>decodeURIComponent((u||'').split('/object/public/photos/')[1]||'');
+  const phGroups=(f)=>{const m=new Map();(photos||[]).filter(f).forEach(p=>{const k=f===hasOrig?p.orig.url:phSrc(p);if(!m.has(k))m.set(k,[]);m.get(k).push(p)});return [...m]};
+  function hasOrig(p){return !!(p&&p.orig&&p.orig.url)}
+  const phSave=(d,patch,drop)=>{const data=Object.assign({},d,patch);delete data.id;if(drop)delete data[drop];return db.doc('photos/'+d.id).set(data)};
+  const mo=b=>Math.round(b/1048576*10)/10+' Mo';
+  function slimUi(){const n=phGroups(hasOrig).length,m=$('lib-slim-msg');if(!$('lib-unslim'))return;
+    $('lib-unslim').hidden=$('lib-purge').hidden=!n;
+    if(m.dataset.busy)return;
+    if(n){say(m,n+' photo'+(n>1?'s allégées':' allégée')+' : les originaux sont conservés. Vérifiez le site, puis purgez-les ou revenez en arrière.');m.dataset.auto='1'}
+    else if(m.dataset.auto){say(m,'');delete m.dataset.auto}}
+  async function slimRun(btn,fn){const m=$('lib-slim-msg');if(!assets){say(m,'Connectez-vous en administrateur.','err');return}
+    ['lib-slim','lib-unslim','lib-purge'].forEach(id=>$(id).disabled=true);m.dataset.busy='1';
+    try{await fn(m)}finally{delete m.dataset.auto;delete m.dataset.busy;['lib-slim','lib-unslim','lib-purge'].forEach(id=>$(id).disabled=false)}}
+  $('lib-slim').addEventListener('click',()=>{
+    if(!confirm('Alléger les photos déjà en ligne ?\n\nLes photos de plus de 300 Ko sont recompressées en 1600 px. Les originaux sont gardés de côté : vous pourrez revenir en arrière.\n\nCela peut prendre quelques minutes : gardez la page ouverte.'))return;
+    slimRun('lib-slim',async m=>{const L=phGroups(p=>!hasOrig(p)&&PH_STORE.test(phSrc(p)));let n=0,done=0,saved=0,ko=0;
+      for(const [u,docs] of L){n++;say(m,'Photo '+n+' / '+L.length+'…');
+        try{const r=await fetch(u,{cache:'no-store'});if(!r.ok)throw new Error(String(r.status));const bl=await r.blob();if(bl.size<300*1024)continue;
+          const bmp=await createImageBitmap(bl);const cv=draw(bmp,PH_MAX,null);if(bmp.close)bmp.close();
+          const {blob}=await encode(cv);if(blob.size>bl.size*.8)continue;
+          const res=await assets.upload(blob,{type:blob.type});
+          const orig={url:u,asset:docs.map(d=>d.asset).find(Boolean)||assetOf(u),size:bl.size};
+          for(const d of docs)await phSave(d,{url:res.url,asset:res.id,orig});
+          done++;saved+=bl.size-blob.size}catch(e){ko++}}
+      say(m,(done?done+' photo'+(done>1?'s allégées':' allégée')+' ('+mo(saved)+' de moins par affichage). Originaux conservés.':'Rien à alléger.')+(ko?' '+ko+' en échec.':''),ko&&!done?'err':'ok')})});
+  $('lib-unslim').addEventListener('click',()=>{
+    if(!confirm('Revenir aux photos d\'origine ?\n\nLes versions allégées sont supprimées et le site réaffiche les originaux.'))return;
+    slimRun('lib-unslim',async m=>{const L=phGroups(hasOrig);let n=0,ko=0;
+      for(const [u,docs] of L){n++;say(m,'Retour à l\'original '+n+' / '+L.length+'…');
+        try{const light=docs.map(d=>d.asset).find(Boolean)||assetOf(phSrc(docs[0])),o=docs[0].orig;
+          for(const d of docs)await phSave(d,{url:o.url,asset:o.asset},'orig');
+          if(light&&light!==o.asset&&!(photos||[]).some(p=>!docs.some(d=>d.id===p.id)&&phSrc(p).includes(light)))await assets.delete(light).catch(()=>{})}catch(e){ko++}}
+      say(m,'Originaux rétablis'+(ko?' ('+ko+' en échec)':'')+'.',ko?'err':'ok')})});
+  $('lib-purge').addEventListener('click',()=>{const L=phGroups(hasOrig),tot=L.reduce((a,[,d])=>a+(d[0].orig.size||0),0);
+    if(!confirm('Purger les originaux ?\n\n'+L.length+' fichier'+(L.length>1?'s':'')+' d\'origine ('+mo(tot)+') seront supprimés définitivement. Les photos allégées restent en ligne. Impossible de revenir en arrière ensuite.'))return;
+    slimRun('lib-purge',async m=>{const used=JSON.stringify(contenu||{})+JSON.stringify(sorties||[]);let n=0,ko=0;
+      for(const [u,docs] of L){n++;say(m,'Purge '+n+' / '+L.length+'…');
+        try{const o=docs[0].orig;if(o.asset&&!used.includes(u))await assets.delete(o.asset);for(const d of docs)await phSave(d,{},'orig')}catch(e){ko++}}
+      say(m,'Originaux purgés : '+mo(tot)+' libérés'+(ko?' ('+ko+' en échec)':'')+'.',ko?'err':'ok')})});
   const errTxt=e=>{const c=e&&e.code;const m=(e&&e.message)||'';
     if(c==='too_large'||c===413||/too large|exceeded/i.test(m))return 'fichier trop lourd';
     if(c==='decode')return 'format non lu (photo HEIC d\'iPhone ? exportez-la en JPEG)';
