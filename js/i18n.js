@@ -24,7 +24,7 @@
   // Heures à l'anglaise : 15h -> 3pm, 18h30 -> 6:30pm
   function hour(h,m){h=+h;m=m==null?0:+m;var s=(h%12||12)+(m?':'+String(m).padStart(2,'0'):'');return s+(h<12||h===24?'am':'pm')}
   function times(s){return s.replace(/\b(\d{1,2})\s?h\s?(\d{2})?\b/g,function(_,h,m){return +h<=24?hour(h,m):_})}
-  window.ALR_I18N={lang:lang,url:urlFor,hour:hour,times:times};
+  window.ALR_I18N={lang:lang,url:urlFor,hour:hour,times:times,t:function(s){return s}}; // t : traduction (texte inchangé en français)
 
   // Sélecteur FR / EN (barre du haut de chaque page)
   function addSwitch(){
