@@ -25,3 +25,9 @@ Site statique (HTML, CSS, JS) hébergé sur Cloudflare Pages. Les données modif
 ## Mises à jour
 - Textes, horaires, agenda, messages, photos, administrateurs : depuis le site, lien « Administration » en bas de page.
 - Design ou nouvelles sections : demander à Claude, qui modifie ce dépôt. Cloudflare republie automatiquement en une minute.
+
+## Version du site
+Le numéro de version s'affiche en haut de l'administration, avec « à jour ✓ » ou un lien « Recharger » si une version plus récente est en ligne.
+**À chaque modification du site, augmenter le numéro** (1.33 → 1.34…) à deux endroits, avec le même numéro :
+- `SITE_VERSION` dans `index.html`
+- `version.json`
