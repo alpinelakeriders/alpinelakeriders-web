@@ -542,6 +542,7 @@ button.link{background:none;border:0;padding:0;font:inherit;color:inherit;cursor
 .admin .wrap{max-width:980px;display:grid;gap:56px}
 .admin-head{display:flex;justify-content:space-between;align-items:center;gap:16px;border-bottom:1px solid var(--line);padding-bottom:20px}
 .admin-head h2{font-size:28px}
+.adm-ver{margin:4px 0 0;font:12px/1.4 var(--mono,ui-monospace,monospace);letter-spacing:.04em;color:var(--muted)}.adm-ver.old{color:var(--danger)}.adm-ver button{font:inherit;color:inherit;text-decoration:underline;background:none;border:0;padding:0;margin-left:6px;cursor:pointer}
 .admin h3{font-size:22px;margin-bottom:20px}
 .grid2{display:grid;gap:22px;grid-template-columns:1fr 1fr}
 @media (max-width:640px){.grid2{grid-template-columns:1fr}}
@@ -1361,7 +1362,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
 </div>
 
 <div class="admin" id="admin" hidden role="dialog" aria-modal="true" aria-labelledby="admin-title"><div class="wrap">
-  <div class="admin-head"><h2 id="admin-title">Administration</h2><div style="display:flex;gap:8px"><button class="pill line small" id="logout" type="button" hidden>Se déconnecter</button><button class="pill line small" id="close-admin" type="button">Fermer</button></div>
+  <div class="admin-head"><div><h2 id="admin-title">Administration</h2><p class="adm-ver" id="adm-ver" aria-live="polite"></p></div><div style="display:flex;gap:8px"><button class="pill line small" id="logout" type="button" hidden>Se déconnecter</button><button class="pill line small" id="close-admin" type="button">Fermer</button></div>
     <nav class="adm-nav" id="adm-nav" aria-label="Rubriques de l'administration"><button type="button" data-go="sec-visites">Visites</button><button type="button" data-go="sec-agenda">Agenda</button><button type="button" data-go="sec-cr">Comptes rendus</button><button type="button" data-go="sec-contact">Reçus<b class="nav-n" id="ct-n" hidden></b></button><button type="button" data-go="sec-avis">Avis<b class="nav-n" id="av-n" hidden></b></button><button type="button" data-go="sec-msg">Messages</button><button type="button" data-go="sec-membres">Membres</button><button type="button" data-go="sec-textes">Textes</button><button type="button" data-go="sec-photos">Photos</button><button type="button" data-go="sec-apero-ph">Photos apéro</button><button type="button" data-go="sec-lacs">Lacs</button><button type="button" data-go="sec-admins">Administrateurs</button><a class="go-spots" href="spots-pumpfoil.html">Annuaire des spots ↗</a><button type="button" data-go="sec-seo">Référencement</button><button type="button" class="all" id="adm-all">Tout déplier</button></nav></div>
   <button class="pill ink small adm-top" id="adm-top" type="button">↑ Menu</button>
   <div class="gate" id="gate">
@@ -2139,6 +2140,16 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
   const admin=$('admin');let isAdmin=false;
   // Accès rapide à l'administration depuis le menu (évite de descendre en bas de page)
   $('menu-admin').addEventListener('click',e=>{e.preventDefault();$('open-admin').click()});
+  // ---------- Version du site ----------
+  // À chaque mise à jour du site, augmenter SITE_VERSION ici ET dans version.json (même numéro).
+  // L'administration compare la version de la page ouverte avec celle en ligne (version.json, jamais mis en cache).
+  const SITE_VERSION='1.33';
+  async function checkVersion(){const el=$('adm-ver');el.className='adm-ver';el.textContent='Version '+SITE_VERSION;
+    try{const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});const v=(await r.json()).version;
+      if(!v||v===SITE_VERSION){el.textContent='Version '+SITE_VERSION+' · à jour ✓';return}
+      el.className='adm-ver old';el.textContent='Version '+SITE_VERSION+' · la version '+v+' est en ligne';
+      const b=document.createElement('button');b.type='button';b.textContent='Recharger';b.addEventListener('click',()=>location.reload());el.append(b)}catch(e){}}
+  $('open-admin').addEventListener('click',checkVersion);
   $('open-admin').addEventListener('click',async()=>{
     admin.hidden=false;document.body.style.overflow='hidden';
     const gm=$('gate-msg');
