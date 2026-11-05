@@ -4,7 +4,9 @@
     "/",
     "/index.html",
     "/api/nuages",
-    "/api/lieu"
+    "/api/lieu",
+    "/liens",
+    "/liens.html"
   ],
   "exclude": []
 }
