@@ -26,6 +26,9 @@ function logVisite(request, url) {
   let source = '';
   try { const r = new URL(request.headers.get('referer') || ''); if (!r.hostname.endsWith('alpinelakeriders.com')) source = r.hostname.replace(/^www\./, ''); } catch (e) {}
   if (!source && url.searchParams.get('source') === 'appli') source = 'icône écran d\'accueil';
+  // Lien de la bio Instagram (alpinelakeriders.com/liens) et liens de cette page vers le site
+  const insta = url.pathname === '/liens' || url.pathname === '/liens.html' || url.searchParams.get('source') === 'instagram';
+  if (insta && (!source || /instagram\.com$/.test(source))) source = 'Instagram (bio)';
   if (!source && url.searchParams.has('avis')) source = 'questionnaire avis' + ({ mail: ' (e-mail)', whatsapp: ' (WhatsApp)' }[url.searchParams.get('avis')] || '');
   const body = { p_pays: request.headers.get('cf-ipcountry') || '', p_appareil: appareil, p_source: source, p_sortie: url.searchParams.get('sortie') || '' };
   return fetch(SB + '/rest/v1/rpc/log_visite', {
@@ -45,6 +48,7 @@ export async function onRequest(context) {
   const res = await next();
   if (request.method !== 'GET' || !(res.headers.get('content-type') || '').includes('text/html')) return res;
   try { const p = logVisite(request, url); if (p) context.waitUntil(p); } catch (e) {}
+  if (url.pathname === '/liens' || url.pathname === '/liens.html') return res; // page fixe, rien à réécrire
   // Version anglaise (?lang=en) : balises de référencement et de partage en anglais, le texte de la page est traduit par js/i18n.js
   const en = url.searchParams.get('lang') === 'en';
   const crId = (url.searchParams.get('cr') || '').slice(0, 80);

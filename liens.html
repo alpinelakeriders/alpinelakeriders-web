@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Liens · Alpine Lake Riders</title>
+<meta name="description" content="Tous les liens d'Alpine Lake Riders : prochaine sortie, adhésion, groupe WhatsApp, météo du lac de la Terrasse.">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://alpinelakeriders.com/">
+<meta property="og:title" content="Alpine Lake Riders">
+<meta property="og:description" content="Pump, vole, recommence. L'association de pumpfoil des lacs alpins.">
+<meta property="og:image" content="https://alpinelakeriders.com/media/partage-v2.jpg">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="/media/favicon.svg?v=3" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/media/icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+/* Page « lien en bio » d'Instagram : une colonne, les liens utiles, au style du site. */
+:root{
+  --bg:#ffffff; --fg:#0d1111; --muted:#6d7574; --line:#e6e9e8; --tint:#f4f6f6; --lake:#16757a;
+  --sans:"Geist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono:"Geist Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0a0d0d; --fg:#eef1f0; --muted:#8e9897; --line:#1f2625; --tint:#121717; --lake:#4fb3b0; color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0a0d0d; --fg:#eef1f0; --muted:#8e9897; --line:#1f2625; --tint:#121717; --lake:#4fb3b0; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font:400 16px/1.5 var(--sans);-webkit-font-smoothing:antialiased;letter-spacing:-.005em;overflow-x:clip}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+:focus-visible{outline:2px solid var(--lake);outline-offset:3px}
+.label{font:500 12px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.logo-dark{display:none}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .logo-light{display:none}:root:not([data-theme="light"]) .logo-dark{display:block}}
+:root[data-theme="dark"] .logo-light{display:none}
+:root[data-theme="dark"] .logo-dark{display:block}
+
+main{max-width:520px;margin:0 auto;padding:0 max(16px,env(safe-area-inset-left,0px)) calc(40px + env(safe-area-inset-bottom,0px))}
+.cover{margin:0 calc(-1 * max(16px,env(safe-area-inset-left,0px)));aspect-ratio:16/10;overflow:hidden;background:var(--tint)}
+.cover img{width:100%;height:100%;object-fit:cover}
+@media (min-width:560px){.cover{margin:16px 0 0;border-radius:18px}}
+.head{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:24px 0 28px}
+.head img{width:150px;height:auto}
+.head h1{margin:0;font-size:15px;font-weight:500;letter-spacing:-.01em;color:var(--muted)}
+.head p{font-size:22px;font-weight:500;letter-spacing:-.03em}
+
+.next{display:block;border-radius:16px;padding:18px 20px;background:#16757a;color:#fff;margin-bottom:12px}
+.next .label{color:rgba(255,255,255,.8)}
+.next b{display:block;font-size:20px;font-weight:500;letter-spacing:-.02em;margin:10px 0 4px}
+.next span.m{font-size:14px;opacity:.9}
+.next .go{display:inline-block;margin-top:12px;font:500 14px/1 var(--sans);background:#fff;color:#0d1111;padding:10px 16px;border-radius:999px}
+
+.links{display:flex;flex-direction:column;gap:10px}
+.links a{display:flex;align-items:center;gap:14px;min-height:60px;padding:12px 18px;border:1px solid var(--line);border-radius:16px;background:var(--bg);transition:background .15s,border-color .15s}
+.links a:hover{background:var(--tint);border-color:var(--muted)}
+.links a:active{transform:scale(.99)}
+.links svg{flex:none;width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.links .t{flex:1;min-width:0}
+.links .t b{display:block;font-weight:500;letter-spacing:-.01em}
+.links .t span{display:block;font-size:13.5px;color:var(--muted)}
+.links .arr{flex:none;color:var(--muted);font-family:var(--mono)}
+.links a.main{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.links a.main .t span,.links a.main .arr{color:inherit;opacity:.7}
+
+footer{display:flex;flex-direction:column;align-items:center;gap:14px;padding-top:36px;text-align:center}
+footer .alf{width:140px;height:auto;opacity:.8}
+footer p{font-size:13px;color:var(--muted)}
+footer a{text-decoration:underline;text-underline-offset:3px}
+</style>
+</head>
+<body>
+<main>
+  <div class="cover"><img src="media/riders-ponton.jpg" alt="Des riders de pumpfoil sur le ponton du lac de la Terrasse" width="2200" height="1237" fetchpriority="high"></div>
+
+  <div class="head">
+    <img class="logo-light" src="media/logo-alr-noir.svg" alt="Alpine Lake Riders" width="2869" height="1699">
+    <img class="logo-dark" src="media/logo-alr-blanc.svg" alt="Alpine Lake Riders" width="2869" height="1699">
+    <h1>L'association de pumpfoil des lacs alpins</h1>
+    <p>Pump, vole, recommence.</p>
+  </div>
+
+  <a class="next" id="next" href="/?source=instagram#agenda" hidden>
+    <span class="label">Prochaine sortie</span>
+    <b id="next-t"></b>
+    <span class="m" id="next-m"></span><br>
+    <span class="go">Je viens</span>
+  </a>
+
+  <nav class="links" aria-label="Liens">
+    <a class="main" href="/?source=instagram#rejoindre">
+      <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
+      <span class="t"><b>Adhérer à l'asso</b><span>Rider, famille ou découverte</span></span><span class="arr">→</span>
+    </a>
+    <a href="/?source=instagram#agenda">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      <span class="t"><b>Agenda des sorties</b><span>Ride libre, initiations, Apéros Pumpfoil</span></span><span class="arr">→</span>
+    </a>
+    <a href="https://chat.whatsapp.com/D0wUPuh0QP87qtSMwNR3xT" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.4A8.4 8.4 0 1 1 21 11.5z"/></svg>
+      <span class="t"><b>Groupe WhatsApp</b><span>Les sessions annoncées au jour le jour</span></span><span class="arr">↗</span>
+    </a>
+    <a href="/lacs.html?source=instagram">
+      <svg viewBox="0 0 24 24"><path d="M12 3v2M5.6 5.6 7 7M3 12h2M17 7l1.4-1.4"/><path d="M8 12a4 4 0 0 1 8 0"/><path d="M3 17c1.5 0 1.5-1 3-1s1.5 1 3 1 1.5-1 3-1 1.5 1 3 1 1.5-1 3-1 1.5 1 3 1"/></svg>
+      <span class="t"><b>Météo et température de l'eau</b><span>Les spots autour du lac de la Terrasse</span></span><span class="arr">→</span>
+    </a>
+    <a href="/?source=instagram#debuter">
+      <svg viewBox="0 0 24 24"><path d="M2 18c2 0 2-1.5 4-1.5s2 1.5 4 1.5 2-1.5 4-1.5 2 1.5 4 1.5 2-1.5 4-1.5"/><path d="M7 13l5-8 5 8"/></svg>
+      <span class="t"><b>Débuter le pumpfoil</b><span>Initiation avec matériel prêté</span></span><span class="arr">→</span>
+    </a>
+    <a href="/?source=instagram#spot">
+      <svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <span class="t"><b>Le spot du lac de la Terrasse</b><span>Ponton, accès et règles</span></span><span class="arr">→</span>
+    </a>
+    <a href="/?source=instagram">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
+      <span class="t"><b>Le site de l'asso</b><span>alpinelakeriders.com</span></span><span class="arr">→</span>
+    </a>
+  </nav>
+
+  <footer>
+    <span class="label">Partenaire matériel</span>
+    <a href="https://www.alpinefoil.com" target="_blank" rel="noopener" aria-label="Alpinefoil">
+      <img class="alf logo-light" src="media/alpinefoil-noir.png" alt="Alpinefoil" width="900" height="75">
+      <img class="alf logo-dark" src="media/alpinefoil-blanc.png" alt="Alpinefoil" width="900" height="75">
+    </a>
+    <p>Lac de la Terrasse, Isère · <a href="mailto:alpinelakeriders@gmail.com">alpinelakeriders@gmail.com</a></p>
+  </footer>
+</main>
+
+<script src="js/config.js"></script>
+<script>
+// Prochaine sortie de l'agenda (lecture publique Supabase). Rien ne s'affiche s'il n'y en a pas.
+(async () => {
+  try {
+    const C = window.ALR_CONFIG; if (!C) return;
+    const d = new Date(), today = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    const r = await fetch(C.url + '/rest/v1/docs?collection=eq.sorties&select=id,data', { headers: { apikey: C.anonKey, Authorization: 'Bearer ' + C.anonKey } });
+    if (!r.ok) return;
+    const s = ((await r.json()) || []).map(x => Object.assign({ id: x.id }, x.data || {}))
+      .filter(x => (x.date || '') >= today).sort((a, b) => a.date < b.date ? -1 : 1)[0];
+    if (!s) return;
+    const dt = new Date(s.date + 'T12:00:00');
+    let q = isNaN(dt) ? '' : dt.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+    q = q.charAt(0).toUpperCase() + q.slice(1);
+    document.getElementById('next-t').textContent = s.titre || 'Sortie';
+    document.getElementById('next-m').textContent = [q, s.heure, s.lieu].filter(Boolean).join(' · ');
+    const a = document.getElementById('next');
+    a.href = '/?sortie=' + encodeURIComponent(s.id) + '&source=instagram';
+    a.hidden = false;
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>
