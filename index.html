@@ -2143,7 +2143,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
   // ---------- Version du site ----------
   // À chaque mise à jour du site, augmenter SITE_VERSION ici ET dans version.json (même numéro).
   // L'administration compare la version de la page ouverte avec celle en ligne (version.json, jamais mis en cache).
-  const SITE_VERSION='1.34';
+  const SITE_VERSION='1.35';
   async function checkVersion(){const el=$('adm-ver');el.className='adm-ver';el.textContent='Version '+SITE_VERSION;
     try{const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});const v=(await r.json()).version;
       if(!v||v===SITE_VERSION){el.textContent='Version '+SITE_VERSION+' · à jour ✓';return}

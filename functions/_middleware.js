@@ -48,13 +48,13 @@ export async function onRequest(context) {
   const res = await next();
   if (request.method !== 'GET' || !(res.headers.get('content-type') || '').includes('text/html')) return res;
   try { const p = logVisite(request, url); if (p) context.waitUntil(p); } catch (e) {}
-  if (url.pathname === '/liens' || url.pathname === '/liens.html') return res; // page fixe, rien à réécrire
+  const liens = url.pathname === '/liens' || url.pathname === '/liens.html'; // page de la bio Instagram : seuls les textes data-k sont repris
   // Version anglaise (?lang=en) : balises de référencement et de partage en anglais, le texte de la page est traduit par js/i18n.js
   const en = url.searchParams.get('lang') === 'en';
   const crId = (url.searchParams.get('cr') || '').slice(0, 80);
   const sid = crId || (url.searchParams.get('sortie') || '').slice(0, 80);
   let c = null, so = null, crImg = '';
-  if (/^[\w-]+$/.test(sid)) {
+  if (!liens && /^[\w-]+$/.test(sid)) {
     try {
       const r = await fetch(SB + '/rest/v1/docs?collection=eq.sorties&id=eq.' + encodeURIComponent(sid) + '&select=data', {
         headers: { apikey: KEY, Authorization: 'Bearer ' + KEY },
@@ -87,6 +87,7 @@ export async function onRequest(context) {
   c = (c && typeof c === 'object') ? c : {};
   try {
     const txt = k => (typeof c[k] === 'string' && c[k].trim()) ? c[k].trim() : '';
+    if (liens) return new HTMLRewriter().on('[data-k]', { element(e) { const k = e.getAttribute('data-k'); if (txt(k)) e.setInnerContent(txt(k)); } }).transform(res);
     const share = txt('partage') || [txt('slogan'), txt('accroche')].filter(Boolean).join(' ');
     const setContent = v => ({ element(e) { e.setAttribute('content', v); } });
     let rw = new HTMLRewriter();
