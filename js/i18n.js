@@ -79,11 +79,11 @@
     'Tout voir ↗':'See all ↗','Infos du spot':'Spot news',
     '≈ 0 °C · glace':'≈ 0 °C · ice','Mesures des 12 derniers mois':'Readings over the last 12 months',
     'Lacs environnants':'Nearby lakes',
-    "La dernière température de surface mesurée sur les plans d'eau autour du lac de la Terrasse. Relevés automatiques à chaque passage satellite sans nuage ; au lac du Bourget, la sonde du Grand Port d'Aix-les-Bains prend le relais lorsqu'elle transmet.":"The latest surface temperature measured on the lakes around Lac de la Terrasse. Readings are taken automatically at every cloud-free satellite pass; at Lac du Bourget, the probe at the Grand Port of Aix-les-Bains takes over whenever it is transmitting.",
+    "La dernière température de l'eau mesurée sur les plans d'eau autour du lac de la Terrasse, mise à jour automatiquement. Au lac du Bourget, la sonde du Grand Port d'Aix-les-Bains donne une mesure directe lorsqu'elle transmet.":"The latest water temperature measured on the lakes around Lac de la Terrasse, updated automatically. At Lac du Bourget, the probe at the Grand Port of Aix-les-Bains gives a direct reading when it transmits.",
     'Chargement des mesures…':'Loading readings…','Mesures indisponibles pour le moment.':'Readings unavailable for the moment.',
-    'Détails et historiques':'Details and history','Réduire':'Show less','Toute la météo et les satellites ↗':'All the weather and satellite images ↗',
-    "Satellite : images infrarouges traitées par notre algorithme, température de la pellicule de surface vers 10h30, ±2 °C ; moins précis sur les petits plans d'eau (Chartreuse, Lônes, Passy), où les berges influencent la mesure. Sonde : Grand Port d'Aix-les-Bains, 1,70 m sous le ponton (source lac-du-bourget.com).":"Satellite: infrared satellite images processed by our algorithm, temperature of the surface skin around 10:30am, ±2 °C; less accurate on small lakes (Chartreuse, Lônes, Passy), where the banks affect the reading. Probe: Grand Port of Aix-les-Bains, 1.70 m below the pontoon (source: lac-du-bourget.com).",
-    'Sonde':'Probe','Satellite':'Satellite','Pas encore de passage sans nuage.':'No cloud-free pass yet.',
+    'Détails et historiques':'Details and history','Réduire':'Show less',"Toute la météo des spots ↗":"All the spot weather ↗",
+    "Sonde du lac du Bourget : Grand Port d'Aix-les-Bains, 1,70 m sous le ponton (source lac-du-bourget.com).":"Lac du Bourget probe: Grand Port of Aix-les-Bains, 1.70 m below the pontoon (source lac-du-bourget.com).",
+    'Sonde':'Probe','Relevé':'Reading',
 
     // L'association
     "L'association":'The association',
@@ -247,7 +247,7 @@
     "Pour chaque spot de pumpfoil : la dernière température de l'eau, la prévision du jour (modèle AROME de Météo-France), la meilleure heure pour rider, et les nuages en direct vus par satellite.":"For each pumpfoil spot: the latest water temperature, today's forecast (Météo-France AROME model), the best time to ride, and live cloud cover seen by satellite.",
     'Aller à un spot':'Go to a spot','Chargement des spots…':'Loading spots…','Spots indisponibles pour le moment.':'Spots unavailable for the moment.',
     'Eau':'Water','Pas encore de mesure.':'No reading yet.','Pas de webcam publique connue sur ce spot.':'No known public webcam at this spot.',
-    "Température de l'eau : images satellites infrarouges traitées par notre algorithme (pellicule de surface vers 10h30, ±2 °C) et sonde du Grand Port d'Aix-les-Bains (lac-du-bourget.com). Prévision : AROME Météo-France via Open-Meteo, mise à jour toutes les heures. Nuages en direct : satellites Meteosat (EUMETSAT), nouvelle image toutes les 10 à 15 minutes.":'Water temperature: infrared satellite images processed by our algorithm (surface skin around 10:30am, ±2 °C) and the probe at the Grand Port of Aix-les-Bains (lac-du-bourget.com). Forecast: AROME Météo-France via Open-Meteo, updated every hour. Live clouds: Meteosat satellites (EUMETSAT), new image every 10 to 15 minutes.',
+    "Température de l'eau : dernière mesure disponible pour chaque spot ; au lac du Bourget, sonde du Grand Port d'Aix-les-Bains (lac-du-bourget.com). Prévision : AROME Météo-France via Open-Meteo, mise à jour toutes les heures. Nuages en direct : satellites Meteosat (EUMETSAT), nouvelle image toutes les 10 à 15 minutes.":'Water temperature: latest available reading for each spot; at Lac du Bourget, the probe at the Grand Port of Aix-les-Bains (lac-du-bourget.com). Forecast: AROME Météo-France via Open-Meteo, updated every hour. Live clouds: Meteosat satellites (EUMETSAT), new image every 10 to 15 minutes.',
     "La meilleure heure privilégie le vent faible (plan d'eau lisse), puis le soleil. Pastille verte : vent jusqu'à 8 km/h ; orange : jusqu'à 14 km/h ; rouge au-delà.":'The best time favours light wind (smooth water), then sunshine. Green dot: wind up to 8 km/h; orange: up to 14 km/h; red above that.'
   };
   // Raccourcis des choix de présence (« Vous êtes inscrit : rider, initiation »)
@@ -270,13 +270,11 @@
     [new RegExp('^(dim\\.|lun\\.|mar\\.|mer\\.|jeu\\.|ven\\.|sam\\.) (\\d{4})$','i'),function(m){return JC[low(m[1])]+' '+m[2]}],
     [new RegExp('^(dim|lun|mar|mer|jeu|ven|sam)\\.? (\\d{1,2}) '+reMC+'$','i'),function(m){return JC[low(m[1])+'.']+' '+m[2]+' '+MC[low(m[3])]}],
     [/^(≈ )?-?\d+,\d °C$/,function(m){return dec(m[0])}],
-    [new RegExp('^Mesure satellite du (\\d{1,2}) '+reM+' \\(dernier passage sans nuage\\) · surface vers 10h30 · ±2 °C$'),function(m){return 'Satellite reading of '+m[1]+' '+MOIS[m[2]]+' (last cloud-free pass) · surface around 10:30am · ±2 °C'}],
+    [new RegExp('^Dernière mesure de température le (\\d{1,2}) '+reM+'$'),function(m){return 'Last temperature reading on '+m[1]+' '+MOIS[m[2]]}],
     [new RegExp('^Mesure directe du (\\d{1,2}) '+reM+' à (\\d{1,2})h(\\d{2})$'),function(m){return 'Direct reading on '+m[1]+' '+MOIS[m[2]]+' at '+hour(m[3],m[4])}],
     [new RegExp('^sonde, (\\d{1,2}) '+reMC+'$'),function(m){return 'probe, '+m[1]+' '+MC[m[2]]}],
-    [new RegExp('^Passage sans nuage du (\\d{1,2}) '+reM+'$'),function(m){return 'Cloud-free pass on '+m[1]+' '+MOIS[m[2]]}],
     [new RegExp('^Sonde, (\\d{1,2}) '+reM+' à (\\d{1,2})h(\\d{2})$'),function(m){return 'Probe, '+m[1]+' '+MOIS[m[2]]+' at '+hour(m[3],m[4])}],
-    [new RegExp('^Satellite, passage sans nuage du (\\d{1,2}) '+reM+'$'),function(m){return 'Satellite, cloud-free pass on '+m[1]+' '+MOIS[m[2]]}],
-    [/^Mesures satellite des 12 derniers mois, (.*)$/,function(m){return 'Satellite readings over the last 12 months, '+m[1]}],
+    [/^Mesures des 12 derniers mois, (.*)$/,function(m){return 'Readings over the last 12 months, '+m[1]}],
     [/^Voir les (\d+) spots et les historiques$/,function(m){return 'See all '+m[1]+' spots and history'}],
     [/^(Prévision|En direct) : (.*)$/,function(m){return (m[1]==='Prévision'?'Forecast: ':'Live: ')+or(m[2])}],
     [/^(C'est noté, merci ! )?Vous êtes inscrit : (.*)\.$/,function(m){return (m[1]?'Got it, thanks! ':'')+"You're signed up: "+m[2].split(', ').map(function(x){return SHORT[low(x)]||or(x)}).join(', ')+'.'}],

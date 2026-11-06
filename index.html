@@ -839,7 +839,7 @@ function go(){var f=null;try{f=localStorage.getItem('alr-admin')}catch(e){}if(f)
 if(!window.claude)return;window.claude.use('user').then(u=>u&&u.canEdit()).then(ok=>{if(ok){show();try{localStorage.setItem('alr-admin','1')}catch(e){}}}).catch(()=>{})}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',go);else go()})();
 </script>
-<script src="js/i18n.js?v=5"></script>
+<script src="js/i18n.js?v=6"></script>
 <script src="js/meteo.js?v=6"></script>
 </head>
 <body>
@@ -998,8 +998,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
   <ol class="lt-hist" id="lake-temp-h" hidden aria-label="Mesures des 12 derniers mois"></ol>
 </div></div>
 <script>
-// Température de surface du lac : passages satellite infrarouge sans nuage,
-// relevés automatiquement par la fonction Supabase « lake-temperature ».
+// Température de l'eau du lac : dernières mesures enregistrées dans Supabase.
 (function(){
   var c=window.ALR_CONFIG;if(!c||!window.fetch)return;
   var MOIS=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
@@ -1014,7 +1013,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
       if(!rows.length)return;
       var last=rows[0];
       $('lake-temp-v').textContent=fmt(last.t);
-      $('lake-temp-m').textContent='Mesure satellite du '+last.d.getDate()+' '+MOIS[last.d.getMonth()]+' (dernier passage sans nuage) · surface vers 10h30 · ±2 °C';
+      $('lake-temp-m').textContent='Dernière mesure de température le '+last.d.getDate()+' '+MOIS[last.d.getMonth()];
       $('lake-temp').hidden=false;
       $('lake-temp-top-v').textContent=$('lake-temp-v').textContent;
       $('lake-temp-top-m').textContent=$('lake-temp-m').textContent;
@@ -1047,13 +1046,13 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
 
 <section id="lacs"><div class="wrap lk-wrap compact" id="lk-wrap">
   <div class="head"><h2>Lacs environnants</h2><span class="label">Température de l'eau</span></div>
-  <p class="lk-intro">La dernière température de surface mesurée sur les plans d'eau autour du lac de la Terrasse. Relevés automatiques à chaque passage satellite sans nuage ; au lac du Bourget, la sonde du Grand Port d'Aix-les-Bains prend le relais lorsqu'elle transmet.</p>
+  <p class="lk-intro">La dernière température de l'eau mesurée sur les plans d'eau autour du lac de la Terrasse, mise à jour automatiquement. Au lac du Bourget, la sonde du Grand Port d'Aix-les-Bains donne une mesure directe lorsqu'elle transmet.</p>
   <div class="lk compact" id="lk-list"><div class="ag-empty">Chargement des mesures…</div></div>
-  <div class="lk-bar"><button class="lt-btn lk-toggle" id="lk-toggle" type="button" aria-expanded="false" aria-controls="lk-list" hidden>Détails et historiques <span aria-hidden="true">↓</span></button><a class="lk-all" href="lacs.html" target="_blank" rel="noopener">Toute la météo et les satellites ↗</a></div>
-  <p class="lk-note">Satellite : images infrarouges traitées par notre algorithme, température de la pellicule de surface vers 10h30, ±2 °C ; moins précis sur les petits plans d'eau (Chartreuse, Lônes, Passy), où les berges influencent la mesure. Sonde : Grand Port d'Aix-les-Bains, 1,70 m sous le ponton (source lac-du-bourget.com).</p>
+  <div class="lk-bar"><button class="lt-btn lk-toggle" id="lk-toggle" type="button" aria-expanded="false" aria-controls="lk-list" hidden>Détails et historiques <span aria-hidden="true">↓</span></button><a class="lk-all" href="lacs.html" target="_blank" rel="noopener">Toute la météo des spots ↗</a></div>
+  <p class="lk-note">Sonde du lac du Bourget : Grand Port d'Aix-les-Bains, 1,70 m sous le ponton (source lac-du-bourget.com).</p>
 </div></section>
 <script>
-// Lacs environnants : dernière mesure par lac (sonde si récente, sinon satellite) + historique 12 mois.
+// Lacs environnants : dernière mesure par lac (sonde si récente, sinon dernière mesure enregistrée) + historique 12 mois.
 (function(){
   var c=window.ALR_CONFIG,box=document.getElementById('lk-list');if(!c||!window.fetch||!box)return;
   var H={headers:{apikey:c.anonKey,Authorization:'Bearer '+c.anonKey}};
@@ -1088,17 +1087,17 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
         t.textContent=fmt(Number(lv.temp_c));tag.className+=' live';tag.textContent='Sonde';
         meta.append(tag,span('lk-long','Mesure directe du '+md.getDate()+' '+MOIS[md.getMonth()]+' à '+String(md.getHours()).padStart(2,'0')+'h'+String(md.getMinutes()).padStart(2,'0')),span('lk-short','sonde, '+md.getDate()+' '+MC[md.getMonth()]));
       }else if(rows.length){
-        t.textContent=fmt(rows[0].t);tag.textContent='Satellite';
-        meta.append(tag,span('lk-long','Passage sans nuage du '+rows[0].d.getDate()+' '+MOIS[rows[0].d.getMonth()]),span('lk-short',rows[0].d.getDate()+' '+MC[rows[0].d.getMonth()]));
+        t.textContent=fmt(rows[0].t);tag.textContent='Relevé';
+        meta.append(tag,span('lk-long','Dernière mesure de température le '+rows[0].d.getDate()+' '+MOIS[rows[0].d.getMonth()]),span('lk-short',rows[0].d.getDate()+' '+MC[rows[0].d.getMonth()]));
       }else{
-        t.textContent='–';meta.append(document.createTextNode('Pas encore de passage sans nuage.'));
+        t.textContent='–';meta.append(document.createTextNode('Pas encore de mesure.'));
       }
       main.append(nm,t,meta);
       var hist=fresh?rows:rows.slice(1);
       if(hist.length){
         var btn=document.createElement('button');btn.type='button';btn.className='lt-btn';btn.setAttribute('aria-expanded','false');
         btn.innerHTML='Historique <span aria-hidden="true">↓</span>';
-        var ol=document.createElement('ol');ol.className='lt-hist';ol.hidden=true;ol.setAttribute('aria-label','Mesures satellite des 12 derniers mois, '+L.name);
+        var ol=document.createElement('ol');ol.className='lt-hist';ol.hidden=true;ol.setAttribute('aria-label','Mesures des 12 derniers mois, '+L.name);
         hist.forEach(function(x){
           var li=document.createElement('li');
           var d=document.createElement('span');d.textContent=x.d.getDate()+' '+MC[x.d.getMonth()]+' '+x.d.getFullYear();
@@ -2143,7 +2142,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
   // ---------- Version du site ----------
   // À chaque mise à jour du site, augmenter SITE_VERSION ici ET dans version.json (même numéro).
   // L'administration compare la version de la page ouverte avec celle en ligne (version.json, jamais mis en cache).
-  const SITE_VERSION='1.35';
+  const SITE_VERSION='1.36';
   async function checkVersion(){const el=$('adm-ver');el.className='adm-ver';el.textContent='Version '+SITE_VERSION;
     try{const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});const v=(await r.json()).version;
       if(!v||v===SITE_VERSION){el.textContent='Version '+SITE_VERSION+' · à jour ✓';return}

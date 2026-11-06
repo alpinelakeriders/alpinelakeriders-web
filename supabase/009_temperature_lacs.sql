@@ -1,7 +1,6 @@
 -- Température de surface des lacs (déjà appliqué sur le projet Supabase, gardé ici pour mémoire)
--- Alimenté par la fonction Edge « lake-temperature » (Landsat 8-9 via Copernicus + sonde du Bourget),
+-- Alimenté par la fonction Edge « lake-temperature » (méthode de mesure interne, non publique),
 -- appelée deux fois par jour par pg_cron (job « releve-temperature-lac »).
--- Secrets requis pour la fonction : SH_CLIENT_ID, SH_CLIENT_SECRET (client OAuth Copernicus Data Space).
 
 create table public.lakes (
   slug text primary key, name text not null, commune text,
@@ -48,7 +47,7 @@ create or replace view public.lake_temperature_latest with (security_invoker = t
 alter table public.lake_temperature add column rejected boolean not null default false;
 alter table public.lakes add column outlier_c numeric;
 -- Lacs : lakes.cold_outlier_c = 3.5 → seules les chutes froides isolées sont écartées
--- (un voile nuageux non détecté refroidit la mesure ; les coups de chaud réels sont conservés).
+-- (les coups de chaud réels sont conservés).
 alter table public.lakes add column cold_outlier_c numeric;
 
 -- Ordre et vue réduite gérés depuis l'administration du site (rubrique « Lacs »)
