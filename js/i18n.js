@@ -167,7 +167,7 @@
     'Le plus simple est le départ dropstart .':'The easiest way to start is the dropstart.',
     "Le pump est très physique : quelques essais, puis une vraie pause. Mieux vaut dix départs bien faits qu'une heure d'épuisement. Ne ridez jamais seul et gardez vos distances avec le ponton et les autres riders.":'Pumping is very physical: a few attempts, then a proper break. Ten good starts beat an hour of exhaustion. Never ride alone, and keep your distance from the pontoon and other riders.',
     'Le pump est très physique : quelques essais, puis une vraie pause. Ne ridez jamais seul et gardez vos distances avec le ponton et les autres riders.':'Pumping is very physical: a few attempts, then a proper break. Never ride alone, and keep your distance from the pontoon and other riders.',
-    'Lire le tuto complet sur le blog Alpinefoil':'Read the full tutorial on the Alpinefoil blog','Venir à une initiation':'Come to a beginner session',
+    'Lire le tuto complet sur le blog Alpinefoil':'Read the full tutorial on the Alpinefoil blog','Venir à une initiation':'Come to a beginner session','Apprendre le pumpfoil':'Learn pumpfoil','Où et comment apprendre le pumpfoil':'Where and how to learn pumpfoil (in French)',
 
     // Apéro Pumpfoil
     'Le rendez-vous':'The get-together','Apéro Pumpfoil':'Apéro Pumpfoil','Ride':'Ride','Apéro':'Apéro','Dernier':'Last','Prochain':'Next',
