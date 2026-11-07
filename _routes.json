@@ -7,6 +7,10 @@
     "/api/lieu",
     "/liens",
     "/liens.html",
+    "/lacs",
+    "/lacs.html",
+    "/spots-pumpfoil",
+    "/spots-pumpfoil.html",
     "/supabase/*",
     "/README.md"
   ],
