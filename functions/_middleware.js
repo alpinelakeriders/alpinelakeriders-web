@@ -45,6 +45,8 @@ export async function onRequest(context) {
     url.hostname = url.hostname.slice(4);
     return Response.redirect(url.toString(), 301);
   }
+  // Fichiers internes du dépôt (SQL, notes) : jamais servis aux visiteurs
+  if (url.pathname.startsWith('/supabase/') || url.pathname.toLowerCase() === '/readme.md') return new Response('Not found', { status: 404 });
   const res = await next();
   if (request.method !== 'GET' || !(res.headers.get('content-type') || '').includes('text/html')) return res;
   try { const p = logVisite(request, url); if (p) context.waitUntil(p); } catch (e) {}

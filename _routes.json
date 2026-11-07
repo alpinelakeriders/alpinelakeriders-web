@@ -6,7 +6,9 @@
     "/api/nuages",
     "/api/lieu",
     "/liens",
-    "/liens.html"
+    "/liens.html",
+    "/supabase/*",
+    "/README.md"
   ],
   "exclude": []
 }

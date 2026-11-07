@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..700&family=Geist+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="css/meteo.css?v=5">
-<script src="js/i18n.js?v=5"></script>
+<script src="js/i18n.js?v=6"></script>
 <style>
 :root{
   --paper:#ffffff;
@@ -85,7 +85,7 @@ footer p+p{margin-top:8px}
 <div id="spots"><p class="vide">Chargement des spots…</p></div>
 </main>
 <footer><div class="wrap">
-  <p>Température de l'eau : images satellites infrarouges traitées par notre algorithme (pellicule de surface vers 10h30, ±2 °C) et sonde du Grand Port d'Aix-les-Bains (lac-du-bourget.com). Prévision : AROME Météo-France via Open-Meteo, mise à jour toutes les heures. Nuages en direct : satellites Meteosat (EUMETSAT), nouvelle image toutes les 10 à 15 minutes.</p>
+  <p>Température de l'eau : dernière mesure disponible pour chaque spot ; au lac du Bourget, sonde du Grand Port d'Aix-les-Bains (lac-du-bourget.com). Prévision : AROME Météo-France via Open-Meteo, mise à jour toutes les heures. Nuages en direct : satellites Meteosat (EUMETSAT), nouvelle image toutes les 10 à 15 minutes.</p>
   <p>La meilleure heure privilégie le vent faible (plan d'eau lisse), puis le soleil. Pastille verte : vent jusqu'à 8 km/h (4 nœuds) ; orange : jusqu'à 14 km/h (8 nœuds) ; rouge au-delà.</p>
 </div></footer>
 <script src="js/config.js?v=50"></script>
@@ -118,7 +118,7 @@ footer p+p{margin-top:8px}
       var lv=live.filter(function(x){return x.lake===L.slug})[0],fresh=lv&&(Date.now()-new Date(lv.measured_at).getTime())<48*3600e3;
       var eau=el('div','sp-eau');eau.append(el('span','label','Eau'));
       if(fresh){var md=new Date(lv.measured_at);eau.append(el('b',null,fmt(Number(lv.temp_c))),el('small',null,'Sonde, '+md.getDate()+' '+MOIS[md.getMonth()]+' à '+md.getHours()+'h'+String(md.getMinutes()).padStart(2,'0')))}
-      else if(rows.length){eau.append(el('b',null,fmt(rows[0].t)),el('small',null,'Satellite, passage sans nuage du '+rows[0].d.getDate()+' '+MOIS[rows[0].d.getMonth()]))}
+      else if(rows.length){eau.append(el('b',null,fmt(rows[0].t)),el('small',null,'Dernière mesure de température le '+rows[0].d.getDate()+' '+MOIS[rows[0].d.getMonth()]))}
       else eau.append(el('small',null,'Pas encore de mesure.'));
       s.append(eau);
       var hist=fresh?rows:rows.slice(1);
