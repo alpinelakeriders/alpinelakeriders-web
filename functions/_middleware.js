@@ -50,8 +50,10 @@ export async function onRequest(context) {
   // Fichiers internes du dépôt (SQL, notes) : jamais servis aux visiteurs
   if (url.pathname.startsWith('/supabase/') || url.pathname.toLowerCase() === '/readme.md') return new Response('Not found', { status: 404 });
   // Page météo des lacs : seule l'adresse canonique de la version anglaise est ajustée
-  if (/^\/lacs(\.html)?$/.test(url.pathname) || /^\/spots-pumpfoil(\.html)?$/.test(url.pathname)) {
+  if (/^\/(lacs|spots-pumpfoil|apprendre-pumpfoil)(\.html)?$/.test(url.pathname)) {
     const r = await next();
+    // Page « Apprendre le pumpfoil » : visites comptées comme pour l'accueil
+    if (url.pathname.startsWith('/apprendre-pumpfoil') && request.method === 'GET') { try { const p = logVisite(request, url); if (p) context.waitUntil(p); } catch (e) {} }
     if (url.pathname.startsWith('/lacs') && url.searchParams.get('lang') === 'en' && (r.headers.get('content-type') || '').includes('text/html')) {
       return new HTMLRewriter().on('link[rel="canonical"]', { element(e) { e.setAttribute('href', 'https://alpinelakeriders.com/lacs?lang=en'); } })
         .on('html', { element(e) { e.setAttribute('lang', 'en'); } }).transform(r);
