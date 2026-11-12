@@ -41,12 +41,23 @@ function logVisite(request, url) {
 export async function onRequest(context) {
   const { request, next } = context;
   const url = new URL(request.url);
-  if (url.hostname.startsWith('www.')) {
-    url.hostname = url.hostname.slice(4);
+  // www.alpinelakeriders.com et l'ancienne adresse alpinelakeriders-web.pages.dev → alpinelakeriders.com
+  // (une seule adresse pour Google ; les aperçus de test *.alpinelakeriders-web.pages.dev ne sont pas touchés)
+  if (url.hostname.startsWith('www.') || url.hostname === 'alpinelakeriders-web.pages.dev') {
+    url.hostname = 'alpinelakeriders.com';
     return Response.redirect(url.toString(), 301);
   }
   // Fichiers internes du dépôt (SQL, notes) : jamais servis aux visiteurs
   if (url.pathname.startsWith('/supabase/') || url.pathname.toLowerCase() === '/readme.md') return new Response('Not found', { status: 404 });
+  // Page météo des lacs : seule l'adresse canonique de la version anglaise est ajustée
+  if (/^\/lacs(\.html)?$/.test(url.pathname) || /^\/spots-pumpfoil(\.html)?$/.test(url.pathname)) {
+    const r = await next();
+    if (url.pathname.startsWith('/lacs') && url.searchParams.get('lang') === 'en' && (r.headers.get('content-type') || '').includes('text/html')) {
+      return new HTMLRewriter().on('link[rel="canonical"]', { element(e) { e.setAttribute('href', 'https://alpinelakeriders.com/lacs?lang=en'); } })
+        .on('html', { element(e) { e.setAttribute('lang', 'en'); } }).transform(r);
+    }
+    return r;
+  }
   const res = await next();
   if (request.method !== 'GET' || !(res.headers.get('content-type') || '').includes('text/html')) return res;
   try { const p = logVisite(request, url); if (p) context.waitUntil(p); } catch (e) {}
