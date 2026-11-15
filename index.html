@@ -1384,7 +1384,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
     <ul><li><a href="#asso">L'asso</a></li><li><a href="#agenda">Agenda</a></li><li><a href="#debuter">Débuter</a></li><li><a href="apprendre-pumpfoil">Apprendre le pumpfoil</a></li><li><a href="#apero">Apéros Pumpfoil</a></li><li><a href="https://chat.whatsapp.com/D0wUPuh0QP87qtSMwNR3xT" target="_blank" rel="noopener">WhatsApp</a></li><li><a href="#rejoindre">Adhérer</a></li><li><a href="#contact">Contact</a></li></ul>
   </div>
   <button class="a2hs-foot" type="button" data-a2hs hidden><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="6" y="2.5" width="12" height="19" rx="2.6"/><path d="M12 8.5v6M9 11.5h6"/></svg><span data-a2hs-l></span></button>
-  <div class="legal"><span>© 2027 Alpine Lake Riders · Association loi 1901 · La Terrasse, Isère</span><span>Mentions légales · Statuts · <button class="link" id="cookie-open" type="button" hidden>Cookies</button> · <button class="link" id="open-admin" type="button">Administration</button></span></div>
+  <div class="legal"><span>© 2027 Alpine Lake Riders · Association loi 1901 · La Terrasse, Isère · Température et niveau de l'eau : API <a href="https://lakemetric.com/fr/temperature-eau/">lakemetric.com</a></span><span>Mentions légales · Statuts · <button class="link" id="cookie-open" type="button" hidden>Cookies</button> · <button class="link" id="open-admin" type="button">Administration</button></span></div>
 </div></footer>
 
 <div class="a2hs-pop" id="a2hs-pop" role="dialog" aria-modal="false" aria-labelledby="a2hs-t" hidden>
@@ -2239,7 +2239,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
   // ---------- Version du site ----------
   // À chaque mise à jour du site, augmenter SITE_VERSION ici ET dans version.json (même numéro).
   // L'administration compare la version de la page ouverte avec celle en ligne (version.json, jamais mis en cache).
-  const SITE_VERSION='1.43';
+  const SITE_VERSION='1.44';
   async function checkVersion(){const el=$('adm-ver');el.className='adm-ver';el.textContent='Version '+SITE_VERSION;
     try{const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});const v=(await r.json()).version;
       if(!v||v===SITE_VERSION){el.textContent='Version '+SITE_VERSION+' · à jour ✓';return}
