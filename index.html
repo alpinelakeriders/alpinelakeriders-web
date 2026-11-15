@@ -1102,6 +1102,16 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
       $('lake-temp-top-v').textContent=$('lake-temp-v').textContent;
       $('lake-temp-top-m').textContent=$('lake-temp-m').textContent;
       $('lake-temp-top').hidden=false;
+      // Estimation du jour quand la dernière mesure date de plus de 2 jours (modèle calé sur nos mesures et la météo)
+      var today=new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Paris'});
+      if(Date.now()-last.d>2*864e5){
+        fetch(c.url+'/rest/v1/lake_temp_estimate?select=temp_c&lake=eq.terrasse&day=eq.'+today,{headers:{apikey:c.anonKey,Authorization:'Bearer '+c.anonKey}})
+          .then(function(r){return r.ok?r.json():[]}).then(function(e){
+            var v=e&&e[0]&&Number(e[0].temp_c);if(!isFinite(v))return;
+            var t=' · Estimation pour aujourd\u2019hui : ≈ '+Math.round(v)+' °C';
+            $('lake-temp-m').textContent+=t;$('lake-temp-top-m').textContent+=t;
+          }).catch(function(){});
+      }
       var since=new Date(last.d);since.setFullYear(since.getFullYear()-1);since.setDate(since.getDate()-7);
       var prev=rows.slice(1).filter(function(r){return r.d>=since});if(!prev.length)return;
       var list=$('lake-temp-h'),btn=$('lake-temp-btn');
@@ -2226,7 +2236,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
   // ---------- Version du site ----------
   // À chaque mise à jour du site, augmenter SITE_VERSION ici ET dans version.json (même numéro).
   // L'administration compare la version de la page ouverte avec celle en ligne (version.json, jamais mis en cache).
-  const SITE_VERSION='1.40';
+  const SITE_VERSION='1.41';
   async function checkVersion(){const el=$('adm-ver');el.className='adm-ver';el.textContent='Version '+SITE_VERSION;
     try{const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});const v=(await r.json()).version;
       if(!v||v===SITE_VERSION){el.textContent='Version '+SITE_VERSION+' · à jour ✓';return}
