@@ -1108,8 +1108,8 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
         fetch(c.url+'/rest/v1/lake_temp_estimate?select=temp_c&lake=eq.terrasse&day=eq.'+today,{headers:{apikey:c.anonKey,Authorization:'Bearer '+c.anonKey}})
           .then(function(r){return r.ok?r.json():[]}).then(function(e){
             var v=e&&e[0]&&Number(e[0].temp_c);if(!isFinite(v))return;
-            var t=' · Estimation pour aujourd\u2019hui : ≈ '+Math.round(v)+' °C';
-            $('lake-temp-m').textContent+=t;$('lake-temp-top-m').textContent+=t;
+            var big='≈ '+Math.round(v)+' °C',m='Estimation du jour · dernière mesure '+fmt(last.t)+' le '+last.d.getDate()+' '+MOIS[last.d.getMonth()];
+            $('lake-temp-v').textContent=big;$('lake-temp-top-v').textContent=big;$('lake-temp-m').textContent=m;$('lake-temp-top-m').textContent=m;
           }).catch(function(){});
       }
       var since=new Date(last.d);since.setFullYear(since.getFullYear()-1);since.setDate(since.getDate()-7);
@@ -1160,9 +1160,10 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
   Promise.all([
     get('lakes?select=slug,name,commune,ordre,en_resume,lat,lon&slug=neq.terrasse&order=ordre'),
     get('lake_temperature?select=lake,acquired_on,temp_c&lake=neq.terrasse&rejected=is.false&acquired_on=gte.'+iso+'&order=acquired_on.desc&limit=1000'),
-    get('lake_live?select=lake,measured_at,temp_c&order=measured_at.desc&limit=20')
+    get('lake_live?select=lake,measured_at,temp_c&order=measured_at.desc&limit=20'),
+    get('lake_temp_estimate?select=lake,temp_c&day=eq.'+new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Paris'}))
   ]).then(function(r){
-    var lakes=r[0]||[],sat=r[1]||[],live=r[2]||[];
+    var lakes=r[0]||[],sat=r[1]||[],live=r[2]||[],est={};(r[3]||[]).forEach(function(x){est[x.lake]=Number(x.temp_c)});
     box.textContent='';
     if(!lakes.length){box.innerHTML='<div class="ag-empty">Mesures indisponibles pour le moment.</div>';return}
     lakes.forEach(function(L){
@@ -1180,6 +1181,9 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
         var md=new Date(lv.measured_at);
         t.textContent=fmt(Number(lv.temp_c));tag.className+=' live';tag.textContent='Sonde';
         meta.append(tag,span('lk-long','Mesure directe du '+md.getDate()+' '+MOIS[md.getMonth()]+' à '+String(md.getHours()).padStart(2,'0')+'h'+String(md.getMinutes()).padStart(2,'0')),span('lk-short','sonde, '+md.getDate()+' '+MC[md.getMonth()]));
+      }else if(rows.length&&Date.now()-rows[0].d>2*864e5&&isFinite(est[L.slug])){
+        t.textContent='≈ '+Math.round(est[L.slug])+' °C';tag.textContent='Estimation';
+        meta.append(tag,span('lk-long','Estimation du jour · dernière mesure '+fmt(rows[0].t)+' le '+rows[0].d.getDate()+' '+MOIS[rows[0].d.getMonth()]),span('lk-short','estimation'));
       }else if(rows.length){
         t.textContent=fmt(rows[0].t);tag.textContent='Relevé';
         meta.append(tag,span('lk-long','Dernière mesure de température le '+rows[0].d.getDate()+' '+MOIS[rows[0].d.getMonth()]),span('lk-short',rows[0].d.getDate()+' '+MC[rows[0].d.getMonth()]));
@@ -1187,7 +1191,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
         t.textContent='–';meta.append(document.createTextNode('Pas encore de mesure.'));
       }
       main.append(nm,t,meta);
-      var hist=fresh?rows:rows.slice(1);
+      var hist=(fresh||t.textContent.charAt(0)==='≈')?rows:rows.slice(1);
       if(hist.length){
         var btn=document.createElement('button');btn.type='button';btn.className='lt-btn';btn.setAttribute('aria-expanded','false');
         btn.innerHTML='Historique <span aria-hidden="true">↓</span>';
@@ -2236,7 +2240,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
   // ---------- Version du site ----------
   // À chaque mise à jour du site, augmenter SITE_VERSION ici ET dans version.json (même numéro).
   // L'administration compare la version de la page ouverte avec celle en ligne (version.json, jamais mis en cache).
-  const SITE_VERSION='1.41';
+  const SITE_VERSION='1.42';
   async function checkVersion(){const el=$('adm-ver');el.className='adm-ver';el.textContent='Version '+SITE_VERSION;
     try{const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});const v=(await r.json()).version;
       if(!v||v===SITE_VERSION){el.textContent='Version '+SITE_VERSION+' · à jour ✓';return}
