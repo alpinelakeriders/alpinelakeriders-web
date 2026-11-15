@@ -312,6 +312,14 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .lake-temp b{font-weight:500;font-size:15px;font-variant-numeric:tabular-nums}
 .lake-temp small{font-size:13px;color:var(--muted)}
 .lt-lvl{margin-top:6px}
+.lv-wrap{margin:10px 0 4px;max-width:760px}
+.lv-per{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.lv-per button{background:none;border:0;box-shadow:inset 0 0 0 1px var(--line);border-radius:999px;padding:6px 12px;font:500 11px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);cursor:pointer}
+.lv-per button.on{color:var(--bg);background:var(--fg);box-shadow:none}
+.lv-svg{display:block;width:100%;height:220px;touch-action:pan-y;cursor:crosshair}
+.lv-svg text{font:500 10px var(--mono);fill:var(--muted)}
+.lv-tip{font-size:13px;color:var(--muted);min-height:20px;margin-top:4px}
+.lv-tip b{color:var(--fg);font-weight:500}
 .lt-btn{display:inline-block;text-decoration:none;flex-basis:100%;text-align:left;margin-top:6px;background:none;border:0;padding:4px 0;font:500 11px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);cursor:pointer}
 .lt-btn:hover{color:var(--fg)}
 .lt-btn span{display:inline-block;margin-left:4px}
@@ -1008,6 +1016,12 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
     <span class="label">Niveau du lac</span>
     <b id="lake-lvl-v"></b>
     <small id="lake-lvl-m"></small>
+    <button class="lt-btn" id="lake-lvl-btn" type="button" aria-expanded="false" aria-controls="lake-lvl-c">Courbe du niveau <span aria-hidden="true">↓</span></button>
+  </div>
+  <div class="lv-wrap" id="lake-lvl-c" hidden>
+    <div class="lv-per" role="group" aria-label="Période"><button type="button" data-d="365" class="on">1 an</button><button type="button" data-d="1095">3 ans</button><button type="button" data-d="0">Depuis 2005</button></div>
+    <svg class="lv-svg" id="lake-lvl-svg" role="img" aria-label="Évolution du niveau du lac de la Terrasse"></svg>
+    <div class="lv-tip" id="lake-lvl-tip"></div>
   </div>
 </div></div>
 <script>
@@ -1026,7 +1040,45 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
       if(isFinite(ref)){var cm=Math.round((v-ref)*100);m=(Math.abs(cm)<5?'Au niveau habituel':Math.abs(cm)+' cm '+(cm>0?'au-dessus':'en dessous')+' du niveau habituel')+' · '+m;}
       ['lake-lvl','lake-lvl-top'].forEach(function(id){$(id+'-v').textContent=v.toFixed(2).replace('.',',')+' m';$(id+'-m').textContent=m;$(id).hidden=false});
       $('lake-temp').hidden=false;$('lake-temp-top').hidden=false;
+      courbe(ref);
     }).catch(function(){});
+  // Courbe du niveau (1 an, 3 ans ou depuis 2005)
+  function courbe(ref){
+    var btn=$('lake-lvl-btn'),box=$('lake-lvl-c'),svg=$('lake-lvl-svg'),tip=$('lake-lvl-tip'),pts=[],days=365,NS='http://www.w3.org/2000/svg',cache={};
+    var MC=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+    function el(n,a){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);return e}
+    function f2(v){return v.toFixed(2).replace('.',',')+' m'}
+    function load(){
+      if(cache[days]){pts=cache[days];draw();return}
+      fetch(c.url+'/rest/v1/rpc/lake_level_series',{method:'POST',headers:{apikey:c.anonKey,Authorization:'Bearer '+c.anonKey,'Content-Type':'application/json'},body:JSON.stringify({p_lake:'terrasse',p_days:days})})
+        .then(function(r){return r.ok?r.json():[]}).then(function(rows){
+          pts=cache[days]=(rows||[]).map(function(r){return {t:new Date(r.d+'T12:00:00').getTime(),v:Number(r.level_m)}}).filter(function(p){return isFinite(p.v)});draw();
+        }).catch(function(){});
+    }
+    function draw(hi){
+      while(svg.firstChild)svg.removeChild(svg.firstChild);if(pts.length<2)return;
+      var W=svg.clientWidth||600,H=svg.clientHeight||220,L=46,R=8,T=8,B=22;svg.setAttribute('viewBox','0 0 '+W+' '+H);
+      var t0=pts[0].t,t1=pts[pts.length-1].t,lo=Infinity,hv=-Infinity;pts.forEach(function(p){lo=Math.min(lo,p.v);hv=Math.max(hv,p.v)});
+      if(isFinite(ref)){lo=Math.min(lo,ref);hv=Math.max(hv,ref)}
+      var st=(hv-lo)>2?0.5:0.25;lo=Math.floor(lo/st)*st;hv=Math.ceil(hv/st)*st;if(hv-lo<st)hv=lo+st;
+      var X=function(t){return L+(t-t0)/(t1-t0)*(W-L-R)},Y=function(v){return T+(hv-v)/(hv-lo)*(H-T-B)};
+      for(var v=lo;v<=hv+1e-6;v+=st){svg.append(el('line',{x1:L,x2:W-R,y1:Y(v),y2:Y(v),stroke:'var(--line)'}));var tx=el('text',{x:L-6,y:Y(v)+3,'text-anchor':'end'});tx.textContent=v.toFixed(2).replace('.',',');svg.append(tx)}
+      if(isFinite(ref)){svg.append(el('line',{x1:L,x2:W-R,y1:Y(ref),y2:Y(ref),stroke:'var(--lake)','stroke-dasharray':'4 4'}));var rt=el('text',{x:L+4,y:Y(ref)-4});rt.textContent='niveau habituel';rt.setAttribute('style','fill:var(--lake)');svg.append(rt)}
+      var span=(t1-t0)/864e5,stepM=span>2000?24:span>800?6:span>200?2:1,d=new Date(t0);d=new Date(d.getFullYear(),d.getMonth()+1,1);
+      while(d.getTime()<=t1){if(d.getMonth()%stepM===0){var x=X(d.getTime());var lt=el('text',{x:x,y:H-6,'text-anchor':'middle'});lt.textContent=stepM>=12?String(d.getFullYear()):MC[d.getMonth()]+' '+String(d.getFullYear()).slice(2);svg.append(lt)}d=new Date(d.getFullYear(),d.getMonth()+1,1)}
+      var dp=pts.map(function(p,i){return (i?'L':'M')+X(p.t).toFixed(1)+' '+Y(p.v).toFixed(1)}).join('');
+      svg.append(el('path',{d:dp,fill:'none',stroke:'var(--fg)','stroke-width':1.6,'stroke-linejoin':'round'}));
+      if(hi!=null){var p=pts[hi];svg.append(el('line',{x1:X(p.t),x2:X(p.t),y1:T,y2:H-B,stroke:'var(--muted)','stroke-width':.6}));svg.append(el('circle',{cx:X(p.t),cy:Y(p.v),r:4,fill:'var(--lake)'}));
+        var dd=new Date(p.t);tip.innerHTML=(days>800?'Semaine du ':'')+dd.getDate()+' '+MC[dd.getMonth()]+' '+dd.getFullYear()+' · <b>'+f2(p.v)+'</b>'+(isFinite(ref)?' · '+(Math.round((p.v-ref)*100)>0?'+':'')+Math.round((p.v-ref)*100)+' cm':'')}
+      else tip.textContent='';
+      svg._X=X;
+    }
+    function move(e){if(!svg._X||pts.length<2)return;var r=svg.getBoundingClientRect(),x=(e.clientX-r.left)*(svg.viewBox.baseVal.width/r.width),b=0,bd=1e9;pts.forEach(function(p,i){var z=Math.abs(svg._X(p.t)-x);if(z<bd){bd=z;b=i}});draw(b)}
+    svg.addEventListener('pointermove',move);svg.addEventListener('pointerdown',move);svg.addEventListener('pointerleave',function(){draw()});
+    Array.prototype.forEach.call(box.querySelectorAll('.lv-per button'),function(b){b.addEventListener('click',function(){days=+b.getAttribute('data-d');Array.prototype.forEach.call(box.querySelectorAll('.lv-per button'),function(x){x.classList.toggle('on',x===b)});load()})});
+    btn.addEventListener('click',function(){var open=box.hidden;box.hidden=!open;btn.setAttribute('aria-expanded',open?'true':'false');btn.querySelector('span').textContent=open?'↑':'↓';if(open)load()});
+    window.addEventListener('resize',function(){if(!box.hidden)draw()});
+  }
 })();
 </script>
 <script>
@@ -2174,7 +2226,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
   // ---------- Version du site ----------
   // À chaque mise à jour du site, augmenter SITE_VERSION ici ET dans version.json (même numéro).
   // L'administration compare la version de la page ouverte avec celle en ligne (version.json, jamais mis en cache).
-  const SITE_VERSION='1.39';
+  const SITE_VERSION='1.40';
   async function checkVersion(){const el=$('adm-ver');el.className='adm-ver';el.textContent='Version '+SITE_VERSION;
     try{const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});const v=(await r.json()).version;
       if(!v||v===SITE_VERSION){el.textContent='Version '+SITE_VERSION+' · à jour ✓';return}
