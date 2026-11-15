@@ -889,6 +889,11 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
     <b id="lake-lvl-top-v"></b>
     <small id="lake-lvl-top-m"></small>
   </div>
+  <div class="lv-wrap" id="lake-lvl-c" hidden>
+    <div class="lv-per" role="group" aria-label="Période"><button type="button" data-d="365" class="on">1 an</button><button type="button" data-d="1095">3 ans</button><button type="button" data-d="0">Depuis 2005</button></div>
+    <svg class="lv-svg" id="lake-lvl-svg" role="img" aria-label="Évolution du niveau du lac de la Terrasse"></svg>
+    <div class="lv-tip" id="lake-lvl-tip"></div>
+  </div>
 </div></div>
 
 <div class="meteo" id="meteo"><div class="wrap">
@@ -1016,12 +1021,6 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
     <span class="label">Niveau du lac</span>
     <b id="lake-lvl-v"></b>
     <small id="lake-lvl-m"></small>
-    <button class="lt-btn" id="lake-lvl-btn" type="button" aria-expanded="false" aria-controls="lake-lvl-c">Courbe du niveau <span aria-hidden="true">↓</span></button>
-  </div>
-  <div class="lv-wrap" id="lake-lvl-c" hidden>
-    <div class="lv-per" role="group" aria-label="Période"><button type="button" data-d="365" class="on">1 an</button><button type="button" data-d="1095">3 ans</button><button type="button" data-d="0">Depuis 2005</button></div>
-    <svg class="lv-svg" id="lake-lvl-svg" role="img" aria-label="Évolution du niveau du lac de la Terrasse"></svg>
-    <div class="lv-tip" id="lake-lvl-tip"></div>
   </div>
 </div></div>
 <script>
@@ -1044,7 +1043,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
     }).catch(function(){});
   // Courbe du niveau (1 an, 3 ans ou depuis 2005)
   function courbe(ref){
-    var btn=$('lake-lvl-btn'),box=$('lake-lvl-c'),svg=$('lake-lvl-svg'),tip=$('lake-lvl-tip'),pts=[],days=365,NS='http://www.w3.org/2000/svg',cache={};
+    var box=$('lake-lvl-c'),svg=$('lake-lvl-svg'),tip=$('lake-lvl-tip'),pts=[],days=365,NS='http://www.w3.org/2000/svg',cache={};
     var MC=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
     function el(n,a){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);return e}
     function f2(v){return v.toFixed(2).replace('.',',')+' m'}
@@ -1076,7 +1075,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
     function move(e){if(!svg._X||pts.length<2)return;var r=svg.getBoundingClientRect(),x=(e.clientX-r.left)*(svg.viewBox.baseVal.width/r.width),b=0,bd=1e9;pts.forEach(function(p,i){var z=Math.abs(svg._X(p.t)-x);if(z<bd){bd=z;b=i}});draw(b)}
     svg.addEventListener('pointermove',move);svg.addEventListener('pointerdown',move);svg.addEventListener('pointerleave',function(){draw()});
     Array.prototype.forEach.call(box.querySelectorAll('.lv-per button'),function(b){b.addEventListener('click',function(){days=+b.getAttribute('data-d');Array.prototype.forEach.call(box.querySelectorAll('.lv-per button'),function(x){x.classList.toggle('on',x===b)});load()})});
-    btn.addEventListener('click',function(){var open=box.hidden;box.hidden=!open;btn.setAttribute('aria-expanded',open?'true':'false');btn.querySelector('span').textContent=open?'↑':'↓';if(open)load()});
+    box.hidden=false;load();
     window.addEventListener('resize',function(){if(!box.hidden)draw()});
   }
 })();
@@ -2240,7 +2239,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
   // ---------- Version du site ----------
   // À chaque mise à jour du site, augmenter SITE_VERSION ici ET dans version.json (même numéro).
   // L'administration compare la version de la page ouverte avec celle en ligne (version.json, jamais mis en cache).
-  const SITE_VERSION='1.42';
+  const SITE_VERSION='1.43';
   async function checkVersion(){const el=$('adm-ver');el.className='adm-ver';el.textContent='Version '+SITE_VERSION;
     try{const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});const v=(await r.json()).version;
       if(!v||v===SITE_VERSION){el.textContent='Version '+SITE_VERSION+' · à jour ✓';return}
