@@ -311,6 +311,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .lt-now{display:flex;align-items:baseline;gap:8px 16px;flex-wrap:wrap}
 .lake-temp b{font-weight:500;font-size:15px;font-variant-numeric:tabular-nums}
 .lake-temp small{font-size:13px;color:var(--muted)}
+.lt-lvl{margin-top:6px}
 .lt-btn{display:inline-block;text-decoration:none;flex-basis:100%;text-align:left;margin-top:6px;background:none;border:0;padding:4px 0;font:500 11px/1 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);cursor:pointer}
 .lt-btn:hover{color:var(--fg)}
 .lt-btn span{display:inline-block;margin-left:4px}
@@ -875,6 +876,11 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
     <small id="lake-temp-top-m"></small>
     <a class="lt-btn" id="lake-temp-top-btn" href="#lake-temp" hidden>Historique <span aria-hidden="true">↓</span></a>
   </div>
+  <div class="lt-now lt-lvl" id="lake-lvl-top" hidden>
+    <span class="label">Niveau du lac</span>
+    <b id="lake-lvl-top-v"></b>
+    <small id="lake-lvl-top-m"></small>
+  </div>
 </div></div>
 
 <div class="meteo" id="meteo"><div class="wrap">
@@ -998,7 +1004,31 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
     <button class="lt-btn" id="lake-temp-btn" type="button" aria-expanded="false" aria-controls="lake-temp-h" hidden>Historique <span aria-hidden="true">↓</span></button>
   </div>
   <ol class="lt-hist" id="lake-temp-h" hidden aria-label="Mesures des 12 derniers mois"></ol>
+  <div class="lt-now lt-lvl" id="lake-lvl" hidden>
+    <span class="label">Niveau du lac</span>
+    <b id="lake-lvl-v"></b>
+    <small id="lake-lvl-m"></small>
+  </div>
 </div></div>
+<script>
+// Niveau du lac de la Terrasse : dernière mesure et niveau habituel (médiane sur 10 ans), calculés dans Supabase.
+(function(){
+  var c=window.ALR_CONFIG;if(!c||!window.fetch)return;
+  var MOIS=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  var $=function(id){return document.getElementById(id)};
+  fetch(c.url+'/rest/v1/rpc/lake_level_summary',{method:'POST',headers:{apikey:c.anonKey,Authorization:'Bearer '+c.anonKey,'Content-Type':'application/json'},body:JSON.stringify({p_lake:'terrasse'})})
+    .then(function(r){return r.ok?r.json():[]})
+    .then(function(rows){
+      var o=rows&&rows[0];if(!o)return;
+      var v=Number(o.level_m),d=new Date(o.measured_at),ref=Number(o.habituel);
+      if(!isFinite(v)||isNaN(d)||Date.now()-d>7*864e5)return;
+      var m='Mesure du '+d.getDate()+' '+MOIS[d.getMonth()];
+      if(isFinite(ref)){var cm=Math.round((v-ref)*100);m=(Math.abs(cm)<5?'Au niveau habituel':Math.abs(cm)+' cm '+(cm>0?'au-dessus':'en dessous')+' du niveau habituel')+' · '+m;}
+      ['lake-lvl','lake-lvl-top'].forEach(function(id){$(id+'-v').textContent=v.toFixed(2).replace('.',',')+' m';$(id+'-m').textContent=m;$(id).hidden=false});
+      $('lake-temp').hidden=false;$('lake-temp-top').hidden=false;
+    }).catch(function(){});
+})();
+</script>
 <script>
 // Température de l'eau du lac : dernières mesures enregistrées dans Supabase.
 (function(){
@@ -2144,7 +2174,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
   // ---------- Version du site ----------
   // À chaque mise à jour du site, augmenter SITE_VERSION ici ET dans version.json (même numéro).
   // L'administration compare la version de la page ouverte avec celle en ligne (version.json, jamais mis en cache).
-  const SITE_VERSION='1.38';
+  const SITE_VERSION='1.39';
   async function checkVersion(){const el=$('adm-ver');el.className='adm-ver';el.textContent='Version '+SITE_VERSION;
     try{const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});const v=(await r.json()).version;
       if(!v||v===SITE_VERSION){el.textContent='Version '+SITE_VERSION+' · à jour ✓';return}
