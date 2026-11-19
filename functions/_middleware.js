@@ -86,7 +86,7 @@ export async function onRequest(context) {
         });
         if (r.ok) {
           const ph = ((await r.json()) || []).map(x => x.data || {}).filter(p => p.actif !== false && /^https:\/\//.test(p.url || '')).sort((a, b) => (a.ordre || 0) - (b.ordre || 0));
-          if (ph[0]) crImg = ph[0].url;
+          if (ph[0]) crImg = ph[0].url.replace(/^https:\/\/[a-z0-9]+\.supabase\.co\/storage\/v1\/object\/public\/photos\//, 'https://alpinelakeriders.com/img/');
         }
       } catch (e) {}
     } else if (crId) so = null;

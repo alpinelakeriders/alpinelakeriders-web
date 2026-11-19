@@ -1804,6 +1804,10 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
 
   // ---------- Bande photos : contenu depuis la base ----------
   const phSrc=p=>p.url||p.src||'';
+  // Affichage des photos via Cloudflare (/img/…) : la bande passante Supabase n'est presque plus utilisée
+  const SBPH=/^https:\/\/[a-z0-9]+\.supabase\.co\/storage\/v1\/object\/public\/photos\//;
+  const cdn=u=>typeof u==='string'&&SBPH.test(u)?'/img/'+u.replace(SBPH,''):u;
+  const phImg=p=>cdn(phSrc(p));
   const zoneOf=p=>typeof p.zone==='string'&&p.zone.startsWith('cr:')?p.zone:['apero','lib','spot'].includes(p.zone)?p.zone:'bandeau';
   const SITE_Z=['bandeau','apero','spot'];
   const phSorted=(z='bandeau',tout=false)=>{const seen=new Set();return (photos||[]).filter(p=>zoneOf(p)===z).sort((a,b)=>(a.ordre||0)-(b.ordre||0)||String(a.id).localeCompare(String(b.id)))
@@ -1827,7 +1831,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
     const list=shuffled('apero');if(!list.length)return; // sinon on garde la photo par défaut
     const sig=list.map(p=>p.id+phSrc(p)+(p.alt||'')).join('|');if(sig===apSig)return;apSig=sig;
     apCar.textContent='';
-    list.forEach((p,k)=>{const im=document.createElement('img');if(k>0)im.dataset.src=phSrc(p);else{im.loading='lazy';im.src=phSrc(p)}im.alt=p.alt||'Apéro Pumpfoil au lac de la Terrasse';im.decoding='async';if(p.pos)im.style.objectPosition=p.pos;apCar.append(im)});
+    list.forEach((p,k)=>{const im=document.createElement('img');if(k>0)im.dataset.src=phImg(p);else{im.loading='lazy';im.src=phImg(p)}im.alt=p.alt||'Apéro Pumpfoil au lac de la Terrasse';im.decoding='async';if(p.pos)im.style.objectPosition=p.pos;apCar.append(im)});
     const bar=$('ap-bar');bar.textContent='';bar.hidden=list.length<2;
     if(list.length>1){
       const num=document.createElement('div');num.className='ap-num';num.innerHTML='<b id="ap-n" style="font-weight:500">01</b> <span>/ '+String(list.length).padStart(2,'0')+'</span>';
@@ -1865,7 +1869,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
     $('spot-dots').querySelectorAll('button').forEach((d,k)=>d.setAttribute('aria-current',String(k===spI)))}
   function spRestart(){clearInterval(spTimer);if(spCar.querySelectorAll('img').length<2||matchMedia('(prefers-reduced-motion: reduce)').matches)return;spTimer=setInterval(()=>{if(spVis&&!document.hidden)spShow(spI+1)},6000)}
   function renderSpot(){const list=shuffled('spot');if(!list.length)return;const sig=list.map(p=>p.id+phSrc(p)+(p.pos||'')).join('|');if(sig===spSig)return;spSig=sig;
-    spCar.textContent='';list.forEach((p,k)=>{const im=document.createElement('img');if(k>0)im.dataset.src=phSrc(p);else{im.loading='lazy';im.src=phSrc(p)}im.alt=p.alt||'Le lac de la Terrasse';im.decoding='async';if(p.pos)im.style.objectPosition=p.pos;spCar.append(im)});
+    spCar.textContent='';list.forEach((p,k)=>{const im=document.createElement('img');if(k>0)im.dataset.src=phImg(p);else{im.loading='lazy';im.src=phImg(p)}im.alt=p.alt||'Le lac de la Terrasse';im.decoding='async';if(p.pos)im.style.objectPosition=p.pos;spCar.append(im)});
     const d=$('spot-dots');d.textContent='';d.hidden=list.length<2;
     if(list.length>1)list.forEach((p,k)=>{const b=document.createElement('button');b.type='button';b.setAttribute('aria-label','Photo '+(k+1));b.addEventListener('click',()=>{spShow(k);spRestart()});d.append(b)});
     spShow(0);spRestart()}
@@ -1880,7 +1884,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
     const base=phSorted(),inB=new Set(base.map(phSrc)),ap=shuffled('apero').filter(p=>!inB.has(phSrc(p))),extra=(mixN?ap.slice(-mixN):[]).map(p=>Object.assign({},p,{tall:false}));
     const pool=base.filter(p=>!p.fixe).concat(extra).sort((a,b)=>rk(a.id+'s')-rk(b.id+'s')),out=[];
     for(let i=0;i<base.length+extra.length;i++)out.push(i<base.length&&base[i].fixe?base[i]:pool.shift());
-    out.filter(Boolean).forEach((p,k)=>{const im=document.createElement('img');if(k>3)im.loading='lazy';im.src=phSrc(p);im.alt=p.alt||'Session de pumpfoil au lac';im.decoding='async';if(p.pos)im.style.objectPosition=p.pos;if(p.tall)im.className='tall';
+    out.filter(Boolean).forEach((p,k)=>{const im=document.createElement('img');if(k>3)im.loading='lazy';im.src=phImg(p);im.alt=p.alt||'Session de pumpfoil au lac';im.decoding='async';if(p.pos)im.style.objectPosition=p.pos;if(p.tall)im.className='tall';
       im.addEventListener('error',()=>im.remove());st.append(im)});
     st.scrollLeft=0;pos=0;loopify();setTimeout(edges,300);
   }
@@ -2239,7 +2243,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
   // ---------- Version du site ----------
   // À chaque mise à jour du site, augmenter SITE_VERSION ici ET dans version.json (même numéro).
   // L'administration compare la version de la page ouverte avec celle en ligne (version.json, jamais mis en cache).
-  const SITE_VERSION='1.45';
+  const SITE_VERSION='1.46';
   async function checkVersion(){const el=$('adm-ver');el.className='adm-ver';el.textContent='Version '+SITE_VERSION;
     try{const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});const v=(await r.json()).version;
       if(!v||v===SITE_VERSION){el.textContent='Version '+SITE_VERSION+' · à jour ✓';return}
@@ -2951,7 +2955,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
     if(!all.length){const p=document.createElement('p');p.className='msg';p.textContent=Z.vide;list.append(p)}
     all.forEach((p,i)=>{
       const c=document.createElement('div');c.className='ph'+(p.tall&&z==='bandeau'?' tall':'')+(z==='apero'||z.startsWith('cr:')?' ap':'')+(z==='spot'?' sp':'')+(p.actif===false?' off':'');
-      const im=document.createElement('img');im.src=phSrc(p);im.alt='';im.className='adj';im.draggable=false;im.title='Glissez la photo pour changer sa place';
+      const im=document.createElement('img');im.src=phImg(p);im.alt='';im.className='adj';im.draggable=false;im.title='Glissez la photo pour changer sa place';
       let fp=parsePos(p.pos);im.style.objectPosition=fp.x+'% '+fp.y+'%';
       focalDrag(im,im,()=>fp,v=>{fp=v},()=>db.doc('photos/'+p.id).update({pos:fp.x+'% '+fp.y+'%'}).catch(()=>{}),()=>c.classList.contains('framing'));
       const alt=document.createElement('input');alt.type='text';alt.value=p.alt||'';alt.placeholder='Description (accessibilité)';
@@ -3226,18 +3230,18 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
     if(s.crTexte){const p=document.createElement('p');p.className='cr-recit';p.textContent=s.crTexte;t.append(p)}
     // Planche-contact : un aperçu des photos, un clic affiche la photo dans le carrousel
     const th=document.createElement('div');th.className='cr-th';const TH=ph.length>9?8:9;
-    ph.slice(0,TH).forEach((p,k)=>{const b=document.createElement('button');b.type='button';b.setAttribute('aria-label','Voir la photo '+(k+1));const im=document.createElement('img');im.src=phSrc(p);im.alt='';im.loading='lazy';im.decoding='async';b.append(im);
+    ph.slice(0,TH).forEach((p,k)=>{const b=document.createElement('button');b.type='button';b.setAttribute('aria-label','Voir la photo '+(k+1));const im=document.createElement('img');im.src=phImg(p);im.alt='';im.loading='lazy';im.decoding='async';b.append(im);
       b.addEventListener('click',()=>{show(k);restart()});th.append(b)});
     if(ph.length>TH){const b=document.createElement('button');b.type='button';b.className='more';b.textContent='+'+(ph.length-TH);b.setAttribute('aria-label','Photos suivantes');b.addEventListener('click',()=>{show(TH);restart()});th.append(b)}
     if(ph.length>1)t.append(th);
     t.append(crSocial(s,ph));
     const fig=document.createElement('figure');fig.className='cr-car';fig.setAttribute('aria-roledescription','carrousel');fig.setAttribute('aria-label','Photos de la sortie : '+(s.titre||''));
     const alt0=(s.titre||'Sortie')+' · '+crDateLong(s.date);
-    const sls=ph.map(p=>{const sl=document.createElement('div');sl.className='sl'+(p.tall?' tall':'');const u=phSrc(p);
+    const sls=ph.map(p=>{const sl=document.createElement('div');sl.className='sl'+(p.tall?' tall':'');const u=phImg(p);
       if(p.tall){const bg=document.createElement('img');bg.className='bg';bg.alt='';bg.setAttribute('aria-hidden','true');bg.dataset.src=u;sl.append(bg)}
       const im=document.createElement('img');im.className='fg';im.alt=p.alt||alt0;im.decoding='async';im.dataset.src=u;if(p.pos&&!p.tall)im.style.objectPosition=p.pos;
       im.addEventListener('error',()=>sl.classList.add('bad'));sl.append(im);fig.append(sl);return sl});
-    fig.addEventListener('click',e=>{if(e.target.closest('.cr-ctl'))return;fsvOpen(ph.map(p=>({url:phSrc(p),alt:p.alt||alt0})),i,(s.titre||'Sortie'))});
+    fig.addEventListener('click',e=>{if(e.target.closest('.cr-ctl'))return;fsvOpen(ph.map(p=>({url:phImg(p),alt:p.alt||alt0})),i,(s.titre||'Sortie'))});
     const bar=document.createElement('div');bar.className='cr-bar';const bi=document.createElement('i');bar.append(bi);
     const ctl=document.createElement('div');ctl.className='cr-ctl';
     const mkA=(txt,lab)=>{const b=document.createElement('button');b.type='button';b.className='arrow';b.textContent=txt;b.setAttribute('aria-label',lab);return b};
@@ -3485,7 +3489,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
   function igCaption(force){if(!crId)return;const s=crPast().find(x=>x.id===crId);if(!s)return;if(force||ig.capAuto){$('cr-ig-cap').value=igText(s,ig.v);ig.capAuto=true}igPreview()}
   function igPreview(){const all=phSorted('cr:'+crId,true),pick=ig.sel.map(id=>all.find(p=>p.id===id)).filter(Boolean);
     const ph=$('cr-ig-ph');ph.textContent='';ph.style.aspectRatio=ig.r===1?'1':'4/5';
-    if(pick[0]){const im=document.createElement('img');im.src=phSrc(pick[0]);im.alt='';if(pick[0].pos)im.style.objectPosition=pick[0].pos;ph.append(im);if(pick.length>1){const c=document.createElement('span');c.textContent='1/'+pick.length;ph.append(c)}}
+    if(pick[0]){const im=document.createElement('img');im.src=phImg(pick[0]);im.alt='';if(pick[0].pos)im.style.objectPosition=pick[0].pos;ph.append(im);if(pick.length>1){const c=document.createElement('span');c.textContent='1/'+pick.length;ph.append(c)}}
     const d=$('cr-ig-dots');d.textContent='';if(pick.length>1)pick.forEach(()=>d.append(document.createElement('i')));
     const t=$('cr-ig-prev');t.textContent='';const b=document.createElement('b');b.textContent='alpinelakeriders ';t.append(b,$('cr-ig-cap').value);
     $('cr-ig-dl').disabled=!pick.length;$('cr-ig-dl').textContent=pick.length>1?'Télécharger les '+pick.length+' images':'Télécharger l\'image'}
@@ -3496,7 +3500,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
     const g=$('cr-ig-grid');g.textContent='';
     if(!all.length){const p=document.createElement('p');p.className='msg';p.textContent='Ajoutez d\'abord des photos au compte rendu.';g.append(p)}
     all.forEach(p=>{const b=document.createElement('button');b.type='button';const k=ig.sel.indexOf(p.id);b.className=k>=0?'on':'';b.setAttribute('aria-pressed',String(k>=0));
-      const im=document.createElement('img');im.src=phSrc(p);im.alt='';im.loading='lazy';b.append(im);if(k>=0){const n=document.createElement('i');n.textContent=k+1;b.append(n)}
+      const im=document.createElement('img');im.src=phImg(p);im.alt='';im.loading='lazy';b.append(im);if(k>=0){const n=document.createElement('i');n.textContent=k+1;b.append(n)}
       b.addEventListener('click',()=>{ig.touched=true;const j=ig.sel.indexOf(p.id);if(j>=0)ig.sel.splice(j,1);else if(ig.sel.length<10)ig.sel.push(p.id);else{say($('cr-ig-msg'),'10 photos au plus sur Instagram.','err');return}renderIg()});g.append(b)});
     igPreview();try{if(igSt)igPaint()}catch(e){}
     $('cr-ig-share').hidden=!(navigator.canShare&&matchMedia('(hover:none)').matches)}
@@ -3505,7 +3509,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
   $('cr-ig-copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText($('cr-ig-cap').value);say($('cr-ig-msg'),'Légende copiée.','ok')}catch(e){$('cr-ig-cap').select();say($('cr-ig-msg'),'Sélectionnée : faites Copier.','ok')}});
   document.querySelectorAll('#cr-ig-fmt button').forEach(b=>b.addEventListener('click',()=>{ig.r=+b.dataset.r;document.querySelectorAll('#cr-ig-fmt button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));igPreview()}));
   // Image au format Instagram (1080 px de large), recadrée autour du point choisi (« Cadrer »)
-  async function igImage(p){const im=new Image();im.crossOrigin='anonymous';im.src=phSrc(p);await im.decode();
+  async function igImage(p){const im=new Image();im.crossOrigin='anonymous';im.src=phImg(p);await im.decode();
     const W=1080,H=Math.round(1080*ig.r),cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d');x.imageSmoothingQuality='high';
     const fp=parsePos(p.pos),k=Math.max(W/im.naturalWidth,H/im.naturalHeight),sw=W/k,sh=H/k,sx=(im.naturalWidth-sw)*fp.x/100,sy=(im.naturalHeight-sh)*fp.y/100;
     x.drawImage(im,sx,sy,sw,sh,0,0,W,H);return new Promise(r=>cv.toBlob(r,'image/jpeg',.92))}
