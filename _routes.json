@@ -14,7 +14,8 @@
     "/apprendre-pumpfoil",
     "/apprendre-pumpfoil.html",
     "/supabase/*",
-    "/README.md"
+    "/README.md",
+    "/sb/*"
   ],
   "exclude": []
 }
