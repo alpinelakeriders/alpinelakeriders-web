@@ -2,4 +2,6 @@
 window.ALR_CONFIG = {
   url: 'https://lhnwxbgaemphzmceieht.supabase.co',
   anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxobnd4YmdhZW1waHptY2VpZWh0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMwMzc1MDksImV4cCI6MjEwODYxMzUwOX0.uxcxlf3eJAKxi3z3NxVeY5P5ipqO3yvTk--WvkrrrYE'
+  // Relais en cache pour les lectures (functions/sb) : même site, donc pas de bande passante Supabase
+  ,readUrl: /^https?:$/.test(location.protocol) ? location.origin + '/sb' : ''
 };

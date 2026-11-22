@@ -4,6 +4,11 @@
   const cfg=window.ALR_CONFIG||{};
   if(!cfg.url||!cfg.anonKey||!window.supabase)return; // sans base : le site s'affiche avec ses textes par défaut
   const sb=window.supabase.createClient(cfg.url,cfg.anonKey);
+  // Lectures des simples visiteurs (sans session) : via le relais en cache /sb (voir functions/sb),
+  // pour ne pas consommer la bande passante Supabase. Dès qu'on est connecté ou qu'on a écrit, lecture directe.
+  const rd=cfg.readUrl?window.supabase.createClient(cfg.readUrl,cfg.anonKey,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false,storageKey:'alr-read'}}):sb;
+  let wrote=false;
+  async function R(){if(rd===sb||wrote)return sb;const {data}=await sb.auth.getSession();return data.session?sb:rd}
   // Lien « mot de passe oublié » : l'événement peut arriver avant que la page écoute
   let recovering=false,recoveryCb=null;
   sb.auth.onAuthStateChange(ev=>{if(ev==='PASSWORD_RECOVERY'){recovering=true;if(recoveryCb)setTimeout(recoveryCb,0)}});
@@ -11,18 +16,16 @@
   const split=p=>{const i=p.indexOf('/');return [p.slice(0,i),p.slice(i+1)]};
   const snapDoc=(id,data)=>({id,exists:!!data,data:()=>data||undefined});
   const snapCol=rows=>({empty:!rows.length,docs:rows.map(r=>snapDoc(r.id,r.data))});
-  async function fetchCol(c){const {data,error}=await sb.from('docs').select('id,data').eq('collection',c);if(error)throw fail(error);return data}
-  async function fetchDoc(c,id){const {data,error}=await sb.from('docs').select('id,data').eq('collection',c).eq('id',id).maybeSingle();if(error)throw fail(error);return data&&data.data}
+  async function fetchCol(c){const {data,error}=await (await R()).from('docs').select('id,data').eq('collection',c);if(error)throw fail(error);return data}
+  async function fetchDoc(c,id){const {data,error}=await (await R()).from('docs').select('id,data').eq('collection',c).eq('id',id).maybeSingle();if(error)throw fail(error);return data&&data.data}
   const watchers={};
-  function watch(c,fn){
-    if(!watchers[c]){watchers[c]=[];
-      sb.channel('docs-'+c).on('postgres_changes',{event:'*',schema:'public',table:'docs',filter:'collection=eq.'+c},()=>watchers[c].forEach(f=>f())).subscribe();}
-    watchers[c].push(fn);
-  }
+  // Pas de connexion « temps réel » : elle se relançait sans fin sur les onglets restés ouverts
+  // et consommait le quota Supabase. Les données se rechargent au retour sur l'onglet et après chaque écriture.
+  function watch(c,fn){(watchers[c]=watchers[c]||[]).push(fn)}
   // Recharge au retour sur l'onglet (le temps réel peut s'interrompre en veille)
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)Object.values(watchers).flat().forEach(f=>f())});
   // Après une écriture, on rafraîchit aussi localement (le temps réel ne signale pas toujours les suppressions)
-  const touch=c=>setTimeout(()=>(watchers[c]||[]).forEach(f=>f()),50);
+  const touch=c=>(wrote=true,setTimeout(()=>(watchers[c]||[]).forEach(f=>f()),50));
   const db={
     doc(path){const [c,id]=split(path);return{
       async get(){return snapDoc(id,await fetchDoc(c,id))},
@@ -45,11 +48,11 @@
         ({error}=await sb.rpc('envoyer_contact',{p_nom:d.nom,p_email:d.email,p_message:d.message+(d.tel?'\n\nTéléphone : '+d.tel:''),p_piege:d.piege||''}))}
       if(error)throw fail(error);return true},
     async avis(visiteur,a,piege){const {error}=await sb.rpc('donner_avis',{p_visiteur:visiteur,p_avis:a,p_piege:piege||''});if(error)throw fail(error);return true},
-    async avisPublics(){const {data,error}=await sb.rpc('avis_publics');if(error)throw fail(error);return data},
+    async avisPublics(){const {data,error}=await (await R()).rpc('avis_publics');if(error)throw fail(error);return data},
     async like(sortie,visiteur,aime){const {data,error}=await sb.rpc('aimer_cr',{p_sortie:sortie,p_visiteur:visiteur,p_aime:!!aime});if(error)throw fail(error);return data},
     async stats(j){const {data,error}=await sb.rpc('stats_visites',{p_jours:j});if(error)throw fail(error);return data},
-    async countMembers(){const {data,error}=await sb.rpc('nb_membres');if(error)throw fail(error);return data},
-    async lakes(){const {data,error}=await sb.from('lakes').select('slug,name,commune,ordre,en_resume').neq('slug','terrasse').order('ordre');if(error)throw fail(error);return data||[]},
+    async countMembers(){const {data,error}=await (await R()).rpc('nb_membres');if(error)throw fail(error);return data},
+    async lakes(){const {data,error}=await (await R()).from('lakes').select('slug,name,commune,ordre,en_resume').neq('slug','terrasse').order('ordre');if(error)throw fail(error);return data||[]},
     async saveLakes(items){const {data,error}=await sb.rpc('save_lakes_layout',{p_items:items});if(error)throw fail(error);return data},
     async clearCollection(c){const {error}=await sb.from('docs').delete().eq('collection',c);if(error)throw fail(error);touch(c)},
     collection(c){return{

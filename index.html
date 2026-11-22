@@ -1029,7 +1029,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
   var c=window.ALR_CONFIG;if(!c||!window.fetch)return;
   var MOIS=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
   var $=function(id){return document.getElementById(id)};
-  fetch(c.url+'/rest/v1/rpc/lake_level_summary',{method:'POST',headers:{apikey:c.anonKey,Authorization:'Bearer '+c.anonKey,'Content-Type':'application/json'},body:JSON.stringify({p_lake:'terrasse'})})
+  fetch((c.readUrl||c.url)+'/rest/v1/rpc/lake_level_summary',{method:'POST',headers:{apikey:c.anonKey,Authorization:'Bearer '+c.anonKey,'Content-Type':'application/json'},body:JSON.stringify({p_lake:'terrasse'})})
     .then(function(r){return r.ok?r.json():[]})
     .then(function(rows){
       var o=rows&&rows[0];if(!o)return;
@@ -1049,7 +1049,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
     function f2(v){return v.toFixed(2).replace('.',',')+' m'}
     function load(){
       if(cache[days]){pts=cache[days];draw();return}
-      fetch(c.url+'/rest/v1/rpc/lake_level_series',{method:'POST',headers:{apikey:c.anonKey,Authorization:'Bearer '+c.anonKey,'Content-Type':'application/json'},body:JSON.stringify({p_lake:'terrasse',p_days:days})})
+      fetch((c.readUrl||c.url)+'/rest/v1/rpc/lake_level_series',{method:'POST',headers:{apikey:c.anonKey,Authorization:'Bearer '+c.anonKey,'Content-Type':'application/json'},body:JSON.stringify({p_lake:'terrasse',p_days:days})})
         .then(function(r){return r.ok?r.json():[]}).then(function(rows){
           pts=cache[days]=(rows||[]).map(function(r){return {t:new Date(r.d+'T12:00:00').getTime(),v:Number(r.level_m)}}).filter(function(p){return isFinite(p.v)});draw();
         }).catch(function(){});
@@ -1088,7 +1088,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
   var MC=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
   var fmt=function(t){return t<0.5?'≈ 0 °C · glace':t.toFixed(1).replace('.',',')+' °C'};
   var $=function(id){return document.getElementById(id)};
-  fetch(c.url+'/rest/v1/lake_temperature?select=acquired_on,temp_c&lake=eq.terrasse&rejected=is.false&order=acquired_on.desc&limit=60',{headers:{apikey:c.anonKey,Authorization:'Bearer '+c.anonKey}})
+  fetch((c.readUrl||c.url)+'/rest/v1/lake_temperature?select=acquired_on,temp_c&lake=eq.terrasse&rejected=is.false&order=acquired_on.desc&limit=60',{headers:{apikey:c.anonKey,Authorization:'Bearer '+c.anonKey}})
     .then(function(r){return r.ok?r.json():[]})
     .then(function(rows){
       rows=(rows||[]).map(function(r){return {t:Number(r.temp_c),d:new Date(r.acquired_on+'T12:00:00')}})
@@ -1104,7 +1104,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
       // Estimation du jour quand la dernière mesure date de plus de 2 jours (modèle calé sur nos mesures et la météo)
       var today=new Date().toLocaleDateString('sv-SE',{timeZone:'Europe/Paris'});
       if(Date.now()-last.d>2*864e5){
-        fetch(c.url+'/rest/v1/lake_temp_estimate?select=temp_c&lake=eq.terrasse&day=eq.'+today,{headers:{apikey:c.anonKey,Authorization:'Bearer '+c.anonKey}})
+        fetch((c.readUrl||c.url)+'/rest/v1/lake_temp_estimate?select=temp_c&lake=eq.terrasse&day=eq.'+today,{headers:{apikey:c.anonKey,Authorization:'Bearer '+c.anonKey}})
           .then(function(r){return r.ok?r.json():[]}).then(function(e){
             var v=e&&e[0]&&Number(e[0].temp_c);if(!isFinite(v))return;
             var big='≈ '+Math.round(v)+' °C',m='Estimation du jour · dernière mesure '+fmt(last.t)+' le '+last.d.getDate()+' '+MOIS[last.d.getMonth()];
@@ -1155,7 +1155,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
   var span=function(c,t){var e=document.createElement('span');e.className=c;e.textContent=t;return e};
   var since=new Date();since.setFullYear(since.getFullYear()-1);since.setDate(since.getDate()-7);
   var iso=since.toISOString().slice(0,10);
-  var get=function(path){return fetch(c.url+'/rest/v1/'+path,H).then(function(r){return r.ok?r.json():[]})};
+  var get=function(path){return fetch((c.readUrl||c.url)+'/rest/v1/'+path,H).then(function(r){return r.ok?r.json():[]})};
   Promise.all([
     get('lakes?select=slug,name,commune,ordre,en_resume,lat,lon&slug=neq.terrasse&order=ordre'),
     get('lake_temperature?select=lake,acquired_on,temp_c&lake=neq.terrasse&rejected=is.false&acquired_on=gte.'+iso+'&order=acquired_on.desc&limit=1000'),
@@ -1803,7 +1803,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
   setTimeout(()=>{loopify();requestAnimationFrame(tick)},1200);
 
   // ---------- Bande photos : contenu depuis la base ----------
-  const phSrc=p=>p.url||p.src||'';
+  const phSrc=p=>(p.url||p.src||'').replace('https://lhnwxbgaemphzmceieht.supabase.co/storage/v1/object/public/',(window.ALR_CONFIG&&ALR_CONFIG.readUrl)?ALR_CONFIG.readUrl+'/storage/v1/object/public/':'https://lhnwxbgaemphzmceieht.supabase.co/storage/v1/object/public/');
   const zoneOf=p=>typeof p.zone==='string'&&p.zone.startsWith('cr:')?p.zone:['apero','lib','spot'].includes(p.zone)?p.zone:'bandeau';
   const SITE_Z=['bandeau','apero','spot'];
   const phSorted=(z='bandeau',tout=false)=>{const seen=new Set();return (photos||[]).filter(p=>zoneOf(p)===z).sort((a,b)=>(a.ordre||0)-(b.ordre||0)||String(a.id).localeCompare(String(b.id)))
@@ -2239,7 +2239,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!m.hidden){
   // ---------- Version du site ----------
   // À chaque mise à jour du site, augmenter SITE_VERSION ici ET dans version.json (même numéro).
   // L'administration compare la version de la page ouverte avec celle en ligne (version.json, jamais mis en cache).
-  const SITE_VERSION='1.45';
+  const SITE_VERSION='1.46';
   async function checkVersion(){const el=$('adm-ver');el.className='adm-ver';el.textContent='Version '+SITE_VERSION;
     try{const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});const v=(await r.json()).version;
       if(!v||v===SITE_VERSION){el.textContent='Version '+SITE_VERSION+' · à jour ✓';return}

@@ -111,7 +111,7 @@ footer p+p{margin-top:8px}
   var fmt=function(t){return t<0.5?'≈ 0 °C':t.toFixed(1).replace('.',',')+' °C'};
   var el=function(t,cl,tx){var e=document.createElement(t);if(cl)e.className=cl;if(tx!=null)e.textContent=tx;return e};
   var since=new Date();since.setFullYear(since.getFullYear()-1);since.setDate(since.getDate()-7);
-  var get=function(p){return fetch(c.url+'/rest/v1/'+p,H).then(function(r){return r.ok?r.json():[]}).catch(function(){return []})};
+  var get=function(p){return fetch((c.readUrl||c.url)+'/rest/v1/'+p,H).then(function(r){return r.ok?r.json():[]}).catch(function(){return []})};
   Promise.all([
     get('lakes?select=slug,name,commune,ordre,lat,lon&order=ordre'),
     get('lake_temperature?select=lake,acquired_on,temp_c&rejected=is.false&acquired_on=gte.'+since.toISOString().slice(0,10)+'&order=acquired_on.desc&limit=2000'),
