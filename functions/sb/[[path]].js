@@ -71,7 +71,7 @@ export async function onRequest({ request, waitUntil }) {
   const t = ttl(path, request.method);
   const h = new Headers(r.headers);
   ['set-cookie', 'access-control-allow-origin', 'vary'].forEach(k => h.delete(k));
-  h.set('cache-control', 'public, max-age=' + Math.min(t, 300) + ', s-maxage=' + t);
+  h.set('cache-control', r.status === 200 ? 'public, max-age=' + Math.min(t, 300) + ', s-maxage=' + t : 'no-store');
   if (r.status === 200) {
     const stored = new Response(r.clone().body, { status: r.status, headers: h });
     waitUntil(cache.put(key, stored));
